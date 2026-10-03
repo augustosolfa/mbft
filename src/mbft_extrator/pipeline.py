@@ -116,35 +116,33 @@ def extrair_conteudo_ic(
         except Exception as e:
             logger.warning(f"Aviso na extração tabular Docling da ficha {codigo_ficha}: {e}")
 
-    # 3. Extração e Recorte de Ilustrações / Desenhos em 300 DPI
+    # 3. Extração de Imagens e Ilustrações Nativas do PDF
     img_idx = 1
     for p_no in range(pag_ini_ic - 1, pag_fim):
         page = doc[p_no]
         w, h = page.get_size()
-        tp = page.get_textpage()
         y_superior = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else h
 
-        # Identifica se há área gráfica/vetorial (espaço com menção a desenho)
-        lowest_txt_y = y_superior
-        has_drawing_here = False
-        for i in range(tp.count_rects()):
-            r = tp.get_rect(i)
-            if r[3] <= y_superior:
-                txt = tp.get_text_bounded(*r).strip()
-                if re.search(r"desenho\s+ilustrativo|imagens\s+ilustrativas|placa\s+r-", txt, re.IGNORECASE):
-                    has_drawing_here = True
-                lowest_txt_y = min(lowest_txt_y, r[1])
+        for obj in page.get_objects():
+            if obj.type == pdfium.raw.FPDF_PAGEOBJ_IMAGE:
+                x0, y0, x1, y1 = obj.get_bounds()
+                # Verifica se o objeto está dentro do espaço de Informações Complementares
+                if y1 <= y_superior + 20.0 and y0 >= 30.0:
+                    # Filtra artefatos minúsculos (pontos/linhas)
+                    if (x1 - x0) >= 25.0 and (y1 - y0) >= 25.0:
+                        img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
+                        img_caminho = imagens_dir / img_nome
+                        caminho_rel = f"imagens/{img_nome}"
 
-        if has_drawing_here and (lowest_txt_y - 50.0 > 40.0):
-            bbox = (35.0, 50.0, w - 35.0, lowest_txt_y - 5.0)
-            img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
-            img_caminho = imagens_dir / img_nome
-            caminho_rel = f"imagens/{img_nome}"
-
-            caminho_gerado = recortar_imagem_300dpi(page, bbox, img_caminho)
-            if caminho_gerado:
-                imagens_extraidas.append(caminho_rel)
-                img_idx += 1
+                        try:
+                            bm = obj.get_bitmap()
+                            pil_img = bm.to_pil()
+                            pil_img.save(img_caminho, "PNG")
+                            logger.info(f"Imagem nativa extraída com sucesso: {img_caminho} ({pil_img.width}x{pil_img.height} px)")
+                            imagens_extraidas.append(caminho_rel)
+                            img_idx += 1
+                        except Exception as e:
+                            logger.warning(f"Erro ao extrair bitmap da imagem {img_nome}: {e}")
 
     # 4. Montagem do HTML Semântico
     if textos_ic:
