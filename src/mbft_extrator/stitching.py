@@ -21,7 +21,7 @@ METADATA_FIELDS = [
     ("medida_administrativa", r"\bMedida\s+Administrativa\s*:"),
     ("pode_configurar_crime_transito", r"\bPode\s+Configurar\s+(?:Crime\s+de\s+Tr[aâ]nsito|Infra[cç][aã]o\s+Penal)\s*:?"),
     ("infrator", r"\bInfrator\s*:"),
-    ("competencia", r"\bCompet[eê]ncia\s*:"),
+    ("competencia", r"\bCompet[eê\ufffd]ncia(?:\s*\([^)]*\))?\s*:"),
     ("pontuacao", r"\bPontua[cç][aã]o\s*:"),
     ("constatacao_infracao", r"\bConstata[cç][aã]o\s+da\s+Infra[cç][aã]o\s*:"),
 ]

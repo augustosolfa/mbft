@@ -18,4 +18,5 @@ mbft.pdf
 # Diretório de fichas individuais opcionais
 fichas/
 
-
+# Backups de extrações consolidadas
+backup_extracao_v1/
