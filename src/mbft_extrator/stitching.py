@@ -212,6 +212,25 @@ def extrair_linhas_colunas_pagina(page: pdfium.PdfPage, is_first_page: bool) -> 
     return cols_lines, ic_y_bound
 
 
+def unificar_linhas_e_hifens(lines: List[str]) -> str:
+    """
+    Unifica uma sequência de linhas de texto corrido, removendo quebras duras e
+    reunindo palavras hifenizadas no final da linha (ex: 'cruzamen-' + 'to' -> 'cruzamento').
+    """
+    if not lines:
+        return ""
+    texto = lines[0].strip()
+    for l in lines[1:]:
+        l = l.strip()
+        if not l:
+            continue
+        if texto.endswith("-") and not texto.endswith(" -"):
+            texto = texto[:-1] + l
+        else:
+            texto = texto + " " + l
+    return texto
+
+
 def processar_coluna_normativa(lines: List[str]) -> CampoNormativo:
     """
     Costura as linhas de uma coluna formando itens estruturados e um texto limpo:
@@ -268,3 +287,4 @@ def processar_coluna_normativa(lines: List[str]) -> CampoNormativo:
 
     texto_md = "\n\n".join(itens).strip() if itens else "Não há."
     return CampoNormativo(texto=texto_md, itens=itens)
+
