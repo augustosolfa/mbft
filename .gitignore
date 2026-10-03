@@ -15,3 +15,7 @@ wheels/
 # Arquivos de dados binários pesados
 mbft.pdf
 
+# Diretório de fichas individuais opcionais
+fichas/
+
+
