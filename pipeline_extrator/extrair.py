@@ -8,6 +8,14 @@ Uso:
     uv run python extrair.py tudo
 """
 
+import sys
+from pathlib import Path
+
+# Garante que src/ esteja no sys.path se executado diretamente sem instalação prévia
+src_dir = Path(__file__).resolve().parent / "src"
+if str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))
+
 from mbft_extrator.cli import main
 
 if __name__ == "__main__":

@@ -20,6 +20,22 @@ if sys.stdout.encoding.lower() != "utf-8":
         pass
 
 
+def _obter_raiz_repo() -> Path:
+    cwd = Path.cwd()
+    if (cwd / "data" / "processed").exists():
+        return cwd
+    atual = Path(__file__).resolve().parent
+    for p in [atual, *atual.parents]:
+        if (p / "data" / "processed").exists():
+            return p
+    return cwd
+
+
+RAIZ_REPO = _obter_raiz_repo()
+DEFAULT_V1 = RAIZ_REPO / "data" / "processed" / "backup_extracao_v1" / "fichas_mbft.json"
+DEFAULT_V2 = RAIZ_REPO / "data" / "processed" / "fichas_mbft.json"
+
+
 def carregar_json(caminho: Path) -> Dict[str, Dict[str, Any]]:
     if not caminho.exists():
         raise FileNotFoundError(f"Arquivo não encontrado: {caminho}")
@@ -150,8 +166,8 @@ def comparar_versoes(v1_path: Path, v2_path: Path, verbose: bool = False):
 
 def main():
     parser = argparse.ArgumentParser(description="Compara os resultados JSON entre v1 e v2.")
-    parser.add_argument("--v1", default="backup_extracao_v1/fichas_mbft.json", type=Path)
-    parser.add_argument("--v2", default="fichas_mbft.json", type=Path)
+    parser.add_argument("--v1", default=DEFAULT_V1, type=Path, help=f"Caminho do JSON v1 (padrão: {DEFAULT_V1})")
+    parser.add_argument("--v2", default=DEFAULT_V2, type=Path, help=f"Caminho do JSON v2 (padrão: {DEFAULT_V2})")
     parser.add_argument("--verbose", "-v", action="store_true", help="Exibe detalhes completos das diferenças")
     args = parser.parse_args()
 

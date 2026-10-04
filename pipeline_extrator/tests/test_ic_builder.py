@@ -27,7 +27,18 @@ def agrupar_retangulos_em_linhas(rects_list, y_tolerance=3.5):
             lines.append({"y": curr_y, "text": s, "x0": curr[0][0], "x1": curr[-1][1]})
     return lines
 
-doc = pdfium.PdfDocument("mbft.pdf")
+def _obter_pdf_path() -> Path:
+    for cand in [
+        Path("data/raw/mbft.pdf"),
+        Path("../data/raw/mbft.pdf"),
+        Path("../../data/raw/mbft.pdf"),
+        Path("mbft.pdf"),
+    ]:
+        if cand.exists():
+            return cand
+    raise FileNotFoundError("mbft.pdf não encontrado em data/raw/mbft.pdf")
+
+doc = pdfium.PdfDocument(str(_obter_pdf_path()))
 p = doc[376]
 tp = p.get_textpage()
 
