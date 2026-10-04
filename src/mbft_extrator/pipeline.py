@@ -46,9 +46,41 @@ def detectar_limites_ic(
     return False, pag_ini, None
 
 
+def tem_tabela_em_ic(
+    doc: pdfium.PdfDocument,
+    pag_ini_ic: int,
+    pag_fim: int,
+    ic_y_bound: Optional[float],
+) -> bool:
+    """
+    Verifica se a região de Informações Complementares contém linhas de grade de tabela
+    (linhas horizontais E verticais vetoriais cruzadas).
+    """
+    for p_no in range(pag_ini_ic - 1, pag_fim):
+        p = doc[p_no]
+        max_y = ic_y_bound if (p_no == pag_ini_ic - 1) else None
+        linhas_h = 0
+        linhas_v = 0
+        for obj in p.get_objects():
+            if obj.type == 2:  # FPDF_PAGEOBJ_PATH
+                b = obj.get_bounds()
+                top = b[3]
+                if max_y is not None and top > max_y:
+                    continue
+                w = b[2] - b[0]
+                h = b[3] - b[1]
+                if w > 80 and h < 4:
+                    linhas_h += 1
+                elif h > 20 and w < 4:
+                    linhas_v += 1
+        if linhas_h >= 3 and linhas_v >= 2:
+            return True
+    return False
+
+
 def extrair_conteudo_ic(
     doc: pdfium.PdfDocument,
-    converter: Optional[DocumentConverter],
+    converter: Any,
     pdf_path: Path,
     codigo_ficha: str,
     pag_ini_ic: int,
@@ -59,11 +91,14 @@ def extrair_conteudo_ic(
     """
     Extrai textos, tabelas (Docling CUDA) e ilustrações (nativas e 300 DPI) de Informações Complementares.
     """
-    # 1. Extração de Tabelas Complexas via Docling (com GPU CUDA)
+    # 1. Extração seletiva de Tabelas Complexas via Docling (GPU CUDA sob demanda)
     tabelas_html: List[str] = []
-    if converter and (pag_fim >= pag_ini_ic):
+    possui_tabela = tem_tabela_em_ic(doc, pag_ini_ic, pag_fim, ic_y_bound)
+
+    if possui_tabela and converter and (pag_fim >= pag_ini_ic):
         try:
-            docling_doc = processar_intervalo_docling(converter, pdf_path, pag_ini_ic, pag_fim)
+            actual_converter = converter() if callable(converter) else converter
+            docling_doc = processar_intervalo_docling(actual_converter, pdf_path, pag_ini_ic, pag_fim)
             for item, lvl in docling_doc.iterate_items():
                 if type(item).__name__ == "TableItem":
                     t_md = item.export_to_markdown(docling_doc)
@@ -88,7 +123,7 @@ def extrair_conteudo_ic(
 
 def extrair_ficha_completa(
     doc: pdfium.PdfDocument,
-    converter: Optional[DocumentConverter],
+    converter: Any,
     pdf_path: Path,
     mapeada: FichaMapeada,
     imagens_dir: Path,
@@ -149,6 +184,7 @@ def extrair_ficha_completa(
         pode_configurar_crime_transito=meta.get("pode_configurar_crime_transito", "NÃO"),
         infrator=meta.get("infrator", ""),
         competencia=meta.get("competencia", ""),
+        competencia_alterada_lei_14599=meta.get("competencia_alterada_lei_14599", False),
         pontuacao=meta.get("pontuacao", ""),
         constatacao_infracao=meta.get("constatacao_infracao", ""),
         quando_autuar=quando_autuar,

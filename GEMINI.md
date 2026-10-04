@@ -63,6 +63,7 @@ Cada ficha no arquivo `fichas_mbft.json` conterá a seguinte estrutura padroniza
 | `pode_configurar_crime_transito` | `string` | Indicação de crime de trânsito |
 | `infrator` | `string` | Condutor, Proprietário, Pessoa Física/Jurídica, etc. |
 | `competencia` | `string` | Órgão ou entidade executiva de trânsito competente |
+| `competencia_alterada_lei_14599` | `boolean` | `true` se a competência foi alterada pela Lei n. 14.599/23, senão `false` |
 | `pontuacao` | `string` | Pontos a computar na CNH |
 | `constatacao_infracao` | `string` | Com abordagem, Sem abordagem, etc. |
 | `quando_autuar` | `object` | `{ "texto": str, "itens": list[str] }` |

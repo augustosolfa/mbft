@@ -36,6 +36,10 @@ class Ficha(BaseModel):
     pode_configurar_crime_transito: str = Field(default="NÃO", description="Indicação de crime de trânsito")
     infrator: str = Field(default="", description="Condutor, Proprietário, etc.")
     competencia: str = Field(default="", description="Órgão ou entidade executiva competente")
+    competencia_alterada_lei_14599: bool = Field(
+        default=False,
+        description="Indica se a competência da ficha foi alterada pela Lei n. 14.599/23"
+    )
     pontuacao: str = Field(default="", description="Pontos a computar na CNH")
     constatacao_infracao: str = Field(default="", description="Com abordagem, Sem abordagem, etc.")
     

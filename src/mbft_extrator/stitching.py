@@ -27,7 +27,7 @@ METADATA_FIELDS = [
 ]
 
 
-def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -> Dict[str, str]:
+def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -> Dict[str, Any]:
     """
     Extrai do cabeçalho da primeira página os metadados jurídicos da infração.
     """
@@ -46,14 +46,18 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
     )
 
     positions = []
+    competencia_alterada_lei = False
     for label, pat in METADATA_FIELDS:
         m = re.search(pat, header_txt, re.IGNORECASE)
         if m:
             positions.append((m.start(), m.end(), label))
+            if label == "competencia" and re.search(r"14\.?599", m.group(0)):
+                competencia_alterada_lei = True
 
     positions.sort(key=lambda x: x[0])
 
-    meta: Dict[str, str] = {label: "" for label, _ in METADATA_FIELDS}
+    meta: Dict[str, Any] = {label: "" for label, _ in METADATA_FIELDS}
+    meta["competencia_alterada_lei_14599"] = competencia_alterada_lei
     for i, (start, end, label) in enumerate(positions):
         next_start = positions[i + 1][0] if i + 1 < len(positions) else len(header_txt)
         val = header_txt[end:next_start]

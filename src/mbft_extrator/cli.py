@@ -8,11 +8,12 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import List, Optional
+from concurrent.futures import ProcessPoolExecutor
+from typing import List, Optional, Tuple, Any
 
 import pypdfium2 as pdfium
 
-from .models import Ficha
+from .models import Ficha, FichaMapeada
 from .fatiador import mapear_fichas_no_pdf
 from .pipeline import extrair_ficha_completa
 from .parte_geral import extrair_parte_geral
@@ -25,6 +26,59 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger("MBFT-CLI")
+
+# Variáveis globais do processo worker (lazy loading)
+_WORKER_DOC: Optional[pdfium.PdfDocument] = None
+_WORKER_CONVERTER: Optional[Any] = None
+
+
+def _get_worker_converter():
+    """Inicializa o conversor Docling sob demanda (lazy) na GPU para o worker."""
+    global _WORKER_CONVERTER
+    if _WORKER_CONVERTER is None:
+        _WORKER_CONVERTER = criar_conversor_docling()
+    return _WORKER_CONVERTER
+
+
+def _processar_uma_ficha_worker(item_args: Tuple[str, dict, str, str, bool, bool]) -> dict:
+    """Função executada em cada processo worker para processar uma ficha individual."""
+    pdf_path_str, m_dict, imagens_dir_str, cache_fichas_dir_str, salvar_individuais, force = item_args
+    m = FichaMapeada(**m_dict)
+    pdf_path = Path(pdf_path_str)
+    imagens_dir = Path(imagens_dir_str)
+    cache_fichas_dir = Path(cache_fichas_dir_str)
+    f_cache = cache_fichas_dir / f"ficha_{m.codigo}.json"
+
+    # Checkpoint
+    if f_cache.exists() and not force:
+        with open(f_cache, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    global _WORKER_DOC
+    if _WORKER_DOC is None:
+        _WORKER_DOC = pdfium.PdfDocument(pdf_path_str)
+
+    ficha_obj = extrair_ficha_completa(
+        doc=_WORKER_DOC,
+        converter=_get_worker_converter,
+        pdf_path=pdf_path,
+        mapeada=m,
+        imagens_dir=imagens_dir,
+    )
+    dados = ficha_obj.model_dump()
+
+    # Salva checkpoint no cache
+    with open(f_cache, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+
+    # Se salvar individuais
+    if salvar_individuais:
+        pasta_indiv = Path("fichas")
+        pasta_indiv.mkdir(parents=True, exist_ok=True)
+        with open(pasta_indiv / f"ficha_{m.codigo}.json", "w", encoding="utf-8") as f:
+            json.dump(dados, f, ensure_ascii=False, indent=2)
+
+    return dados
 
 
 def cmd_geral(args):
@@ -65,44 +119,39 @@ def cmd_fichas(args):
                 mapeadas = mapeadas[v_ini - 1 : v_fim]
                 logger.info(f"Filtro por índice de fichas {v_ini}-{v_fim}: {len(mapeadas)} fichas selecionadas.")
 
-    doc = pdfium.PdfDocument(str(pdf_path))
-    converter = criar_conversor_docling()
+    total = len(mapeadas)
+    workers = max(1, getattr(args, "workers", 4))
+    logger.info(f"Processando {total} fichas com {workers} worker(s) paralelos...")
+
+    tasks = [
+        (
+            str(pdf_path),
+            m.model_dump(),
+            str(imagens_dir),
+            str(cache_fichas_dir),
+            args.salvar_individuais,
+            args.force,
+        )
+        for m in mapeadas
+    ]
 
     fichas_extraidas: List[Ficha] = []
-    total = len(mapeadas)
-
+    concluidas = 0
     t0 = time.time()
-    for idx, m in enumerate(mapeadas, start=1):
-        f_cache = cache_fichas_dir / f"ficha_{m.codigo}.json"
-        
-        # Checkpointing
-        if f_cache.exists() and not args.force:
-            logger.info(f"[{idx}/{total}] Ficha {m.codigo} carregada do checkpoint.")
-            with open(f_cache, "r", encoding="utf-8") as f:
-                ficha_obj = Ficha(**json.load(f))
-        else:
-            logger.info(f"[{idx}/{total}] Extraindo Ficha {m.codigo} (págs {m.pag_ini}-{m.pag_fim})...")
-            ficha_obj = extrair_ficha_completa(
-                doc=doc,
-                converter=converter,
-                pdf_path=pdf_path,
-                mapeada=m,
-                imagens_dir=imagens_dir,
-            )
-            # Salva checkpoint
-            with open(f_cache, "w", encoding="utf-8") as f:
-                json.dump(ficha_obj.model_dump(), f, ensure_ascii=False, indent=2)
 
-        fichas_extraidas.append(ficha_obj)
+    if workers <= 1:
+        for t in tasks:
+            dados = _processar_uma_ficha_worker(t)
+            concluidas += 1
+            logger.info(f"[{concluidas}/{total}] Ficha {dados['id']} processada.")
+            fichas_extraidas.append(Ficha(**dados))
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            for dados in executor.map(_processar_uma_ficha_worker, tasks):
+                concluidas += 1
+                logger.info(f"[{concluidas}/{total}] Ficha {dados['id']} processada.")
+                fichas_extraidas.append(Ficha(**dados))
 
-        # Se solicitado salvar individuais
-        if args.salvar_individuais:
-            pasta_indiv = Path("fichas")
-            pasta_indiv.mkdir(parents=True, exist_ok=True)
-            with open(pasta_indiv / f"ficha_{m.codigo}.json", "w", encoding="utf-8") as f:
-                json.dump(ficha_obj.model_dump(), f, ensure_ascii=False, indent=2)
-
-    doc.close()
     elapsed = time.time() - t0
 
     # Gravação do JSON consolidado principal
@@ -142,6 +191,7 @@ def main():
     p_fichas.add_argument("--range", help="Faixa de páginas (ex: 32-37) ou de fichas (ex: 1-5)")
     p_fichas.add_argument("--salvar-individuais", action="store_true", help="Salva cada ficha em fichas/ficha_<id>.json")
     p_fichas.add_argument("--force", action="store_true", help="Ignora checkpoints e reprocessa do zero")
+    p_fichas.add_argument("--workers", type=int, default=4, help="Número de workers paralelos (padrão: 4)")
 
     # Subcomando tudo
     p_tudo = subparsers.add_parser("tudo", help="Executa o pipeline completo (Parte Geral + Fichas)")
@@ -150,6 +200,7 @@ def main():
     p_tudo.add_argument("--range", help="Faixa opcional para as fichas")
     p_tudo.add_argument("--salvar-individuais", action="store_true")
     p_tudo.add_argument("--force", action="store_true")
+    p_tudo.add_argument("--workers", type=int, default=4, help="Número de workers paralelos (padrão: 4)")
 
     args = parser.parse_args()
 
@@ -163,3 +214,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
