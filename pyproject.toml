@@ -9,13 +9,15 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "mbft-extrator",
+    "mbft-core",
 ]
 
 [tool.uv.sources]
 mbft-extrator = { workspace = true }
+mbft-core = { workspace = true }
 
 [tool.uv.workspace]
-members = ["pipelines/*"]
+members = ["pipelines/*", "packages/*"]
 
 [[tool.uv.index]]
 name = "pytorch-cu132"

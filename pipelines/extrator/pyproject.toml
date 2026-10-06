@@ -12,6 +12,7 @@ dependencies = [
     "torchvision",
     "docling",
     "pypdfium2",
+    "mbft-core",
 ]
 
 [[tool.uv.index]]
@@ -22,6 +23,7 @@ explicit = true
 [tool.uv.sources]
 torch = { index = "pytorch-cu132" }
 torchvision = { index = "pytorch-cu132" }
+mbft-core = { workspace = true }
 
 [project.scripts]
 mbft-extrator = "mbft_extrator:main"

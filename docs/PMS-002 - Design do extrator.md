@@ -78,7 +78,9 @@ O extrator atua de ponta a ponta sobre o PDF em pipeline sequencial:
 4. **HTML Semântico:** A seção de *Informações Complementares* contém notas e quadros que não cabem em texto puro; seu conteúdo é compilado em tags HTML higienizadas (`<p>`, `<strong>`, `<table>`, `<ul>`).
 5. **Configuração do Pipeline Docling e OCR:** Como o PDF oficial possui camada textual vetorial nativa e de alta qualidade, o `PdfPipelineOptions` é configurado explicitamente com `do_ocr = False` para maximizar o desempenho e evitar degradação de caracteres jurídicos (`§`, incisos). A execução de OCR é reservada estritamente como mecanismo de contingência (*fallback*) caso alguma página pontual não apresente camada de texto extraível.
 
-### Contrato de Dados (Pydantic Schema)
+### Contrato de Dados e Guardrail de Saída (`mbft-core`)
+
+O contrato de dados das fichas reside no pacote neutro compartilhado `packages/core` (`mbft-core`), servindo como guardrail estrito de validação da saída do Extrator e contrato de entrada do Enriquecedor (PMS-003), sem acoplar os pipelines consumidores às dependências pesadas de PDF/visão computacional:
 
 ```python
 from typing import List

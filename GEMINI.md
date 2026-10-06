@@ -35,7 +35,7 @@ mbft/
 ├── AGENTS.md                    # Entrada de regras de agentes de IA
 ├── GEMINI.md                    # Governança e regras globais do monorepo
 ├── README.md                    # Apresentação geral do projeto
-├── pyproject.toml               # Raiz do UV Workspace (members = ["pipelines/*"])
+├── pyproject.toml               # Raiz do UV Workspace (members = ["pipelines/*", "packages/*"])
 │
 ├── data/
 │   ├── raw/                     # Dados brutos originais (ex.: mbft.pdf) - NUNCA ALTERAR
@@ -52,7 +52,14 @@ mbft/
 ├── docs/                        # Propostas de Melhoria do Sistema (PMS)
 │   ├── PMS-000 - Template de PMS.md
 │   ├── PMS-001 - Mecanismo RAG do Manual Brasileiro de Fiscalizacao de Transito.md
-│   └── PMS-002 - Design do extrator.md
+│   ├── PMS-002 - Design do extrator.md
+│   └── PMS-003 - Design do enriquecedor.md
+│
+├── packages/                    # Pacotes e bibliotecas compartilhadas do workspace
+│   └── core/                    # Contratos canônicos de guardrail e domínio (mbft-core)
+│       ├── pyproject.toml       # Dependência leve (pydantic)
+│       ├── README.md
+│       └── src/mbft_core/       # Modelos canônicos (Ficha, FichaEnriquecida, Enums)
 │
 └── pipelines/                   # Módulos de processamento assíncrono (batch)
     └── extrator/                # Módulo do Extrator Estruturado de Alta Fidelidade
@@ -70,7 +77,10 @@ mbft/
 
 ## 4. Módulos do Sistema
 
-### 4.1. `pipelines/extrator`
+### 4.1. `packages/core` (`mbft-core`)
+Território neutro de contratos canônicos e modelos de domínio (Pydantic v2). Define os guardrails de saída do Extrator, de entrada e saída do Enriquecedor e de consumo da Carga, sem acoplamento a bibliotecas pesadas de visão/OCR ou ML.
+
+### 4.2. `pipelines/extrator` (`mbft-extrator`)
 Responsável pela extração, fatiamento geométrico, costura de canais paralelos entre páginas, extração semântica via Docling CUDA, estruturação do JSON canônico e geração de HTML e imagens a 300 DPI.
 - **Documentação Técnica Completa**: Consulte [pipelines/extrator/README.md](file:///d:/dev/mbft%20-%20extrator/pipelines/extrator/README.md).
 - **Casos de Teste Benchmark**: Consulte [pipelines/extrator/tests/casos_de_teste_benchmark.md](file:///d:/dev/mbft%20-%20extrator/pipelines/extrator/tests/casos_de_teste_benchmark.md).
