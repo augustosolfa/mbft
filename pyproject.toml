@@ -1,31 +1,25 @@
 [project]
-name = "mbft-extrator"
+name = "mbft-workspace"
 version = "0.1.0"
-description = "Extrator estruturado de dados do Manual Brasileiro de Fiscalização de Trânsito (MBFT)"
+description = "Monorepo para extração, processamento e aplicações do Manual Brasileiro de Fiscalização de Trânsito (MBFT)"
 readme = "README.md"
 authors = [
     { name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net" }
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "torch",
-    "torchvision",
-    "docling",
-    "pypdfium2",
+    "mbft-extrator",
+    "mbft-core",
 ]
+
+[tool.uv.sources]
+mbft-extrator = { workspace = true }
+mbft-core = { workspace = true }
+
+[tool.uv.workspace]
+members = ["pipelines/*", "packages/*"]
 
 [[tool.uv.index]]
 name = "pytorch-cu132"
 url = "https://download.pytorch.org/whl/cu132"
 explicit = true
-
-[tool.uv.sources]
-torch = { index = "pytorch-cu132" }
-torchvision = { index = "pytorch-cu132" }
-
-[project.scripts]
-mbft-extrator = "mbft_extrator:main"
-
-[build-system]
-requires = ["uv_build>=0.12.17,<0.13.0"]
-build-backend = "uv_build"
