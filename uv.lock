@@ -851,7 +851,7 @@ wheels = [
 [[package]]
 name = "mbft-extrator"
 version = "0.1.0"
-source = { editable = "pipeline_extrator" }
+source = { editable = "pipelines/extrator" }
 dependencies = [
     { name = "docling" },
     { name = "pypdfium2" },
@@ -876,7 +876,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mbft-extrator", editable = "pipeline_extrator" }]
+requires-dist = [{ name = "mbft-extrator", editable = "pipelines/extrator" }]
 
 [[package]]
 name = "mdurl"

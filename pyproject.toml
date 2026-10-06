@@ -15,7 +15,7 @@ dependencies = [
 mbft-extrator = { workspace = true }
 
 [tool.uv.workspace]
-members = ["pipeline_extrator"]
+members = ["pipelines/*"]
 
 [[tool.uv.index]]
 name = "pytorch-cu132"

@@ -12,13 +12,13 @@ O pipeline extrai duas partes principais do documento:
    - Disposições preliminares, conceitos gerais e resoluções do CONTRAN.
    - Conversão com remoção de ruídos de cabeçalhos/rodapés e preservação de tabelas e hierarquia semântica (`#`, `##`, `###`).
    - Marcadores discretos de página (ex.: `<!-- Página X -->`).
-   - Saída padrão: `data/processed/mbft_parte_geral.md`.
+   - Saída padrão: `data/processed/extrator/mbft_parte_geral.md`.
 
 2. **Fichas de Fiscalização Estruturadas (Páginas 32 até 826)**:
    - 404 fichas de fiscalização com início demarcado por `Código do Enquadramento: <código>`.
    - **Costura Geométrica de Colunas**: Tratamento de fichas multipáginas (até 6 páginas consecutivas, ex.: Ficha 683-11) preservando o fluxo paralelo dos canais normativos sem intercalação indevida de texto.
    - **Normalização Textual**: Junção de quebras duras de linha e des-hifenização inteligente de palavras quebradas (`cruzamen-` + `to` -> `cruzamento`).
-   - Saída padrão: `data/processed/fichas_mbft.json` (e opcionalmente `data/processed/fichas/ficha_<id>.json`).
+   - Saída padrão: `data/processed/extrator/fichas_mbft.json` (e opcionalmente `data/processed/extrator/fichas/ficha_<id>.json`).
 
 ---
 
@@ -64,7 +64,7 @@ Cada ficha gerada possui o seguinte esquema:
 ## 4. Extração de Imagens Nativas (Bitmaps)
 
 - Imagens nativas embutidas no PDF são extraídas diretamente dos fluxos binários de imagem do PDF.
-- Todas as imagens são salvas em `data/processed/imagens/` com o padrão de nomenclatura `ficha<codigo_enquadramento>_<indice>.png`.
+- Todas as imagens são salvas em `data/processed/extrator/imagens/` com o padrão de nomenclatura `ficha<codigo_enquadramento>_<indice>.png`.
 
 ---
 
@@ -74,16 +74,19 @@ Executar a partir da raiz do monorepo:
 
 ```bash
 # Extração da Parte Geral
-uv run --package mbft-extrator python pipeline_extrator/extrair.py geral
+uv run mbft-extrator geral
 
 # Extração de intervalo de páginas ou fichas
-uv run --package mbft-extrator python pipeline_extrator/extrair.py fichas --range 32-37
+uv run mbft-extrator fichas --range 32-37
 
 # Extração completa com fichas individuais
-uv run --package mbft-extrator python pipeline_extrator/extrair.py tudo --salvar-individuais
+uv run mbft-extrator tudo --salvar-individuais
+
+# Ou usando diretamente o script atalho
+uv run python pipelines/extrator/extrair.py tudo
 
 # Auditoria regressiva entre versões de extração
-uv run --package mbft-extrator python pipeline_extrator/comparar_versoes.py
+uv run python pipelines/extrator/scripts/comparar_versoes.py
 ```
 
 ---

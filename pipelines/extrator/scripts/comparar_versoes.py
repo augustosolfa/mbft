@@ -32,8 +32,8 @@ def _obter_raiz_repo() -> Path:
 
 
 RAIZ_REPO = _obter_raiz_repo()
-DEFAULT_V1 = RAIZ_REPO / "data" / "processed" / "backup_extracao_v1" / "fichas_mbft.json"
-DEFAULT_V2 = RAIZ_REPO / "data" / "processed" / "fichas_mbft.json"
+DEFAULT_V1 = RAIZ_REPO / "data" / "archive" / "backup_extracao_v1" / "fichas_mbft.json"
+DEFAULT_V2 = RAIZ_REPO / "data" / "processed" / "extrator" / "fichas_mbft.json"
 
 
 def carregar_json(caminho: Path) -> Dict[str, Dict[str, Any]]:

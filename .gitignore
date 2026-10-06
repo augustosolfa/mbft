@@ -12,7 +12,7 @@ wheels/
 
 # Cache de extração intermediária
 .cache_extracao/
-pipeline_extrator/.cache_extracao/
+pipelines/*/.cache_extracao/
 
 # Arquivos de dados binários pesados
 mbft.pdf
@@ -20,8 +20,8 @@ data/raw/
 
 # Diretório de fichas individuais opcionais
 fichas/
-data/processed/fichas/
+data/processed/*/fichas/
 
-# Backups de extrações consolidadas
+# Backups e dados arquivados
 backup_extracao_v1/
-data/processed/backup_extracao_v1/
+data/archive/

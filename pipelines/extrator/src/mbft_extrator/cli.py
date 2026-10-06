@@ -54,12 +54,12 @@ def _obter_raiz_repo() -> Path:
 
 RAIZ_REPO = _obter_raiz_repo()
 DEFAULT_PDF = RAIZ_REPO / "data" / "raw" / "mbft.pdf"
-DEFAULT_MD = RAIZ_REPO / "data" / "processed" / "mbft_parte_geral.md"
-DEFAULT_JSON = RAIZ_REPO / "data" / "processed" / "fichas_mbft.json"
-DEFAULT_IMAGENS = RAIZ_REPO / "data" / "processed" / "imagens"
-DEFAULT_FICHAS_INDIV = RAIZ_REPO / "data" / "processed" / "fichas"
-DEFAULT_RELATORIO = RAIZ_REPO / "data" / "processed" / "relatorio_extracao.md"
-DEFAULT_CACHE = RAIZ_REPO / "pipeline_extrator" / ".cache_extracao"
+DEFAULT_MD = RAIZ_REPO / "data" / "processed" / "extrator" / "mbft_parte_geral.md"
+DEFAULT_JSON = RAIZ_REPO / "data" / "processed" / "extrator" / "fichas_mbft.json"
+DEFAULT_IMAGENS = RAIZ_REPO / "data" / "processed" / "extrator" / "imagens"
+DEFAULT_FICHAS_INDIV = RAIZ_REPO / "data" / "processed" / "extrator" / "fichas"
+DEFAULT_RELATORIO = RAIZ_REPO / "data" / "processed" / "extrator" / "relatorio_extracao.md"
+DEFAULT_CACHE = RAIZ_REPO / "pipelines" / "extrator" / ".cache_extracao"
 
 
 def _processar_uma_ficha_worker(item_args: Tuple[str, dict, str, str, bool, bool]) -> dict:

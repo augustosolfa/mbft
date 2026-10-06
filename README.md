@@ -7,11 +7,12 @@ Monorepo para processamento, extração de dados estruturados e aplicações int
 ## 🏗️ Estrutura do Repositório
 
 - **`data/raw/`**: Documento fonte original (`mbft.pdf`).
-- **`data/processed/`**: Dados finais consolidados:
-  - `fichas_mbft.json`: Base estruturada contendo as 402 fichas de fiscalização com metadados, regras e conteúdo normativo.
-  - `mbft_parte_geral.md`: Transcrição semântica da parte geral (páginas 1 a 31).
-  - `imagens/`: Ilustrações, placas de sinalização e diagramas de trânsito em alta definição (300 DPI).
-- **`pipeline_extrator/`**: Módulo em Python responsável pela ingestão, OCR, costura geométrica de colunas e serialização com aceleração CUDA.
+- **`data/processed/`**: Dados finais consolidados por etapa:
+  - **`extrator/`**:
+    - `fichas_mbft.json`: Base estruturada contendo as 402 fichas de fiscalização com metadados, regras e conteúdo normativo.
+    - `mbft_parte_geral.md`: Transcrição semântica da parte geral (páginas 1 a 31).
+    - `imagens/`: Ilustrações, placas de sinalização e diagramas de trânsito em alta definição (300 DPI).
+- **`pipelines/extrator/`**: Módulo em Python responsável pela ingestão, OCR, costura geométrica de colunas e serialização com aceleração CUDA.
 
 ---
 
@@ -27,17 +28,23 @@ uv sync
 
 ### Execução do Extrator
 
-A partir da raiz do monorepo:
+A partir da raiz do monorepo, via script de console:
 
 ```bash
 # Executar extração da parte geral
-uv run --package mbft-extrator python pipeline_extrator/extrair.py geral
+uv run mbft-extrator geral
 
 # Executar extração das fichas estruturadas
-uv run --package mbft-extrator python pipeline_extrator/extrair.py fichas
+uv run mbft-extrator fichas
 
 # Executar pipeline completo
-uv run --package mbft-extrator python pipeline_extrator/extrair.py tudo
+uv run mbft-extrator tudo
 ```
 
-Consulte [pipeline_extrator/README.md](file:///d:/dev/mbft%20-%20extrator/pipeline_extrator/README.md) para detalhes técnicos da arquitetura do extrator.
+Ou diretamente através do script auxiliar:
+
+```bash
+uv run python pipelines/extrator/extrair.py tudo
+```
+
+Consulte [pipelines/extrator/README.md](file:///d:/dev/mbft%20-%20extrator/pipelines/extrator/README.md) para detalhes técnicos da arquitetura do extrator.
