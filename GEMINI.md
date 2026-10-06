@@ -36,7 +36,6 @@ mbft/
 ├── GEMINI.md                    # Governança e regras globais do monorepo
 ├── README.md                    # Apresentação geral do projeto
 ├── pyproject.toml               # Raiz do UV Workspace (members = ["pipelines/*"])
-├── uv.lock
 │
 ├── data/
 │   ├── raw/                     # Dados brutos originais (ex.: mbft.pdf) - NUNCA ALTERAR
