@@ -40,11 +40,11 @@ Este documento apresenta a visão geral do mecanismo proposto, com a descrição
 ### Etapas / Módulos
 O mecanismo divide-se em 5 etapas funcionais, separadas entre processamento assíncrono (*batch*) e atendimento síncrono (*runtime*):
 
-1. **Extrator**: recebe o arquivo PDF oficial do MBFT e retorna o texto da parte geral e uma lista em formato JSON com os campos extraídos das fichas de enquadramento, além das imagens associadas.
-2. **Enriquecedor**: normaliza campos de dados categóricos (vocabulário controlado) e gera novos atributos estruturados com base em extração de informação (*Information Extraction*) a partir de campos de texto livre (como referências a artigos, flags de crime de trânsito e enquadramentos correlatos). Também gera as representações vetoriais (*embeddings*) dos dados textuais relevantes.
-3. **Carga**: persiste os dados estruturados das fichas no banco relacional SQL e grava os respectivos vetores de busca no banco vetorial (Cloudflare Vectorize), mantendo a chave identificadora unificada.
-4. **Recuperador**: recebe a busca textual do usuário, gera o seu *embedding*, consulta a base vetorial por proximidade semântica e recupera os registros correspondentes hidratados via SQL.
-5. **Gerador**: utiliza um LLM para processar a pergunta do usuário, o contexto normativo resgatado pelo recuperador e um *prompt* orientador (com regras de ancoragem factual), devolvendo uma resposta contextualizada ao usuário.
+1. **Extrator** (PMS-002): recebe o arquivo PDF oficial do MBFT e retorna o texto da parte geral e uma lista em formato JSON com os campos extraídos das fichas de enquadramento, além das imagens associadas.
+2. **Enriquecedor** (PMS-003): normaliza campos de dados categóricos (vocabulário controlado) e gera novos atributos estruturados com base em extração de informação (*Information Extraction*) a partir de campos de texto livre (como referências a artigos, flags de crime de trânsito e enquadramentos correlatos). Também gera as representações vetoriais (*embeddings*) dos dados textuais relevantes.
+3. **Carga** (PMS-004): persiste os dados estruturados das fichas no banco relacional SQL e grava os respectivos vetores de busca no banco vetorial (Cloudflare Vectorize), mantendo a chave identificadora unificada.
+4. **Recuperador** (PMS-005): recebe a busca textual do usuário, gera o seu *embedding*, consulta a base vetorial por proximidade semântica e recupera os registros correspondentes hidratados via SQL.
+5. **Gerador** (PMS-006): utiliza um LLM para processar a pergunta do usuário, o contexto normativo resgatado pelo recuperador e um *prompt* orientador (com regras de ancoragem factual), devolvendo uma resposta contextualizada ao usuário.
 
 As etapas 1, 2 e 3 são executadas apenas de forma pontual a cada atualização normativa do MBFT.
 As etapas 4 e 5 são disponibilizadas para consumo contínuo por meio de uma API REST.
