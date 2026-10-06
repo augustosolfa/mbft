@@ -89,7 +89,7 @@ def extrair_conteudo_ic(
     imagens_dir: Path,
 ) -> Tuple[str, List[str]]:
     """
-    Extrai textos, tabelas (Docling CUDA) e ilustrações (nativas e 300 DPI) de Informações Complementares.
+    Extrai textos, tabelas (Docling CUDA) e ilustrações (nativas em PNG) de Informações Complementares.
     """
     # 1. Extração seletiva de Tabelas Complexas via Docling (GPU CUDA sob demanda)
     tabelas_html: List[str] = []

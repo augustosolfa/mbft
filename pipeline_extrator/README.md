@@ -15,7 +15,7 @@ O pipeline extrai duas partes principais do documento:
    - Saída padrão: `data/processed/mbft_parte_geral.md`.
 
 2. **Fichas de Fiscalização Estruturadas (Páginas 32 até 826)**:
-   - 402 fichas de fiscalização com início demarcado por `Código do Enquadramento: <código>`.
+   - 404 fichas de fiscalização com início demarcado por `Código do Enquadramento: <código>`.
    - **Costura Geométrica de Colunas**: Tratamento de fichas multipáginas (até 6 páginas consecutivas, ex.: Ficha 683-11) preservando o fluxo paralelo dos canais normativos sem intercalação indevida de texto.
    - **Normalização Textual**: Junção de quebras duras de linha e des-hifenização inteligente de palavras quebradas (`cruzamen-` + `to` -> `cruzamento`).
    - Saída padrão: `data/processed/fichas_mbft.json` (e opcionalmente `data/processed/fichas/ficha_<id>.json`).
@@ -61,10 +61,9 @@ Cada ficha gerada possui o seguinte esquema:
 
 ---
 
-## 4. Extração e Renderização de Imagens (Híbrido 300 DPI)
+## 4. Extração de Imagens Nativas (Bitmaps)
 
 - Imagens nativas embutidas no PDF são extraídas diretamente dos fluxos binários de imagem do PDF.
-- Desenhos e diagramas vetoriais (ex.: esquemas de cruzamento, sinalizações) são renderizados a **300 DPI** a partir de seus *bounding boxes*.
 - Todas as imagens são salvas em `data/processed/imagens/` com o padrão de nomenclatura `ficha<codigo_enquadramento>_<indice>.png`.
 
 ---
@@ -97,5 +96,5 @@ uv run --package mbft-extrator python pipeline_extrator/comparar_versoes.py
 - **`fatiador.py`**: Detecção e mapeamento geométrico das fichas no PDF.
 - **`stitching.py`**: Algoritmo de canais de colunas e costura entre páginas consecutivas.
 - **`docling_extractor.py`**: Integração com Docling e aceleração CUDA.
-- **`html_builder.py`**: Montador de HTML semântico em 2 colunas e exportador de imagens a 300 DPI.
+- **`html_builder.py`**: Montador de HTML semântico em 2 colunas e exportador de imagens nativas PNG.
 - **`auditoria.py`**: Validador e gerador do `relatorio_extracao.md`.

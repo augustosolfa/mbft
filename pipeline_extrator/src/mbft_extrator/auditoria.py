@@ -48,7 +48,7 @@ def gerar_relatorio_auditoria(
         f"- **Total de Páginas do PDF:** {total_paginas_pdf}",
         f"- **Fichas Multipágina (2 ou mais páginas):** {len(fichas_multipagina)} ({len(fichas_multipagina)/total_fichas*100:.1f}%)" if total_fichas > 0 else "",
         f"- **Fichas com Imagens Extraídas:** {len(fichas_com_imagens)}",
-        f"- **Total de Imagens Geradas (300 DPI):** {total_imagens}",
+        f"- **Total de Imagens Geradas (PNG Nativas):** {total_imagens}",
         f"- **Total de Alertas/Anomalias:** {len(alertas)}",
         "",
         "## 2. Casos Canônicos de Validação",

@@ -25,7 +25,7 @@ def mapear_fichas_no_pdf(
     force: bool = False,
 ) -> List[FichaMapeada]:
     """
-    Varre o PDF a partir da página 32 e localiza o início e término de cada uma das 402 fichas.
+    Varre o PDF a partir da página 32 e localiza o início e término de cada uma das 404 fichas.
     Utiliza cache em disco para evitar revarredura do documento de 826 páginas.
     """
     if cache_path and cache_path.exists() and not force:
