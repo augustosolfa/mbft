@@ -30,7 +30,7 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[ChunkPayload]:
                 hierarquia_titulos=[ficha.tipificacao_resumida, secao_nome],
                 paginas=ficha.paginas,
                 artigos_ctb_associados=[ref.artigo for ref in ficha.artigos_ctb],
-                competencia=ficha.competencia.value,
+                competencias=[c.value for c in ficha.competencias],
                 natureza_regra=item.natureza_regra,
                 codigos_concomitantes=item.codigos_concomitantes,
                 codigos_redirecionamento=item.codigos_redirecionamento
@@ -68,7 +68,7 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[ChunkPayload]:
         hierarquia_titulos=[ficha.tipificacao_resumida, "EMENTA"],
         paginas=ficha.paginas,
         artigos_ctb_associados=[ref.artigo for ref in ficha.artigos_ctb],
-        competencia=ficha.competencia.value
+        competencias=[c.value for c in ficha.competencias]
     )
     chunks.append(ChunkPayload(
         metadados=meta_ementa,

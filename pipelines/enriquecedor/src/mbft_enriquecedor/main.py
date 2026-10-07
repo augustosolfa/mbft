@@ -7,7 +7,7 @@ from mbft_core.models.enriquecimento import FichaEnriquecida, CompetenciaFonteEn
 from mbft_enriquecedor.normalizador import (
     normalizar_gravidade, normalizar_penalidades, normalizar_medidas_administrativas,
     higienizar_infrator_crime, normalizar_constatacao, calcular_pontuacao, parse_amparo_legal,
-    parse_resolucoes_contran
+    parse_resolucoes_contran, sanitizar_texto
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
@@ -41,10 +41,10 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
     # Instanciando a ficha
     f_enriquecida = FichaEnriquecida(
         id=f_bruta.id,
-        tipificacao_resumida=f_bruta.tipificacao_resumida,
-        codigo_enquadramento=f_bruta.codigo_enquadramento,
-        amparo_legal=f_bruta.amparo_legal,
-        tipificacao_enquadramento=f_bruta.tipificacao_enquadramento,
+        tipificacao_resumida=sanitizar_texto(f_bruta.tipificacao_resumida),
+        codigo_enquadramento=sanitizar_texto(f_bruta.codigo_enquadramento),
+        amparo_legal=sanitizar_texto(f_bruta.amparo_legal),
+        tipificacao_enquadramento=sanitizar_texto(f_bruta.tipificacao_enquadramento),
         
         gravidade_original=f_bruta.gravidade,
         penalidade_original=f_bruta.penalidade,
@@ -53,12 +53,18 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
         competencia_original=f_bruta.competencia or "",
         constatacao_infracao_original=f_bruta.constatacao_infracao,
         pontuacao_original=f_bruta.pontuacao,
+        pode_configurar_crime_transito_original=f_bruta.pode_configurar_crime_transito,
+        
+        quando_autuar_original=f_bruta.quando_autuar,
+        quando_nao_autuar_original=f_bruta.quando_nao_autuar,
+        definicoes_procedimentos_original=f_bruta.definicoes_procedimentos,
+        exemplos_observacoes_ait_original=f_bruta.exemplos_observacoes_ait,
         
         gravidade=gravidade_norm,
         penalidades=penalidades_norm,
         medidas_administrativas=medidas_norm,
         infratores=infratores_norm,
-        competencia=competencia_norm,
+        competencias=competencia_norm,
         competencia_fonte=competencia_fonte,
         competencia_alterada_lei_14599=f_bruta.competencia_alterada_lei_14599,
         crime_transito=tem_crime,

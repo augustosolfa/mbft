@@ -116,10 +116,11 @@ A Lei nº 14.599/2023 reestruturou substancialmente as competências de fiscaliz
 
 O Enriquecedor resolve essa questão por meio de uma **Tabela Canônica de Competência Normativa**:
 1. O texto original é mantido no campo `competencia_original` (preservando literalidade histórica do PDF);
-2. A competência efetiva é atribuída ao campo `competencia_normalizada`:
-   - `MUNICIPAL`: Infrações privativas do órgão executivo municipal de trânsito;
-   - `ESTADUAL`: Infrações privativas do órgão rodoviário ou estadual (ex.: fiscalização documental e condutor);
-   - `CONCORRENTE`: Infrações de competência compartilhada e fiscalização mútua (a grande maioria das infrações de circulação e operacionais pós-Lei 14.599/2023);
+2. A competência efetiva é mapeada no campo `competencias` (como uma lista de Enums exatos):
+   - `MUNICIPAL`: Infrações envolvendo o órgão executivo municipal de trânsito;
+   - `ESTADUAL`: Infrações envolvendo o órgão executivo estadual de trânsito;
+   - `RODOVIARIO`: Infrações envolvendo órgãos rodoviários (estaduais ou federais);
+   - Infrações com jurisdição concorrente ou mútua simplesmente contêm múltiplos valores na lista (ex: `[MUNICIPAL, ESTADUAL]`);
 3. O campo `competencia_fonte` registra a proveniência do dado:
    - `MBFT_ORIGINAL`: Quando o manual já continha a definição explícita sem conflito;
    - `RESOLUCAO_LEI_14599`: Quando foi resolvida pela tabela de de-para normativa do módulo.
@@ -196,7 +197,7 @@ Em suma, o Enriquecedor materializa os seguintes contratos:
 1. **`FichaEnriquecida`**: Herda estruturalmente os campos extraídos, mas converte literais em tipos de domínio estritos.
    - **Original vs Normalizado**: Mantém atributos como `gravidade_original` para auditoria, ao mesmo tempo em que os classifica em `GravidadeEnum`.
    - **Estruturação de Listas**: Transforma strings como "Retenção do veículo e remoção" em listas como `['Retenção do veículo', 'Remoção do veículo']`.
-   - **Resolução de Competência**: Cruza as lacunas da Lei 14.599/23 e infere definitivamente se a competência é `MUNICIPAL`, `ESTADUAL` ou `CONCORRENTE`, definindo a `CompetenciaFonteEnum`.
+   - **Resolução de Competência**: Cruza as lacunas da Lei 14.599/23 e infere as listas de competências (ex: `[MUNICIPAL, ESTADUAL]`), definindo a `CompetenciaFonteEnum`.
    - **Mapeamento Jurídico**: Popula listas formais de `artigos_ctb` e `resolucoes_contran`.
 
 2. **`ChunkPayload` e `ChunkMetadados`**: Unidade atômica para o modelo vetorial.

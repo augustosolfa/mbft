@@ -20,6 +20,8 @@ def sanitizar_texto(texto: str) -> str:
     t = re.sub(r'\u0002', '-', t)
     # Remover quaisquer outros caracteres de controle (0x00-0x1F, 0x7F-0x9F) exceto newline e tab se houver
     t = re.sub(r'[\x00-\x08\x0b-\x1f\x7f-\x9f]', '', t)
+    # Limpeza de glifos residuais no final da string
+    t = re.sub(r'\s+(?:[pgqçc][pgqçc\s,\(\)]*|[\s,\(\)]+)$', '', t, flags=re.IGNORECASE)
     return t.strip()
 
 def normalizar_gravidade(texto: str) -> GravidadeEnum:
@@ -57,11 +59,17 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
     texto_combinado = f"{texto_infrator} {texto_crime}".strip()
     
     artigos_extraidos = []
-    for match in REGEX_ARTIGO_CTB_VAZADO.finditer(texto_combinado):
-        artigos_extraidos.append(ReferenciaCTB(artigo=match.group(2)))
     
+    # Extrair todos os artigos entre 'Art' e 'CTB'
+    bloco_match = re.search(r'Art\.?(.*?)do\s*CTB', texto_combinado, re.IGNORECASE)
+    if bloco_match:
+        bloco = bloco_match.group(1)
+        numeros = re.findall(r'\b\d{1,3}(?:\s*-[A-Za-z]+)?\b', bloco)
+        for num in numeros:
+            artigos_extraidos.append(ReferenciaCTB(artigo=num.strip()))
+            
     # Remover o vazamento do texto do infrator
-    texto_infrator_limpo = REGEX_ARTIGO_CTB_VAZADO.sub("", texto_infrator).strip()
+    texto_infrator_limpo = re.sub(r'Art\.?.*?do\s*CTB', '', texto_infrator, flags=re.IGNORECASE).strip()
     texto_infrator_limpo = texto_infrator_limpo.replace("SIM", "").replace("NÃO", "").replace("NAO", "").strip()
     
     tem_crime = False

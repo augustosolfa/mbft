@@ -6,6 +6,7 @@ Serve como contrato de saída do Enriquecedor e contrato de entrada (guardrail) 
 from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from mbft_core.models.extracao import CampoNormativo
 
 
 class GravidadeEnum(str, Enum):
@@ -52,7 +53,7 @@ class ConstatacaoInfracaoEnum(str, Enum):
 class CompetenciaEnum(str, Enum):
     MUNICIPAL = "MUNICIPAL"
     ESTADUAL = "ESTADUAL"
-    CONCORRENTE = "CONCORRENTE"
+    RODOVIARIO = "RODOVIARIO"
 
 class CompetenciaFonteEnum(str, Enum):
     MBFT_ORIGINAL = "MBFT_ORIGINAL"
@@ -93,13 +94,19 @@ class FichaEnriquecida(BaseModel):
     competencia_original: str
     constatacao_infracao_original: str
     pontuacao_original: str
+    pode_configurar_crime_transito_original: Optional[str] = None
+    
+    quando_autuar_original: CampoNormativo
+    quando_nao_autuar_original: CampoNormativo
+    definicoes_procedimentos_original: CampoNormativo
+    exemplos_observacoes_ait_original: CampoNormativo
     
     # Atributos normalizados em vocabulário controlado
     gravidade: GravidadeEnum
     penalidades: List[PenalidadeEnum]
     medidas_administrativas: List[MedidaAdministrativaEnum]
     infratores: List[InfratorEnum]
-    competencia: CompetenciaEnum
+    competencias: List[CompetenciaEnum]
     competencia_fonte: CompetenciaFonteEnum
     competencia_alterada_lei_14599: bool
     crime_transito: bool
@@ -136,7 +143,7 @@ class ChunkMetadados(BaseModel):
     hierarquia_titulos: List[str] = Field(default_factory=list)
     paginas: List[int]
     artigos_ctb_associados: List[str] = Field(default_factory=list)
-    competencia: Optional[str] = None
+    competencias: List[str] = Field(default_factory=list)
     
     # Metadados relacionais para busca estruturada
     natureza_regra: Optional[NaturezaRegraEnum] = None
