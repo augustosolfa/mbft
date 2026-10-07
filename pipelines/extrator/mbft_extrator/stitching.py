@@ -83,11 +83,15 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
     elif codigo_padrao:
         meta["codigo_enquadramento"] = codigo_padrao
 
-    if not crime:
-        crime = "NÃO"
-
     meta["infrator"] = infrator
     meta["pode_configurar_crime_transito"] = crime
+
+    comp = meta.get("competencia", "").strip()
+    if not comp:
+        meta["competencia"] = None
+        meta["competencia_alterada_lei_14599"] = True
+    else:
+        meta["competencia"] = comp
 
     return meta
 
