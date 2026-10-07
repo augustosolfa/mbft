@@ -1,0 +1,6 @@
+data/
+*.json
+*.png
+*.jpg
+*.pdf
+uv.lock
