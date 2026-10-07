@@ -132,6 +132,7 @@ class ChunkMetadados(BaseModel):
     tipo_documento: str = Field(..., description="'FICHA' ou 'PARTE_GERAL'")
     origem_id: str = Field(..., description="Código da ficha ou ID do capítulo da Parte Geral")
     secao: str = Field(..., description="Nome da seção temática (ex.: 'QUANDO_NAO_AUTUAR')")
+    item_numero: Optional[int] = Field(None, description="Número posicional do item atômico dentro da seção")
     hierarquia_titulos: List[str] = Field(default_factory=list)
     paginas: List[int]
     artigos_ctb_associados: List[str] = Field(default_factory=list)

@@ -26,6 +26,7 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[ChunkPayload]:
                 tipo_documento="FICHA",
                 origem_id=ficha.id,
                 secao=secao_nome,
+                item_numero=i + 1,
                 hierarquia_titulos=[ficha.tipificacao_resumida, secao_nome],
                 paginas=ficha.paginas,
                 artigos_ctb_associados=[ref.artigo for ref in ficha.artigos_ctb],

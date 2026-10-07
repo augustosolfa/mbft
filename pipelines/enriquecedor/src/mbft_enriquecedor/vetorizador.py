@@ -31,22 +31,39 @@ def vetorizar_e_exportar(chunks: List[ChunkPayload], output_path: str):
             "tipo_documento": m.tipo_documento,
             "origem_id": m.origem_id,
             "secao": m.secao,
+            "item_numero": getattr(m, "item_numero", None),
             "competencia": m.competencia,
             "natureza_regra": m.natureza_regra.value if m.natureza_regra else None,
-            "codigos_redirecionamento": ",".join(m.codigos_redirecionamento) if m.codigos_redirecionamento else None,
-            "codigos_concomitantes": ",".join(m.codigos_concomitantes) if m.codigos_concomitantes else None,
-            "artigos_ctb_associados": ",".join(m.artigos_ctb_associados) if m.artigos_ctb_associados else None,
+            "codigos_redirecionamento": list(m.codigos_redirecionamento) if m.codigos_redirecionamento else [],
+            "codigos_concomitantes": list(m.codigos_concomitantes) if m.codigos_concomitantes else [],
+            "artigos_ctb_associados": list(m.artigos_ctb_associados) if m.artigos_ctb_associados else [],
             "texto_contextualizado": chunk.texto_contextualizado,
             "tokens_estimados": chunk.tokens_estimados,
             "embedding": embeddings[i].tolist() # Converte numpy array para lista de floats nativa
         })
         
-    df = pl.DataFrame(dados)
+    schema = {
+        "chunk_id": pl.Utf8,
+        "tipo_documento": pl.Utf8,
+        "origem_id": pl.Utf8,
+        "secao": pl.Utf8,
+        "item_numero": pl.Int32,
+        "competencia": pl.Utf8,
+        "natureza_regra": pl.Utf8,
+        "codigos_redirecionamento": pl.List(pl.Utf8),
+        "codigos_concomitantes": pl.List(pl.Utf8),
+        "artigos_ctb_associados": pl.List(pl.Utf8),
+        "texto_contextualizado": pl.Utf8,
+        "tokens_estimados": pl.Int32,
+        "embedding": pl.Array(pl.Float32, shape=1024),
+    }
+        
+    df = pl.DataFrame(dados, schema=schema)
     
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     print(f"[{__name__}] Exportando arquivo Parquet para {output_path}...")
     # Salvando em Parquet
-    df.write_parquet(output_path)
+    df.write_parquet(output_path, compression="zstd")
     
     return df
