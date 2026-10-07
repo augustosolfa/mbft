@@ -150,6 +150,13 @@ def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
             
     return artigos
 
+def parse_resolucoes_contran(texto: str) -> List[str]:
+    texto = sanitizar_texto(texto)
+    # Ex: "Resolução do Contran nº 970/2022" ou "Resolução CONTRAN 970"
+    regex_contran = re.compile(r"Resoluç[ãa]o(?:\s+do)?\s+CONTRAN\s*(?:n[ºo°]?\s*)?(\d+(?:/\d+)?)", re.IGNORECASE)
+    matches = regex_contran.findall(texto)
+    return matches
+
 def calcular_pontuacao(texto: str) -> Tuple[int, bool]:
     t = sanitizar_texto(texto).lower()
     valor = 0

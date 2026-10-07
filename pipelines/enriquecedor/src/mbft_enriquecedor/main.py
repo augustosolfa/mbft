@@ -6,7 +6,8 @@ from mbft_core.models.extracao import Ficha
 from mbft_core.models.enriquecimento import FichaEnriquecida, CompetenciaFonteEnum
 from mbft_enriquecedor.normalizador import (
     normalizar_gravidade, normalizar_penalidades, normalizar_medidas_administrativas,
-    higienizar_infrator_crime, normalizar_constatacao, calcular_pontuacao, parse_amparo_legal
+    higienizar_infrator_crime, normalizar_constatacao, calcular_pontuacao, parse_amparo_legal,
+    parse_resolucoes_contran
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
@@ -86,6 +87,17 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
         for art in artigos_extras:
             if art not in f_enriquecida.artigos_ctb:
                 f_enriquecida.artigos_ctb.append(art)
+                
+    # Extrair resoluções do CONTRAN em informações complementares e definições
+    resolucoes = []
+    textos_busca = [f_bruta.informacoes_complementares, f_bruta.amparo_legal]
+    if f_bruta.definicoes_procedimentos:
+        textos_busca.extend(f_bruta.definicoes_procedimentos.itens)
+    for txt in textos_busca:
+        if txt:
+            resolucoes.extend(parse_resolucoes_contran(txt))
+    
+    f_enriquecida.resolucoes_contran = sorted(list(set(resolucoes)))
                 
     return f_enriquecida
 
