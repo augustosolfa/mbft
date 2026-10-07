@@ -130,6 +130,24 @@ def main():
     out_parquet = os.path.join(out_dir, "embeddings_mbft.parquet")
     vetorizar_e_exportar(chunks_totais, out_parquet)
     
+    # 4. Relatório
+    print("[Enriquecedor] Gerando relatório...")
+    out_relatorio = os.path.join(out_dir, "relatorio_enriquecimento.md")
+    with open(out_relatorio, "w", encoding="utf-8") as f:
+        f.write("# Relatório de Enriquecimento MBFT\n\n")
+        f.write(f"- **Fichas Processadas**: {len(fichas_enriquecidas)}\n")
+        f.write(f"- **Chunks Gerados**: {len(chunks_totais)}\n")
+        f.write(f"- **Tamanho do Parquet**: {os.path.getsize(out_parquet) / (1024 * 1024):.2f} MB\n")
+        
+        # Estatísticas
+        fichas_com_crime = sum(1 for f in fichas_enriquecidas if f.crime_transito)
+        f.write(f"- **Fichas com configuração de Crime de Trânsito**: {fichas_com_crime}\n")
+        
+        chunks_excecao = sum(1 for c in chunks_totais if c.metadados.natureza_regra == "EXCECAO_DESVIO")
+        chunks_concomitancia = sum(1 for c in chunks_totais if c.metadados.natureza_regra == "CONCOMITANCIA")
+        f.write(f"- **Regras Atômicas de Exceção / Desvio**: {chunks_excecao}\n")
+        f.write(f"- **Regras Atômicas de Concomitância**: {chunks_concomitancia}\n")
+    
     print("[Enriquecedor] Concluído!")
 
 if __name__ == "__main__":
