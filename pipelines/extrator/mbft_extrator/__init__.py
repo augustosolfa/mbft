@@ -1,5 +1,5 @@
-from .cli import main
-from .layout_analyzer import LayoutAnalyzer
-from .text_joiner import TextJoiner
+"""Extrator estruturado do Manual Brasileiro de Fiscalização de Trânsito (MBFT)."""
 
-__all__ = ["main", "LayoutAnalyzer", "TextJoiner"]
+from .cli import main
+
+__all__ = ["main"]
