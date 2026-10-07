@@ -40,7 +40,7 @@ Este documento especifica o **Enriquecedor** (Etapa 2 do PMS-001), pipeline *bat
   * Fornecer pacote modular `pipelines/enriquecedor` integrado ao UV Workspace da raiz, com CLI própria (`mbft-enriquecedor`) e relatório automatizado de auditoria (`relatorio_enriquecimento.md`).
 
 * **Não Objetivos (Non-Goals):**
-  * Não é meta usar LLMs para inferência ou extração no enriquecimento; toda a extração de informação e normalização de atributos é estritamente determinística, baseada em regras, regex compiladas e tabelas de de-para, garantindo 100% de reprodutibilidade e zero custo operacional de chamadas de API.
+  * Não é meta processar toda a base via LLM indiscriminadamente. A prioridade absoluta e a primeira camada de extração devem ser sempre os métodos programáticos e determinísticos (regex e tabelas de de-para). O uso de modelos de linguagem (LLMs) é permitido e restrito *estritamente a uma camada de fallback* para inferir os dados apenas nos casos anômalos onde o método programático se mostrar deficiente.
   * Não é meta realizar a persistência em banco de dados relacional SQL ou no Cloudflare Vectorize (escopo estrito da Carga / PMS-004).
   * Não é meta responder perguntas ou expor endpoints HTTP em tempo real (escopo do Recuperador / PMS-005 e Gerador / PMS-006).
 
@@ -116,10 +116,11 @@ A Lei nº 14.599/2023 reestruturou substancialmente as competências de fiscaliz
 
 O Enriquecedor resolve essa questão por meio de uma **Tabela Canônica de Competência Normativa**:
 1. O texto original é mantido no campo `competencia_original` (preservando literalidade histórica do PDF);
-2. A competência efetiva é atribuída ao campo `competencia_normalizada`:
-   - `MUNICIPAL`: Infrações privativas do órgão executivo municipal de trânsito;
-   - `ESTADUAL`: Infrações privativas do órgão rodoviário ou estadual (ex.: fiscalização documental e condutor);
-   - `CONCORRENTE`: Infrações de competência compartilhada e fiscalização mútua (a grande maioria das infrações de circulação e operacionais pós-Lei 14.599/2023);
+2. A competência efetiva é mapeada no campo `competencias` (como uma lista de Enums exatos):
+   - `MUNICIPAL`: Infrações envolvendo o órgão executivo municipal de trânsito;
+   - `ESTADUAL`: Infrações envolvendo o órgão executivo estadual de trânsito;
+   - `RODOVIARIO`: Infrações envolvendo órgãos rodoviários (estaduais ou federais);
+   - Infrações com jurisdição concorrente ou mútua simplesmente contêm múltiplos valores na lista (ex: `[MUNICIPAL, ESTADUAL]`);
 3. O campo `competencia_fonte` registra a proveniência do dado:
    - `MBFT_ORIGINAL`: Quando o manual já continha a definição explícita sem conflito;
    - `RESOLUCAO_LEI_14599`: Quando foi resolvida pela tabela de de-para normativa do módulo.
@@ -155,7 +156,7 @@ Cada uma das 404 fichas é subdividida em chunks estruturados, onde cada chunk r
   ```text
   [INFORMAÇÃO DA INFRAÇÃO]
   Código: {codigo_enquadramento} | Tipificação: {tipificacao_resumida}
-  Amparo Legal: {amparo_legal} | Infrator: {infrator} | Gravidade: {gravidade} | Competência: {competencia}
+  Amparo Legal: {amparo_legal} | Infrator: {infrator} | Gravidade: {gravidade} | Penalidade: {penalidade_original} | Competência: {competencias}
   ```
 - **Tipos de Chunks por Ficha**:
   1. `EMENTA`: Cabeçalho completo, amparo legal e enquadramento formal;
@@ -196,7 +197,7 @@ Em suma, o Enriquecedor materializa os seguintes contratos:
 1. **`FichaEnriquecida`**: Herda estruturalmente os campos extraídos, mas converte literais em tipos de domínio estritos.
    - **Original vs Normalizado**: Mantém atributos como `gravidade_original` para auditoria, ao mesmo tempo em que os classifica em `GravidadeEnum`.
    - **Estruturação de Listas**: Transforma strings como "Retenção do veículo e remoção" em listas como `['Retenção do veículo', 'Remoção do veículo']`.
-   - **Resolução de Competência**: Cruza as lacunas da Lei 14.599/23 e infere definitivamente se a competência é `MUNICIPAL`, `ESTADUAL` ou `CONCORRENTE`, definindo a `CompetenciaFonteEnum`.
+   - **Resolução de Competência**: Cruza as lacunas da Lei 14.599/23 e infere as listas de competências (ex: `[MUNICIPAL, ESTADUAL]`), definindo a `CompetenciaFonteEnum`.
    - **Mapeamento Jurídico**: Popula listas formais de `artigos_ctb` e `resolucoes_contran`.
 
 2. **`ChunkPayload` e `ChunkMetadados`**: Unidade atômica para o modelo vetorial.
@@ -205,7 +206,17 @@ Em suma, o Enriquecedor materializa os seguintes contratos:
 
 ---
 
-### 3.8. Formatos de Saída e Persistência Intermediária
+### 3.8. Fallback de Extração via LLM (Gemini 2.5 Flash-Lite)
+
+Para os casos anômalos onde as expressões regulares ou a tabela canônica não consigam extrair os dados com precisão, o Enriquecedor aciona uma camada de fallback via API utilizando o modelo **Gemini 2.5 Flash-Lite** (`gemini-2.5-flash-lite`).
+
+- **Custo-Benefício e Escala:** O `gemini-2.5-flash-lite` foi escolhido por sua altíssima velocidade e custo marginal próximo de zero (US$ 0,05 por 1M tokens de entrada e US$ 0,20 por 1M tokens de saída), não competindo pelos recursos da VRAM local usada para vetorização.
+- **Estruturação Pydantic:** O fallback utiliza recursos de *Structured Outputs* para injetar a inferência perfeitamente nos atributos faltantes do esquema canônico.
+- **Auditoria Explícita:** A intervenção do LLM é salva no JSON final através dos atributos recém-adicionados `campos_inferidos_por_llm` e ativando o modo `revisao_manual_necessaria = True`.
+
+---
+
+### 3.9. Formatos de Saída e Persistência Intermediária
 
 Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
@@ -224,8 +235,8 @@ Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
 ## 4. Alternativas Consideradas
 
-* **Extração de Informação via LLM em Lote (Zero-shot / Few-shot):**
-  * *Por que foi rejeitada:* O custo financeiro de APIs externas, a latência de rede e a imprevisibilidade de alucinação jurídica tornam o uso de LLMs desvantajoso para extração de dados normativos explícitos. O MBFT segue padrões redacionais sistemáticos, permitindo que analisadores léxicos e expressões regulares compiladas atinjam 100% de acurácia com custo marginal zero e auditabilidade absoluta.
+* **Extração de Informação Exclusivamente via LLM (Zero-shot / Few-shot):**
+  * *Por que foi rejeitada:* A dependência integral de LLMs aumenta o custo de processamento, a latência e traz um risco alto de alucinação jurídica. Optou-se por uma arquitetura híbrida inteligente: o analisador léxico e expressões regulares atuam como primeira barreira (garantindo velocidade, custo zero e acurácia exata), e o LLM atua *apenas como fallback de segurança* para estruturar pontualmente as fichas anômalas que fugirem do padrão.
 * **Modelo de Embeddings `text-embedding-3-small` da OpenAI:**
   * *Por que foi rejeitado:* Embora ofereça alta qualidade semântica, introduz acoplamento estrito a uma API comercial proprietária e incorre em custos recorrentes tanto na etapa *batch* quanto em cada requisição de consulta no *runtime*. O modelo aberto `BAAI/bge-m3` atinge desempenho de recuperação comparável ou superior em textos jurídicos em português e já possui suporte de execução gratuita na infraestrutura do Cloudflare Workers AI.
 * **Granularidade de Ficha Monolítica (1 vetor por ficha de fiscalização):**

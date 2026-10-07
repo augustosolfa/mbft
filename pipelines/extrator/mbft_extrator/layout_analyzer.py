@@ -131,11 +131,25 @@ class LayoutAnalyzer:
 
         # Na primeira página, localiza a linha dos títulos das colunas ("Quando Autuar")
         if self.is_first_page:
-            for i in range(self.num_rects):
-                r = self.tp.get_rect(i)
-                txt = self.tp.get_text_bounded(*r).strip()
-                if self.RE_QUANDO_AUTUAR.search(txt):
-                    y_top = min(y_top, r[1])
+            quando_ys = []
+            search_q = self.tp.search("quando", match_case=False)
+            while match := search_q.get_next():
+                quando_ys.append(self.tp.get_charbox(match[0])[1])
+
+            autuar_ys = []
+            search_a = self.tp.search("autuar", match_case=False)
+            while match := search_a.get_next():
+                autuar_ys.append(self.tp.get_charbox(match[0])[1])
+
+            valid_ys = []
+            for qy in quando_ys:
+                for ay in autuar_ys:
+                    if abs(qy - ay) < 8.0:
+                        valid_ys.append((qy + ay) / 2.0)
+
+            if valid_ys:
+                # O limite superior das colunas é o eixo Y da linha "Quando Autuar" mais alta na página
+                y_top = max(valid_ys)
 
         return y_top, y_bottom, ic_y_bound
 

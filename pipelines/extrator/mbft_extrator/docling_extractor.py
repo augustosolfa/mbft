@@ -67,3 +67,36 @@ def processar_intervalo_docling(
     logger.info(f"Executando Docling com CUDA nas páginas {pag_ini} a {pag_fim}...")
     conv_result = converter.convert(str(pdf_path), page_range=(pag_ini, pag_fim))
     return conv_result.document
+
+
+def criar_conversor_docling_ocr(num_threads: int = 8, device: str = "cuda") -> DocumentConverter:
+    logger.info(f"Inicializando pipeline Docling OCR com aceleracao '{device}'...")
+    pipeline_options = PdfPipelineOptions()
+    pipeline_options.do_ocr = True
+    pipeline_options.do_table_structure = True
+    pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE
+    pipeline_options.table_structure_options.do_cell_matching = True
+    pipeline_options.accelerator_options = AcceleratorOptions(num_threads=num_threads, device=device)
+    format_options = {InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
+    return DocumentConverter(format_options=format_options)
+
+def extrair_metadados_visuais(converter_ocr: DocumentConverter, pdf_path: Path, pagina: int) -> dict:
+    import re
+    logger.info(f"Executando Docling OCR na pagina {pagina} de {pdf_path.name}...")
+    conv_result = converter_ocr.convert(str(pdf_path), page_range=(pagina, pagina))
+    md_text = conv_result.document.export_to_markdown()
+    meta_limpo = {}
+    m_inf = re.search(r'Infrator\s*:?\s*([^|]*?)(?=\n|$|Compet[eê]ncia)', md_text, re.IGNORECASE)
+    if m_inf:
+        val = m_inf.group(1).strip()
+        val = re.sub(r'[\*_\|]', '', val)
+        val = re.sub(r'\s+', ' ', val).strip()
+        meta_limpo['infrator'] = val
+    m_const = re.search(r'Constata[cç][aã]o da Infra[cç][aã]o\s*:?\s*([^|]*?)(?=\n|$|Quando)', md_text, re.IGNORECASE)
+    if m_const:
+        val = m_const.group(1).strip()
+        val = re.sub(r'[\*_\|]', '', val)
+        val = re.sub(r'\s+', ' ', val).strip()
+        meta_limpo['constatacao_infracao'] = val
+    return meta_limpo
+

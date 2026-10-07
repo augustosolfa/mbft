@@ -11,6 +11,17 @@ from .models import Ficha
 
 logger = logging.getLogger("MBFT-Auditoria")
 
+class AuditoriaGeral:
+    correcoes_ocr = []
+
+    @classmethod
+    def registrar_correcao_ocr(cls, ficha_id: str, campo: str, valor_antigo: str, valor_novo: str):
+        cls.correcoes_ocr.append({
+            "ficha": ficha_id,
+            "campo": campo,
+            "antigo": valor_antigo,
+            "novo": valor_novo
+        })
 
 def gerar_relatorio_auditoria(
     fichas: List[Ficha],
@@ -78,6 +89,17 @@ def gerar_relatorio_auditoria(
             linhas.append(f"- *... e mais {len(alertas) - 50} alertas omitidos.*")
     else:
         linhas.append("- ✅ Nenhuma anomalia crítica ou campo obrigatório vazio detectado.")
+
+    linhas.extend([
+        "",
+        "## 4. Intervenções do OCR (Visual Fallback)",
+    ])
+    if AuditoriaGeral.correcoes_ocr:
+        linhas.append(f"O motor de OCR visual interveio em {len(AuditoriaGeral.correcoes_ocr)} campos sujos:")
+        for cor in AuditoriaGeral.correcoes_ocr:
+            linhas.append(f"- **Ficha {cor['ficha']}** (`{cor['campo']}`): substituído de `{cor['antigo']}` para `{cor['novo']}`")
+    else:
+        linhas.append("- ✅ Nenhuma anomalia detectada que exigisse OCR.")
 
     linhas.append("")
     conteudo_md = "\n".join(linhas)

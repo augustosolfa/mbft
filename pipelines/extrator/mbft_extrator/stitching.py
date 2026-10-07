@@ -29,15 +29,81 @@ METADATA_FIELDS = [
 ]
 
 
+def get_header_text_by_column(page: pdfium.PdfPage) -> str:
+    """Reconstrói o texto do cabeçalho agrupado por colunas, guiando-se pela grade vetorial."""
+    tp = page.get_textpage()
+    y_limit = 350.0
+    for i in range(tp.count_rects()):
+        r = tp.get_rect(i)
+        t = tp.get_text_bounded(*r).strip()
+        if re.search(r"quando\s+autuar", t, re.IGNORECASE):
+            y_limit = r[1] - 5.0
+            break
+
+    v_lines, h_lines = [], []
+    for obj in page.get_objects():
+        if getattr(obj, "type", None) == 2:  # Path
+            b = obj.get_bounds()
+            w, h = b[2] - b[0], b[3] - b[1]
+            if b[3] > y_limit: # Região dinâmica do cabeçalho
+                if w > 20 and h < 5: h_lines.append(b)
+                elif h > 10 and w < 5: v_lines.append(b)
+    
+    def dedup(lines, idx):
+        lines = sorted([l[idx] for l in lines])
+        res = []
+        for x in lines:
+            if not res or x - res[-1] > 3: res.append(x)
+        return res
+    
+    hl = dedup(h_lines, 1)[::-1]
+    tp = page.get_textpage()
+    cells = []
+    
+    # Ignoramos títulos repetitivos de coluna do corpo para focar só nos metadados da ficha
+    re_ignore = re.compile(r'^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es.*|exemplos.*):?$', re.IGNORECASE)
+    
+    for i in range(len(hl)-1):
+        top, bottom = hl[i], hl[i+1]
+        
+        # Filtra verticais que cruzam esta faixa horizontal específica
+        band_v_lines = [b for b in v_lines if b[1] <= bottom + 5 and b[3] >= top - 5]
+        vl = dedup(band_v_lines, 0)
+        
+        if len(vl) < 2: vl = [36.0, 560.0] # Fallback (margens padrão MBFT)
+            
+        for j in range(len(vl)-1):
+            # Expande as margens laterais extremas para evitar corte da primeira/última letra
+            left = 0 if j == 0 else vl[j] - 2
+            right = 800 if j == len(vl) - 2 else vl[j+1] + 2
+            
+            txt = tp.get_text_bounded(left, bottom - 2, right, top + 2).strip()
+            if txt:
+                txt = re.sub(r'[\r\n]+', ' ', txt)
+                txt = re.sub(r'\s+', ' ', txt)
+                if not re_ignore.match(txt):
+                    cells.append({'text': txt, 'left': vl[j], 'top': top})
+                
+    # Agrupa células por coluna (aprox. a cada 10 pts no eixo X)
+    cols = {}
+    for c in cells:
+        col_idx = round(c['left'] / 10) * 10
+        cols.setdefault(col_idx, []).append(c)
+        
+    # Constrói o texto do cabeçalho final (iterando e concatenando coluna a coluna)
+    header_text = ""
+    for k in sorted(cols.keys()):
+        for c in sorted(cols[k], key=lambda x: -x['top']):
+            header_text += c['text'] + "\n\n"
+            
+    return header_text
+
+
 def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -> Dict[str, Any]:
     """
     Extrai do cabeçalho da primeira página os metadados jurídicos da infração.
     """
-    txt_page = page.get_textpage().get_text_range()
-
-    # O cabeçalho estende-se até a linha dos títulos das colunas ("Quando Autuar")
-    m_qa = re.search(r"quando\s+autuar", txt_page, re.IGNORECASE)
-    header_txt = txt_page[:m_qa.start()] if m_qa else txt_page[:1600]
+    header_txt = get_header_text_by_column(page)
 
     # Remove ruídos de cabeçalho governamental repetitivo
     header_txt = re.sub(
@@ -70,11 +136,15 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
     # Normalizações determinísticas (heurísticas consagradas do extrair_mbft_old.py):
     infrator = meta.get("infrator", "")
     crime = meta.get("pode_configurar_crime_transito", "")
-    if not crime:
-        m_sim_nao = re.match(r"^(N[ÃA]O|SIM)\s*(.*)$", infrator, re.IGNORECASE)
-        if m_sim_nao:
-            crime = m_sim_nao.group(1).upper()
-            infrator = m_sim_nao.group(2).strip()
+    
+    # Corrige vazamento de "SIM" ou "NÃO" para dentro do infrator devido a falha da grade
+    m_sim_nao = re.match(r"^(N[ÃA]O|SIM)\b\s*(.*)$", infrator, re.IGNORECASE)
+    if m_sim_nao:
+        crime_ext = m_sim_nao.group(1).upper()
+        infrator = m_sim_nao.group(2).strip()
+        # Se o crime estava vazio ou capturou sujeira da competência adjacente
+        if not crime or len(crime) > 25 or "Cêi" in crime or "14599" in crime:
+            crime = crime_ext
 
     cod = meta.get("codigo_enquadramento", "")
     m_cod = re.search(r"([0-9]{3}\s*-\s*[0-9]{1,2})", cod)
@@ -85,6 +155,11 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
 
     meta["infrator"] = infrator
     meta["pode_configurar_crime_transito"] = crime.strip() if crime and crime.strip() else None
+
+    # Limpeza de duplicação por sobreposição de bounding box na última linha do cabeçalho
+    const_inf = meta.get("constatacao_infracao", "")
+    const_inf = re.split(r'(?i)constata[cç][aã]o da infra[cç][aã]o', const_inf)[0].strip()
+    meta["constatacao_infracao"] = const_inf
 
     comp = meta.get("competencia", "").strip()
     if not comp:

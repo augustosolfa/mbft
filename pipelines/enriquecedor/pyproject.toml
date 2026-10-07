@@ -1,0 +1,32 @@
+[project]
+name = "mbft-enriquecedor"
+version = "0.1.0"
+description = "Enriquecedor e Vetorizador de dados do Manual Brasileiro de Fiscalização de Trânsito (MBFT)"
+readme = "README.md"
+authors = [
+    { name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "torch",
+    "sentence-transformers",
+    "polars",
+    "google-genai",
+    "mbft-core",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu132" }
+mbft-core = { workspace = true }
+
+[project.scripts]
+mbft-enriquecedor = "mbft_enriquecedor:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
