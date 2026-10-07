@@ -136,11 +136,15 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
     # Normalizações determinísticas (heurísticas consagradas do extrair_mbft_old.py):
     infrator = meta.get("infrator", "")
     crime = meta.get("pode_configurar_crime_transito", "")
-    if not crime:
-        m_sim_nao = re.match(r"^(N[ÃA]O|SIM)\s*(.*)$", infrator, re.IGNORECASE)
-        if m_sim_nao:
-            crime = m_sim_nao.group(1).upper()
-            infrator = m_sim_nao.group(2).strip()
+    
+    # Corrige vazamento de "SIM" ou "NÃO" para dentro do infrator devido a falha da grade
+    m_sim_nao = re.match(r"^(N[ÃA]O|SIM)\b\s*(.*)$", infrator, re.IGNORECASE)
+    if m_sim_nao:
+        crime_ext = m_sim_nao.group(1).upper()
+        infrator = m_sim_nao.group(2).strip()
+        # Se o crime estava vazio ou capturou sujeira da competência adjacente
+        if not crime or len(crime) > 25 or "Cêi" in crime or "14599" in crime:
+            crime = crime_ext
 
     cod = meta.get("codigo_enquadramento", "")
     m_cod = re.search(r"([0-9]{3}\s*-\s*[0-9]{1,2})", cod)
@@ -151,6 +155,11 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
 
     meta["infrator"] = infrator
     meta["pode_configurar_crime_transito"] = crime.strip() if crime and crime.strip() else None
+
+    # Limpeza de duplicação por sobreposição de bounding box na última linha do cabeçalho
+    const_inf = meta.get("constatacao_infracao", "")
+    const_inf = re.split(r'(?i)constata[cç][aã]o da infra[cç][aã]o', const_inf)[0].strip()
+    meta["constatacao_infracao"] = const_inf
 
     comp = meta.get("competencia", "").strip()
     if not comp:

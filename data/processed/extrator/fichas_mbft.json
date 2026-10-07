@@ -374,7 +374,7 @@
     "penalidade": "Multa (3x) )",
     "medida_administrativa": "Recolhimento do documento de habilitação e retenção do veículo até a apresentação de condutor habilitado. (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "SIM Art. 307 do CTB",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não Computável g",
@@ -428,7 +428,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Mediante abordagem. Constatação da Infração: Mediante abordagem. Pode Configurar Crime de Trânsito: SIM Art. 309 do CTB",
+    "constatacao_infracao": "Mediante abordagem. gp",
     "quando_autuar": {
       "texto": "1. Condutor com CNH de categoria diferente da do veículo que esteja dirigindo.",
       "itens": [
@@ -478,36 +478,32 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Mediante abordagem. Constatação da Infração: Mediante abordagem. Pode Configurar Crime de Trânsito: SIM Art. 309 do CTB",
+    "constatacao_infracao": "Mediante abordagem. gp g Quando NÃO Autuar:",
     "quando_autuar": {
-      "texto": "Tipificação Resumida: Dirigir veículo com PPD de categoria diferente da do veículo. Amparo Legal: Art. 162, III. Tipificação do Enquadramento: conduzindo. Gravidade: Gravíssima Infrator: Condutor Pontuação: 7 Quando Autuar:\n\n1. Condutor com PPD de categoria diferente da do veículo que esteja dirigindo.",
+      "texto": "1. Condutor com PPD de categoria diferente da do veículo que esteja dirigindo.",
       "itens": [
-        "Tipificação Resumida: Dirigir veículo com PPD de categoria diferente da do veículo. Amparo Legal: Art. 162, III. Tipificação do Enquadramento: conduzindo. Gravidade: Gravíssima Infrator: Condutor Pontuação: 7 Quando Autuar:",
         "1. Condutor com PPD de categoria diferente da do veículo que esteja dirigindo."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "Dirigir veículo com Carteira Nacional de Habilitação ou Permissão para Dirigir de categoria diferente da do veículo que estej Penalidade: Multa (2X) Competência (alterada pela Lei n. 14.599/23) Órgão ou Entidade de Trânsito Constatação da Infração: Mediante abordagem.\n\n1. Condutor com ACC dirigindo veículo para o qual é necessária habilitação de categoria de \"A\" a \"E\", utilizar enquadramento específico: 501-00, art. 162, I.\n\n2. Condutor com CNH dirigindo veículo de categoria diferente, utilizar enquadramento específico: 503-71, art. 162, III.\n\n3. Condutor com Habilitação Internacional para Dirigir ou habilitação de outro país dirigindo veículo de categoria diferente, utilizar enquadramento específico: 501-00, art. 162, I.",
+      "texto": "1. Condutor com ACC dirigindo veículo para o qual é necessária habilitação de categoria de \"A\" a \"E\", utilizar enquadramento específico: 501-00, art. 162, I.\n\n2. Condutor com CNH dirigindo veículo de categoria diferente, utilizar enquadramento específico: 503-71, art. 162, III.\n\n3. Condutor com Habilitação Internacional para Dirigir ou habilitação de outro país dirigindo veículo de categoria diferente, utilizar enquadramento específico: 501-00, art. 162, I.",
       "itens": [
-        "Dirigir veículo com Carteira Nacional de Habilitação ou Permissão para Dirigir de categoria diferente da do veículo que estej Penalidade: Multa (2X) Competência (alterada pela Lei n. 14.599/23) Órgão ou Entidade de Trânsito Constatação da Infração: Mediante abordagem.",
         "1. Condutor com ACC dirigindo veículo para o qual é necessária habilitação de categoria de \"A\" a \"E\", utilizar enquadramento específico: 501-00, art. 162, I.",
         "2. Condutor com CNH dirigindo veículo de categoria diferente, utilizar enquadramento específico: 503-71, art. 162, III.",
         "3. Condutor com Habilitação Internacional para Dirigir ou habilitação de outro país dirigindo veículo de categoria diferente, utilizar enquadramento específico: 501-00, art. 162, I."
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "Medida Administrativa: Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). : Estadual, Municipal e Rodoviário.\n\n1. Caso o condutor não seja o proprietário, utilizar, concomitantemente, enquadramento específico: 508-82 art. 163 c/c art. 162, III ou 513-42 art. 164 c/c art. 162, III.\n\n2. Se o condutor estiver com a PPD vencida há mais de 30 dias, utilizar, concomitantemente, enquadramento específico: 501-00, art. 162, I.\n\n3. Se o condutor não portar a PPD, utilizar, concomitantemente, enquadramento específico: 691-20, art. 232.",
+      "texto": "1. Caso o condutor não seja o proprietário, utilizar, concomitantemente, enquadramento específico: 508-82 art. 163 c/c art. 162, III ou 513-42 art. 164 c/c art. 162, III.\n\n2. Se o condutor estiver com a PPD vencida há mais de 30 dias, utilizar, concomitantemente, enquadramento específico: 501-00, art. 162, I.\n\n3. Se o condutor não portar a PPD, utilizar, concomitantemente, enquadramento específico: 691-20, art. 232.",
       "itens": [
-        "Medida Administrativa: Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). : Estadual, Municipal e Rodoviário.",
         "1. Caso o condutor não seja o proprietário, utilizar, concomitantemente, enquadramento específico: 508-82 art. 163 c/c art. 162, III ou 513-42 art. 164 c/c art. 162, III.",
         "2. Se o condutor estiver com a PPD vencida há mais de 30 dias, utilizar, concomitantemente, enquadramento específico: 501-00, art. 162, I.",
         "3. Se o condutor não portar a PPD, utilizar, concomitantemente, enquadramento específico: 691-20, art. 232."
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Código do Enquadramento: 503-72 a Pode Configurar Crime de Trânsito: SIM Art. 309 do CTB Observações do AIT:\n\n1. Condutor habilitado na categoria \"B\" dirigindo Combinação de Veículos de Carga.\n\n2. Condutor habilitado na categoria \"A\".",
+      "texto": "1. Condutor habilitado na categoria \"B\" dirigindo Combinação de Veículos de Carga.\n\n2. Condutor habilitado na categoria \"A\".",
       "itens": [
-        "Código do Enquadramento: 503-72 a Pode Configurar Crime de Trânsito: SIM Art. 309 do CTB Observações do AIT:",
         "1. Condutor habilitado na categoria \"B\" dirigindo Combinação de Veículos de Carga.",
         "2. Condutor habilitado na categoria \"A\"."
       ]
@@ -527,8 +523,8 @@
     "gravidade": "Gravíssima",
     "penalidade": "Multa",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual)",
-    "pode_configurar_crime_transito": "Ã Cêi(ldlLi 14599/23) )",
-    "infrator": "NÃO Condutor",
+    "pode_configurar_crime_transito": "NÃO",
+    "infrator": "Condutor",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -781,7 +777,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pp",
@@ -951,7 +947,7 @@
     "penalidade": "Multa (3X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "SIM Art. 310 do CTB",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1004,7 +1000,7 @@
     "penalidade": "Multa (3X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "SIM Art. 310 do CTB",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1057,7 +1053,7 @@
     "penalidade": "Multa (3X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "SIM Art. 310 do CTB",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1110,7 +1106,7 @@
     "penalidade": "Multa (2X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). /",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1165,7 +1161,7 @@
     "penalidade": "Multa (2X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1220,7 +1216,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1277,7 +1273,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1331,7 +1327,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1385,7 +1381,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1440,22 +1436,20 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
-    "constatacao_infracao": "Mediante abordagem. Constatação da Infração: Mediante abordagem. Pode Configurar Crime de Trânsito: NÃO",
+    "constatacao_infracao": "Mediante abordagem. g, p g Quando NÃO Autuar g",
     "quando_autuar": {
-      "texto": "Tipificação Resumida: Amparo Legal: Art. 163 c/c 162, VI. Tipificação do Enquadramento: Gravidade: Gravíssima Infrator: Proprietário Pontuação: 7 Quando Autuar\n\n1. Proprietário que entregar a direção de veículo sem uma ou mais adaptações que constam no documento de habilitação do condutor.",
+      "texto": "1. Proprietário que entregar a direção de veículo sem uma ou mais adaptações que constam no documento de habilitação do condutor.",
       "itens": [
-        "Tipificação Resumida: Amparo Legal: Art. 163 c/c 162, VI. Tipificação do Enquadramento: Gravidade: Gravíssima Infrator: Proprietário Pontuação: 7 Quando Autuar",
         "1. Proprietário que entregar a direção de veículo sem uma ou mais adaptações que constam no documento de habilitação do condutor."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "Entregar veíc pessoa s/ adaptações impostas concessão/renovação licença conduzir. Entregar a direção do veículo à pessoa nas condições previstas no artigo anterior. Penalidade: Multa Competência (alterada pela Lei n. 14.599/23) Órgão ou Entidade de Trânsito Constatação da Infração: Mediante abordagem.\n\n1. Proprietário ausente ou proprietário pessoa jurídica, utilizar enquadramento específico: 515-04, art. 164 c/c 162, VI.\n\n2. Proprietário que entregar a direção de veículo com adaptações, dirigido por condutor com documento de habilitação sem restrição, desde que não esteja comprometendo a segurança.\n\n3. Proprietário que entregar a direção do veículo à pessoa com incapacidade física ou mental temporária, que comprometa a segurança do trânsito, utilizar enquadramento específico: 517-70, art. 166.\n\n4. Proprietário que entregar a direção do veículo à pessoa que esteja descumprindo quaisquer das seguintes restrições no documento de habilitação: “vedado dirigir em rodovias e vias de trânsito rápido”, “vedado dirigir após o pôr-do-sol” ou “outras restrições”, utilizar enquadramento específico: 517-70, art. 166.\n\n5. Quando a pessoa que entregou a direção do veículo não for o proprietário, utilizar enquadramento específico: 515-04, art. 164 c/c 162, VI.\n\n7. Quando o proprietário do veículo for o condutor, utilizar apenas o enquadramento específico: 505-34, art.162, VI.",
+      "texto": "1. Proprietário ausente ou proprietário pessoa jurídica, utilizar enquadramento específico: 515-04, art. 164 c/c 162, VI.\n\n2. Proprietário que entregar a direção de veículo com adaptações, dirigido por condutor com documento de habilitação sem restrição, desde que não esteja comprometendo a segurança.\n\n3. Proprietário que entregar a direção do veículo à pessoa com incapacidade física ou mental temporária, que comprometa a segurança do trânsito, utilizar enquadramento específico: 517-70, art. 166.\n\n4. Proprietário que entregar a direção do veículo à pessoa que esteja descumprindo quaisquer das seguintes restrições no documento de habilitação: “vedado dirigir em rodovias e vias de trânsito rápido”, “vedado dirigir após o pôr-do-sol” ou “outras restrições”, utilizar enquadramento específico: 517-70, art. 166.\n\n5. Quando a pessoa que entregou a direção do veículo não for o proprietário, utilizar enquadramento específico: 515-04, art. 164 c/c 162, VI.\n\n7. Quando o proprietário do veículo for o condutor, utilizar apenas o enquadramento específico: 505-34, art.162, VI.",
       "itens": [
-        "Entregar veíc pessoa s/ adaptações impostas concessão/renovação licença conduzir. Entregar a direção do veículo à pessoa nas condições previstas no artigo anterior. Penalidade: Multa Competência (alterada pela Lei n. 14.599/23) Órgão ou Entidade de Trânsito Constatação da Infração: Mediante abordagem.",
         "1. Proprietário ausente ou proprietário pessoa jurídica, utilizar enquadramento específico: 515-04, art. 164 c/c 162, VI.",
         "2. Proprietário que entregar a direção de veículo com adaptações, dirigido por condutor com documento de habilitação sem restrição, desde que não esteja comprometendo a segurança.",
         "3. Proprietário que entregar a direção do veículo à pessoa com incapacidade física ou mental temporária, que comprometa a segurança do trânsito, utilizar enquadramento específico: 517-70, art. 166.",
@@ -1465,9 +1459,8 @@
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "FICHA DE FISCALIZAÇÃO Medida Administrativa: Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). : Estadual, Municipal e Rodoviário.\n\n1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.\n\n2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.\n\n3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do Estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 505-34, art. 162, VI.\n\n5. Verificar as adaptações que constam no documento de habilitação do condutor.",
+      "texto": "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.\n\n2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.\n\n3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do Estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 505-34, art. 162, VI.\n\n5. Verificar as adaptações que constam no documento de habilitação do condutor.",
       "itens": [
-        "FICHA DE FISCALIZAÇÃO Medida Administrativa: Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). : Estadual, Municipal e Rodoviário.",
         "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.",
         "2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.",
         "3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do Estado ou Distrito Federal, equipara-se ao proprietário do veículo.",
@@ -1476,9 +1469,8 @@
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Código do Enquadramento: 510-04 Pode Configurar Crime de Trânsito: NÃO Observações do AIT\n\n1. Lavrado o AIT nº xxxxxxxxxx do art. 162, VI.",
+      "texto": "1. Lavrado o AIT nº xxxxxxxxxx do art. 162, VI.",
       "itens": [
-        "Código do Enquadramento: 510-04 Pode Configurar Crime de Trânsito: NÃO Observações do AIT",
         "1. Lavrado o AIT nº xxxxxxxxxx do art. 162, VI."
       ]
     },
@@ -1499,7 +1491,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1556,7 +1548,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pçp",
@@ -1610,36 +1602,41 @@
     "penalidade": "Multa (3X) êi (ldli )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). i /)",
     "pode_configurar_crime_transito": "SIM Art. 310 do CTB",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
     "constatacao_infracao": "Mediante abordagem.",
     "quando_autuar": {
-      "texto": "enquadramento: 501-00, Art. 162, I.",
+      "texto": "1. Proprietário ausente ou pessoa jurídica que permitir a posse e condução do veículo a condutor que não possuir documento de habilitação ou que se encontrar em qualquer das hipóteses previstas no campo “Quando Autuar” do enquadramento: 501-00, Art. 162, I.",
       "itens": [
-        "enquadramento: 501-00, Art. 162, I."
+        "1. Proprietário ausente ou pessoa jurídica que permitir a posse e condução do veículo a condutor que não possuir documento de habilitação ou que se encontrar em qualquer das hipóteses previstas no campo “Quando Autuar” do enquadramento: 501-00, Art. 162, I."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "veículo for o condutor não habilitado, utilizar enquadramento específico: 501-00, art. 162, I.\n\n3. Proprietário que permitir a posse e a condução do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 501-00, art. 162, I.",
+      "texto": "1. Proprietário que entregar a direção do veículo a pessoa que não possui documento de habilitação, utilizar enquadramento específico: 506-10, Art. 163 c/c 162 I.\n\n2. Quando o proprietário do veículo for o condutor não habilitado, utilizar enquadramento específico: 501-00, art. 162, I.\n\n3. Proprietário que permitir a posse e a condução do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 501-00, art. 162, I.",
       "itens": [
-        "veículo for o condutor não habilitado, utilizar enquadramento específico: 501-00, art. 162, I.",
+        "1. Proprietário que entregar a direção do veículo a pessoa que não possui documento de habilitação, utilizar enquadramento específico: 506-10, Art. 163 c/c 162 I.",
+        "2. Quando o proprietário do veículo for o condutor não habilitado, utilizar enquadramento específico: 501-00, art. 162, I.",
         "3. Proprietário que permitir a posse e a condução do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 501-00, art. 162, I."
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "condutor não habilitado, no momento da abordagem.\n\n3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do Estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. Adotar providências junto à autoridade competente para o registro do crime do Art. 310 do CTB.\n\n5. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 501-00, art. 162, I.",
+      "texto": "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor não habilitado, no momento da abordagem.\n\n2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor não habilitado, no momento da abordagem.\n\n3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do Estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. Adotar providências junto à autoridade competente para o registro do crime do Art. 310 do CTB.\n\n5. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 501-00, art. 162, I.",
       "itens": [
-        "condutor não habilitado, no momento da abordagem.",
+        "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor não habilitado, no momento da abordagem.",
+        "2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor não habilitado, no momento da abordagem.",
         "3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do Estado ou Distrito Federal, equipara-se ao proprietário do veículo.",
         "4. Adotar providências junto à autoridade competente para o registro do crime do Art. 310 do CTB.",
         "5. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 501-00, art. 162, I."
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Proprietário pessoa física ausente que permitiu a posse e condução do veículo a condutor inabilitado.\n\n2. Lavrado o AIT nº xxxxxxxxxx do art. 162, I.",
+      "itens": [
+        "1. Proprietário pessoa física ausente que permitiu a posse e condução do veículo a condutor inabilitado.",
+        "2. Lavrado o AIT nº xxxxxxxxxx do art. 162, I."
+      ]
     },
     "informacoes_complementares": "<p>Não há.</p>",
     "paginas": [
@@ -1657,7 +1654,7 @@
     "penalidade": "Multa (3X) ( )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). /)",
     "pode_configurar_crime_transito": "SIM Art. 310 do CTB",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -1709,7 +1706,7 @@
     "penalidade": "Multa (3X) êi(ldli )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). i /)",
     "pode_configurar_crime_transito": "SIM Art. 310 do CTB",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -1761,7 +1758,7 @@
     "penalidade": "Multa (2X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). /",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -1814,7 +1811,7 @@
     "penalidade": "Multa (2X) )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -1865,7 +1862,7 @@
     "penalidade": "Multa êi(ldli )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). i /)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -1921,7 +1918,7 @@
     "penalidade": "Multa êi(ldli )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). i /)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -1974,7 +1971,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -2027,7 +2024,7 @@
     "penalidade": "Multa Ctêi(ltdlLi )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). i 14599/23)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -2081,7 +2078,7 @@
     "penalidade": "Multa Ctêi(ltdlLi )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide Parte Geral deste Manual). i 14599/23)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -2134,38 +2131,45 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 ç",
     "constatacao_infracao": "Mediante abordagem. g, p p",
     "quando_autuar": {
-      "texto": "enquadramento: 774-91, art. 162, VII.\n\n2. Quando o veículo for de propriedade de pessoa jurídica e o condutor se encontrar nas condições previstas no item 1, acima.",
+      "texto": "1. Proprietário, ausente, que permitir a posse e condução do veículo a pessoa que:\n\n1.1. não possua Curso Especializado, na forma regulamentada pelo Contran;\n\n1.2. esteja com a validade do Curso Especializado vencida;\n\n1.3. se encontra em qualquer das hipóteses previstas no campo “Quando Autuar”, do enquadramento: 774-91, art. 162, VII.\n\n2. Quando o veículo for de propriedade de pessoa jurídica e o condutor se encontrar nas condições previstas no item 1, acima.",
       "itens": [
-        "enquadramento: 774-91, art. 162, VII.",
+        "1. Proprietário, ausente, que permitir a posse e condução do veículo a pessoa que:",
+        "1.1. não possua Curso Especializado, na forma regulamentada pelo Contran;",
+        "1.2. esteja com a validade do Curso Especializado vencida;",
+        "1.3. se encontra em qualquer das hipóteses previstas no campo “Quando Autuar”, do enquadramento: 774-91, art. 162, VII.",
         "2. Quando o veículo for de propriedade de pessoa jurídica e o condutor se encontrar nas condições previstas no item 1, acima."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "que entregar o veículo a condutor sem possuir curso específico obrigatório na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.\n\n3. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-91, art. 162, VII.\n\n4. Quando o proprietário do veículo for o condutor que não possui o Curso Especializado.",
+      "texto": "1. Proprietário que entregar a direção do veículo a pessoa sem possuir Curso Especializado, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-31, art. 163 c/c 162, VII.\n\n2. Proprietário ausente ou proprietário pessoa jurídica, que entregar o veículo a condutor sem possuir curso específico obrigatório na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.\n\n3. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-91, art. 162, VII.\n\n4. Quando o proprietário do veículo for o condutor que não possui o Curso Especializado.",
       "itens": [
-        "que entregar o veículo a condutor sem possuir curso específico obrigatório na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.",
+        "1. Proprietário que entregar a direção do veículo a pessoa sem possuir Curso Especializado, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-31, art. 163 c/c 162, VII.",
+        "2. Proprietário ausente ou proprietário pessoa jurídica, que entregar o veículo a condutor sem possuir curso específico obrigatório na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.",
         "3. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-91, art. 162, VII.",
         "4. Quando o proprietário do veículo for o condutor que não possui o Curso Especializado."
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 774-91, art. 162, VII.\n\n5. O condutor que se apresentar para realizar a liberação do veículo deve possuir o respectivo curso especializado necessário para conduzi-lo.",
+      "texto": "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.\n\n2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.\n\n3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 774-91, art. 162, VII.\n\n5. O condutor que se apresentar para realizar a liberação do veículo deve possuir o respectivo curso especializado necessário para conduzi-lo.",
       "itens": [
-        "de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.",
+        "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.",
+        "2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.",
+        "3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.",
         "4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 774-91, art. 162, VII.",
         "5. O condutor que se apresentar para realizar a liberação do veículo deve possuir o respectivo curso especializado necessário para conduzi-lo."
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "intermunicipal de passageiros, realizando linha, a condutor que não possui o Curso Especializado CETCP.",
+      "texto": "1. Proprietário ausente no momento da abordagem, permitiu a posse e a condução de veículo transportando chapas serradas, a condutor que não possui Curso Especializado (CETCI).\n\n2. Proprietário, pessoa jurídica, entregou a direção de veículo de transporte rodoviário intermunicipal de passageiros, realizando linha, a condutor que não possui o Curso Especializado CETCP.",
       "itens": [
-        "intermunicipal de passageiros, realizando linha, a condutor que não possui o Curso Especializado CETCP."
+        "1. Proprietário ausente no momento da abordagem, permitiu a posse e a condução de veículo transportando chapas serradas, a condutor que não possui Curso Especializado (CETCI).",
+        "2. Proprietário, pessoa jurídica, entregou a direção de veículo de transporte rodoviário intermunicipal de passageiros, realizando linha, a condutor que não possui o Curso Especializado CETCP."
       ]
     },
     "informacoes_complementares": "<p>Não há.</p>",
@@ -2184,21 +2188,24 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo até a apresentação de condutor habilitado. (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 ç",
     "constatacao_infracao": "Mediante abordagem. g, p p",
     "quando_autuar": {
-      "texto": "enquadramento: 774-92, art. 162, VII.\n\n2. Quando o veículo for de propriedade de pessoa jurídica e o condutor se encontrar nas condições previstas no item 1, acima.",
+      "texto": "1. Proprietário, ausente, que permitir a posse e condução do veículo a pessoa que:\n\n1.1. não possua ou não tenha realizado curso especializado obrigatório, na forma regulamentada pelo Contran;\n\n1.2. se encontra em qualquer das hipóteses previstas no campo “Quando Autuar”, do enquadramento: 774-92, art. 162, VII.\n\n2. Quando o veículo for de propriedade de pessoa jurídica e o condutor se encontrar nas condições previstas no item 1, acima.",
       "itens": [
-        "enquadramento: 774-92, art. 162, VII.",
+        "1. Proprietário, ausente, que permitir a posse e condução do veículo a pessoa que:",
+        "1.1. não possua ou não tenha realizado curso especializado obrigatório, na forma regulamentada pelo Contran;",
+        "1.2. se encontra em qualquer das hipóteses previstas no campo “Quando Autuar”, do enquadramento: 774-92, art. 162, VII.",
         "2. Quando o veículo for de propriedade de pessoa jurídica e o condutor se encontrar nas condições previstas no item 1, acima."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "2. Proprietário que entregar a direção do veículo a pessoa que não possua ou não tenha realizado curso específico obrigatório, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-32, art. 163 c/c 162, VII.\n\n3. Proprietário ausente ou proprietário pessoa jurídica, que entregar o veículo a condutor sem possuir Curso Especializado ou com este vencido, na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.\n\n4. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-92, art. 162, VII.\n\n5. Quando o proprietário do veículo for o condutor que não possui o curso específico obrigatório.",
+      "texto": "1. Proprietário que entregar a direção do veículo a pessoa sem possuir Curso Especializado ou com este vencido, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-31, art. 163 c/c 162, VII.\n\n2. Proprietário que entregar a direção do veículo a pessoa que não possua ou não tenha realizado curso específico obrigatório, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-32, art. 163 c/c 162, VII.\n\n3. Proprietário ausente ou proprietário pessoa jurídica, que entregar o veículo a condutor sem possuir Curso Especializado ou com este vencido, na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.\n\n4. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-92, art. 162, VII.\n\n5. Quando o proprietário do veículo for o condutor que não possui o curso específico obrigatório.",
       "itens": [
+        "1. Proprietário que entregar a direção do veículo a pessoa sem possuir Curso Especializado ou com este vencido, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-31, art. 163 c/c 162, VII.",
         "2. Proprietário que entregar a direção do veículo a pessoa que não possua ou não tenha realizado curso específico obrigatório, na forma regulamentada pelo Contran, utilizar enquadramento específico: 777-32, art. 163 c/c 162, VII.",
         "3. Proprietário ausente ou proprietário pessoa jurídica, que entregar o veículo a condutor sem possuir Curso Especializado ou com este vencido, na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.",
         "4. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-92, art. 162, VII.",
@@ -2206,15 +2213,19 @@
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 774-92, art. 162, VII.",
+      "texto": "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.\n\n2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.\n\n3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.\n\n4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 774-92, art. 162, VII.",
       "itens": [
+        "1. A conduta \"entregar\" exige a presença do proprietário junto ao condutor, no momento da abordagem.",
+        "2. A conduta \"permitir\" caracteriza-se pela ausência do proprietário junto ao condutor, no momento da abordagem.",
         "3. Em caso de veículo objeto de penhor ou de contrato de arrendamento mercantil, comodato, aluguel ou arrendamento não vinculado ao financiamento do veículo, o possuidor, registrado no órgão executivo de trânsito do estado ou Distrito Federal, equipara-se ao proprietário do veículo.",
         "4. A autuação neste enquadramento deve ser precedida pela lavratura do auto da infração no enquadramento 774-92, art. 162, VII."
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Proprietário ausente ao veículo, entregou a direção ao condutor que dirigia o veículo com pendência na realização do curso de reciclagem após a suspensão do direito de dirigir.",
+      "itens": [
+        "1. Proprietário ausente ao veículo, entregou a direção ao condutor que dirigia o veículo com pendência na realização do curso de reciclagem após a suspensão do direito de dirigir."
+      ]
     },
     "informacoes_complementares": "<p>Não há.</p>\n\n<img src=\"imagens/ficha778-12_1.png\" alt=\"– - Tipificação Resumida: Código de Enquadramento:\" />\n<p>– Tipificação Resumida: Código de Enquadramento: Dirigir sob a influência de álcool. 516-91 Amparo Legal: Art. 165. Tipificação do Enquadramento: Dirigir sob a influência de álcool ou de qualquer outra substância psicoativa que determine dependência. Gravidade: Penalidade: Medida Administrativa: Pode Configurar Crime de Gravíssima Multa (10 vezes) e suspensão Recolhimento do documento de Trânsito: do direito de dirigir por 12 habilitação e retenção do (doze) meses. veículo, observado o disposto SIM no § 4º do art. 270 do CTB. (Vide Art. 306 e 310 do CTB a Parte Geral deste Manual). (Vide também, informações Infrator: Competência (alterada pela Lei n. 14.599/23): complementares) Condutor Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário. Pontuação: Constatação da Infração: Não computável Mediante abordagem. Exemplos do Campo de Quando Autuar Quando NÃO Autuar Definições e Procedimentos Observações do AIT:</p>\n\n<p><strong>1. Condutor que apresentar 1. Condutor que, em teste de 1. ETILÔMETRO - aparelho 1. Condutor realizou teste</strong></p>\n\n<table>\n  <tr>\n    <td>\n<p>concentração de álcool igual etilômetro, apresentou ou superior a 0,05 miligrama concentração de álcool igual de álcool por litro de ar ou inferior a 0,04 mg/L de ar alveolar expirado (0,05 mg/L alveolar (medição realizada - - medição realizada - MR) em MR). teste de etilômetro. 2. Condutor dirigindo veículo</p>\n    </td>\n    <td>\n<p>destinado à medição do teor de etilômetro, tendo como alcoólico no ar alveolar. resultado 0,20 mg/L de álcool por litro de ar - 2. AR ALVEOLAR - ar expirado alveolar. Etilômetro aferido pela boca de um indivíduo, pelo Inmetro. originário dos alvéolos pulmonares. 2. Condutor se recusou a se</p>\n    </td>\n  </tr>\n</table>\n\n<p><strong>2. Condutor que se recusar a sob influência de qualquer submeter ao teste do</strong></p>\n\n<table>\n  <tr>\n    <td>\n<p>se submeter ao teste do outra substância psicoativa etilômetro ou a qualquer dos que determine dependência, procedimentos previstos no utilizar enquadramento art. 277 e que apresentar específico: 516-92, art. 165. dois ou mais sinais de alteração da capacidade 3. Condutor que se recusar a psicomotora, pelo uso do se submeter ao teste do álcool, descritos no etilômetro ou a qualquer dos respectivo termo de procedimentos previstos no constatação. art. 277 e não apresentar sinais ou apresentar apenas</p>\n    </td>\n    <td>\n<p>3. Do resultado do etilômetro etilômetro marca xx, (medição realizada - MR) modelo xx e nº de série xx, deverá ser descontada margem apresentando dois ou mais de tolerância, que será o erro sinais de alteração da máximo admissível, conforme capacidade psicomotora, legislação metrológica, de conforme termo de acordo com a “Tabela de constatação que Valores Referenciais para acompanha o AIT. Etilômetro” constante em normativo do Contran.</p>\n    </td>\n  </tr>\n</table>\n\n<p><strong>3. Condutor que, submetido um sinal da alteração da 4. Para se constatar a alteração</strong></p>\n\n<table>\n  <tr>\n    <td>\n<p>a exame de sangue, capacidade psicomotora, apresentar qualquer utilizar enquadramento concentração de álcool por específico: 757-90, art. 165litro de sangue. A. 4. Condutor dirigindo o veículo com incapacidade física ou mental temporária, que comprometa a segurança do trânsito, utilizar enquadramento específico: 733-10, art. 252, III.</p>\n    </td>\n    <td>\n<p>da capacidade psicomotora do</p>\n<p>condutor deverá ser</p>\n<p>considerado não somente um</p>\n<p>sinal, mas um conjunto de</p>\n<p>sinais que comprovem que ele</p>\n<p>se encontra sob a influência de</p>\n<p>álcool, podendo, ainda, serem</p>\n<p>utilizados, prova testemunhal,</p>\n<p>imagem, vídeo ou qualquer</p>\n<p>outro meio de prova em direito</p>\n<p>admitido.</p>\n<p>5. Os sinais de alteração da</p>\n    </td>\n  </tr>\n</table>\n\n<p>descritos em normativo do</p>\n<p>Contran e devem constar no AIT</p>\n<p>ou em termo específico que</p>\n<p>acompanhe o auto.</p>\n<p>6. Quando o teste do</p>\n<p>etilômetro apresentar valor</p>\n<p>igual ou superior a 0,34mg/L de</p>\n<p>ar alveolar (MR), ou quando o</p>\n<p>condutor apresentar dois ou</p>\n<p>mais sinais de alteração da</p>\n<p>capacidade psicomotora,</p>\n<p>caracteriza-se a infração penal</p>\n<p>prevista no art. 306 do CTB e o</p>\n<p>condutor deve ser conduzido à</p>\n<p>autoridade competente.</p>\n<p>7. Em caso de não apresentação</p>\n<p>de condutor habilitado, o</p>\n<p>veículo deverá ser</p>\n<p>encaminhado ao local definido</p>\n<p>pelo órgão autuador.</p>\n<p>8. É vedada a lavratura</p>\n<p>simultânea de Autos de</p>\n<p>Infração com base nos artigos</p>\n<p>165 e 165-A, na mesma</p>\n<p>abordagem.</p>\n<p>9. O condutor deverá se</p>\n<p>submeter ao teste ou exame</p>\n<p>solicitado pelo agente da</p>\n<p>autoridade de trânsito, no</p>\n<p>momento da abordagem, cuja</p>\n<p>recusa a qualquer deles</p>\n<p>sujeitará o infrator à infração</p>\n<p>do art. 165 ou 165-A do CTB,</p>\n<p>conforme o caso.</p>\n<p>10. Será considerado como</p>\n<p>recusa, a simulação do sopro</p>\n<p>por parte do usuário durante o</p>\n<p>teste com etilômetro, o que</p>\n<p>poderá configurar infração do</p>\n<p>art. 165 ou 165-A, conforme o</p>\n<p>caso.</p>\n<p>11. É permitida a lavratura da</p>\n<p>infração do art. 165 no caso de</p>\n<p>atendimento de sinistros de</p>\n<p>trânsito, desde que seja</p>\n<p>possível ao condutor realizar o</p>\n<p>teste ou apresente dois ou mais</p>\n<p>sinais de alteração da</p>\n<p>capacidade psicomotora. Neste</p>\n<p>caso, o horário da infração é o</p>\n<p>horário em que efetivamente</p>\n<p>foi realizado o teste ou constato</p>\n<p>os sinais, sendo que o horário</p>\n\n<p>no campo de observações.</p>\n<p>12. Em caso de reincidência no</p>\n<p>período de até 12 (doze) meses,</p>\n<p>a multa aplica-se em dobro.</p>\n\n<p><strong>1. Relativamente aos crimes de trânsito, o conduzir veículo automotor sob a influência de álcool ou com a capacidade psicomotora</strong></p>\n\n<p>alterada em razão do álcool, pode se constituir, conforme o caso, em elementar dos tipos penais dos Arts. 306 e 310 da Lei nº</p>\n\n<p><strong>9.503/1997 - CTB, além de qualificadora para os crimes de “homicídio culposo na direção de veículo automotor” (Art. 302, § 3º)</strong></p>\n\n<table>\n  <tr>\n    <td>\n<p>e “lesão corporal culposa na direção de veículo automotor</p>\n    </td>\n    <td>\n<p>§ 2º).</p>\n    </td>\n  </tr>\n</table>\n\n<p><strong>2. A produção de eventual contraprova, a que alude o §2º, do art. 306 do CTB, é de responsabilidade exclusiva da polícia judiciária,</strong></p>\n\n<p>em momento posterior à apresentação do preso.</p>\n\n<table><tbody><tr><td></td><td>enquadramento: 774-92, art. 162, VII. 5. Quando o proprietário do veículo for o condutor que não possui o curso específico obrigatório.</td></tr><tr><th colspan=\"2\">Informações Complementares:</th></tr><tr><td colspan=\"2\">Não há.</td></tr></tbody></table>\n\n<table><tbody><tr><td><p>capacidade psicomotora estão</p>\n<p>descritos em normativo do</p>\n<p>Contran e devem constar no AIT</p>\n<p>ou em termo específico que</p>\n<p>acompanhe o auto.</p>\n<p>6. Quando o teste do</p>\n<p>etilômetro apresentar valor</p>\n<p>igual ou superior a 0,34mg/L de</p>\n<p>ar alveolar (MR), ou quando o</p>\n<p>condutor apresentar dois ou</p>\n<p>mais sinais de alteração da</p>\n<p>capacidade psicomotora,</p>\n<p>caracteriza-se a infração penal</p>\n<p>prevista no art. 306 do CTB e o</p>\n<p>condutor deve ser conduzido à</p>\n<p>autoridade competente.</p>\n<p>7. Em caso de não apresentação</p>\n<p>de condutor habilitado, o</p>\n<p>veículo deverá ser</p>\n<p>encaminhado ao local definido</p>\n<p>pelo órgão autuador.</p>\n<p>8. É vedada a lavratura</p>\n<p>simultânea de Autos de</p>\n<p>Infração com base nos artigos</p>\n<p>165 e 165-A, na mesma</p>\n<p>abordagem.</p>\n<p>9. O condutor deverá se</p>\n<p>submeter ao teste ou exame</p>\n<p>solicitado pelo agente da</p>\n<p>autoridade de trânsito, no</p>\n<p>momento da abordagem, cuja</p>\n<p>recusa a qualquer deles</p>\n<p>sujeitará o infrator à infração</p>\n<p>do art. 165 ou 165-A do CTB,</p>\n<p>conforme o caso.</p>\n<p>10. Será considerado como</p>\n<p>recusa, a simulação do sopro</p>\n<p>por parte do usuário durante o</p>\n<p>teste com etilômetro, o que</p>\n<p>poderá configurar infração do</p>\n<p>art. 165 ou 165-A, conforme o</p>\n<p>caso.</p>\n<p>11. É permitida a lavratura da</p>\n<p>infração do art. 165 no caso de</p>\n<p>atendimento de sinistros de</p>\n<p>trânsito, desde que seja</p>\n<p>possível ao condutor realizar o</p>\n<p>teste ou apresente dois ou mais</p>\n<p>sinais de alteração da</p>\n<p>capacidade psicomotora. Neste</p>\n<p>caso, o horário da infração é o</p>\n<p>horário em que efetivamente</p>\n<p>foi realizado o teste ou constato</p>\n<p>os sinais, sendo que o horário</p></td></tr></tbody></table>",
     "paginas": [
@@ -2298,7 +2309,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não computável , p",
-    "constatacao_infracao": "Mediante abordagem. Constatação da Infração: Mediante abordagem. Pode Configurar Crime de Trânsito: NÃO",
+    "constatacao_infracao": "Mediante abordagem. gp",
     "quando_autuar": {
       "texto": "1. Condutor que se recusar a se submeter a qualquer dos procedimentos previstos no art. 277 (teste de etilômetro, exame clínico, perícia ou outro procedimento, na forma disciplinada pelo Contran) e não apresentar ou apresentar apenas um sinal da alteração da capacidade psicomotora.",
       "itens": [
@@ -2463,7 +2474,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "SIM d Art. 310 do CTB",
-    "infrator": "Proprietário - Pontuação: 7 - Quando Autuar Tipificação Resumida: Confiar/entregar veíc pess c/estado físico/psíquico s/ condições dirigir segur. - Amparo Legal: - Art. 166. - Tipificação do Enquadramento: Confiar ou entregar a direção de veículo a pessoa que, mesmo habilitada, por seu estado físico ou com segurança. - Penalidade: - Multa -",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 ç",
@@ -2824,13 +2835,22 @@
     "pontuacao": "7 qj",
     "constatacao_infracao": "Possível sem Abordagem. p,",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor que intencionalmente intimida pedestre que esteja atravessando a via:\n\n1.1. com intuito de assustar, intimidar, incutir medo ou ameaçar o pedestre ou apressar a sua travessia;\n\n1.2. acelera o veículo junto ao semáforo, ameaçando arrancar, independentemente da fase semafórica; ou\n\n1.3. muda repentinamente o rumo do veículo em direção ao pedestre. Informações Complementares:",
+      "itens": [
+        "1. Condutor que intencionalmente intimida pedestre que esteja atravessando a via:",
+        "1.1. com intuito de assustar, intimidar, incutir medo ou ameaçar o pedestre ou apressar a sua travessia;",
+        "1.2. acelera o veículo junto ao semáforo, ameaçando arrancar, independentemente da fase semafórica; ou",
+        "1.3. muda repentinamente o rumo do veículo em direção ao pedestre. Informações Complementares:"
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "situações que impliquem dirigir ameaçando os pedestres que estejam atravessando a via pública.",
+      "texto": "1. Quando houver a simples intenção de não dar a preferência de passagem a pedestre, utilizar enquadramentos específicos, conforme o caso: art. 214, I - 612-20; 214, II - 613-00; 214, III - 614-90; 214, IV - 615-70 e 214, V - 616-50.\n\n2. Condutor que dirigir ameaçando os demais veículos, utilizar enquadramento específico: 521-52, art. 170.\n\n3. Usar o veículo para arremessar água ou detritos sobre os pedestres, utilizar enquadramento específico: 522-31, art. 171.\n\n4. Usar o veículo para disputar corrida, utilizar enquadramento específico: 524-00, art. 173.\n\n1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações que impliquem dirigir ameaçando os pedestres que estejam atravessando a via pública.",
       "itens": [
-        "situações que impliquem dirigir ameaçando os pedestres que estejam atravessando a via pública."
+        "1. Quando houver a simples intenção de não dar a preferência de passagem a pedestre, utilizar enquadramentos específicos, conforme o caso: art. 214, I - 612-20; 214, II - 613-00; 214, III - 614-90; 214, IV - 615-70 e 214, V - 616-50.",
+        "2. Condutor que dirigir ameaçando os demais veículos, utilizar enquadramento específico: 521-52, art. 170.",
+        "3. Usar o veículo para arremessar água ou detritos sobre os pedestres, utilizar enquadramento específico: 522-31, art. 171.",
+        "4. Usar o veículo para disputar corrida, utilizar enquadramento específico: 524-00, art. 173.",
+        "1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações que impliquem dirigir ameaçando os pedestres que estejam atravessando a via pública."
       ]
     },
     "definicoes_procedimentos": {
@@ -2838,8 +2858,11 @@
       "itens": []
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor intimidava os pedestres que atravessavam a faixa ameaçando arrancar com o veículo.\n\n2. Condutor desvia intencionalmente o veículo em direção ao pedestre com o intuito de assustá-lo.",
+      "itens": [
+        "1. Condutor intimidava os pedestres que atravessavam a faixa ameaçando arrancar com o veículo.",
+        "2. Condutor desvia intencionalmente o veículo em direção ao pedestre com o intuito de assustá-lo."
+      ]
     },
     "informacoes_complementares": "<p>Não há.</p>",
     "paginas": [
@@ -2863,20 +2886,35 @@
     "pontuacao": "7 qj",
     "constatacao_infracao": "Possível sem abordagem. p,",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor intencionalmente intimida outro condutor, através de ações como:\n\n1.1. acelerar o veículo parado junto ao semáforo, ameaçando arrancar, com intuito de apressar condutor do veículo à sua frente;\n\n1.2. mudar repentinamente o rumo do veículo em direção a outro, ameaçando abalroá-lo ou tomar a sua frente (\"cortar\",\"fechar\");\n\n1.3. perseguir um veículo com o intuito de interceptá\u0002 lo.",
+      "itens": [
+        "1. Condutor intencionalmente intimida outro condutor, através de ações como:",
+        "1.1. acelerar o veículo parado junto ao semáforo, ameaçando arrancar, com intuito de apressar condutor do veículo à sua frente;",
+        "1.2. mudar repentinamente o rumo do veículo em direção a outro, ameaçando abalroá-lo ou tomar a sua frente (\"cortar\",\"fechar\");",
+        "1.3. perseguir um veículo com o intuito de interceptá\u0002 lo."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Caracterizando a disputa de corrida, utilizar enquadramento específico: 524-00, art.173.\n\n2. Quando houver a simples intenção de não dar a preferência ou prioridade de passagem aos demais veículos, utilizar enquadramentos específicos.\n\n3. Condutor que dirige ameaçando os pedestres, utilizar enquadramento específico: 521-51, art. 170.\n\n4. Usar o veículo para arremessar água ou detritos sobre os demais veículos, utilizar enquadramento específico: 522-32, art. 171.",
+      "itens": [
+        "1. Caracterizando a disputa de corrida, utilizar enquadramento específico: 524-00, art.173.",
+        "2. Quando houver a simples intenção de não dar a preferência ou prioridade de passagem aos demais veículos, utilizar enquadramentos específicos.",
+        "3. Condutor que dirige ameaçando os pedestres, utilizar enquadramento específico: 521-51, art. 170.",
+        "4. Usar o veículo para arremessar água ou detritos sobre os demais veículos, utilizar enquadramento específico: 522-32, art. 171."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Em caso de perseguição, sempre que possível, informar a placa do veículo perseguido (ou suas características).",
+      "itens": [
+        "1. Em caso de perseguição, sempre que possível, informar a placa do veículo perseguido (ou suas características)."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor intimidava outro veículo acelerando e freando bruscamente.\n\n2. Condutor desvia intencionalmente o veículo em direção a outro veículo com o intuito de assustar os ocupantes.",
+      "itens": [
+        "1. Condutor intimidava outro veículo acelerando e freando bruscamente.",
+        "2. Condutor desvia intencionalmente o veículo em direção a outro veículo com o intuito de assustar os ocupantes."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras</strong></p>\n\n<p>situações que impliquem dirigir ameaçando os demais veículos.</p>",
     "paginas": [
@@ -3147,7 +3185,7 @@
     "penalidade": "Multa (10X) ( ()p",
     "medida_administrativa": "Não Aplicável /)",
     "pode_configurar_crime_transito": "SIM d Art. 308 do CTB",
-    "infrator": "Pessoas Física ou Jurídica",
+    "infrator": "Pessoas Física ou Jurídica C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não computável p",
@@ -3664,7 +3702,7 @@
     "penalidade": "Multa (5X) e Suspensão do direito de dirigir )",
     "medida_administrativa": "Recolhimento do Documento de Habilitação. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não Computável",
@@ -3726,7 +3764,7 @@
     "penalidade": "Multa (5X) e Suspensão do direito de dirigir )",
     "medida_administrativa": "Recolhimento do Documento de Habilitação. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "SIM 312 do CTB",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não Computável",
@@ -3791,7 +3829,7 @@
     "penalidade": "Multa (5X) e Suspensão do direito de dirigir )",
     "medida_administrativa": "Recolhimento do Documento de Habilitação. (Vide Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Condutor - Pontuação: Não Computável - Quando AUTUAR Tipificação Resumida: Deixar o cond envolvido em acid, de remover o veíc local qdo determ polic/agente. - Amparo Legal: - Art. 176, IV. - Tipificação do Enquadramento: Deixar o condutor envolvido em acidente com vítima de adotar providências para determinadas por policial ou agente da autoridade de trânsito. - remover - Penalidade: Multa (5X) e Suspensão do - direito de dirigir -",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não Computável g",
@@ -3849,7 +3887,7 @@
     "penalidade": "Multa (5X e Suspensão do direito de dirigir) g)ç",
     "medida_administrativa": "Recolhimento do Documento de Habilitação. /",
     "pode_configurar_crime_transito": "SIM 312 do CTB",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não Computável",
@@ -4129,7 +4167,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do Veículo (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "4 p",
@@ -10933,7 +10971,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Movimento de retorno passando por cima da faixa de pedestres.",
       "itens": [
@@ -11399,20 +11437,42 @@
     "pontuacao": "5",
     "constatacao_infracao": "Possível sem abordagem.",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo que transpuser, sem autorização, bloqueio viário destinado a impedir ou restringir a circulação de veículos e pedestres nos casos de:\n\n1.1. execução de obras, serviços ou obstáculos na via;\n\n1.2. realização de eventos, shows ou passeatas;\n\n1.3. canalização ou reversão de fluxos;\n\n1.4. controle viário do tipo “pare e siga”;\n\n1.5. sinistro de trânsito;\n\n1.6. controle sanitário, aduaneiro ou tributário;\n\n1.7. entre outras situações.\n\n2. Veículo transitando em faixa reversível não ativada, sinalizada com Marcação de Faixa Reversível no Contra\u0002 fluxo - MFR ou com dispositivos de uso temporário.\n\n3. Veículo que transpuser bloqueio realizado por cancela em cruzamento rodoferroviário, quando não existir sinalização semafórica de regulamentação ou placa R\u0002\n\n1.",
+      "itens": [
+        "1. Veículo que transpuser, sem autorização, bloqueio viário destinado a impedir ou restringir a circulação de veículos e pedestres nos casos de:",
+        "1.1. execução de obras, serviços ou obstáculos na via;",
+        "1.2. realização de eventos, shows ou passeatas;",
+        "1.3. canalização ou reversão de fluxos;",
+        "1.4. controle viário do tipo “pare e siga”;",
+        "1.5. sinistro de trânsito;",
+        "1.6. controle sanitário, aduaneiro ou tributário;",
+        "1.7. entre outras situações.",
+        "2. Veículo transitando em faixa reversível não ativada, sinalizada com Marcação de Faixa Reversível no Contra\u0002 fluxo - MFR ou com dispositivos de uso temporário.",
+        "3. Veículo que transpuser bloqueio realizado por cancela em cruzamento rodoferroviário, quando não existir sinalização semafórica de regulamentação ou placa R\u0002",
+        "1."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo que transpuser, sem autorização, qualquer bloqueio realizado por órgão policial ou de segurança pública, utilizar enquadramento específico: 60760, art. 210.\n\n2. Veículo que transpuser, sem autorização, bloqueio realizado por agentes da autoridade de trânsito para fins de fiscalização, utilizar enquadramento específico: 607-60, art. 210.\n\n3. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem.",
+      "itens": [
+        "1. Veículo que transpuser, sem autorização, qualquer bloqueio realizado por órgão policial ou de segurança pública, utilizar enquadramento específico: 60760, art. 210.",
+        "2. Veículo que transpuser, sem autorização, bloqueio realizado por agentes da autoridade de trânsito para fins de fiscalização, utilizar enquadramento específico: 607-60, art. 210.",
+        "3. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. O bloqueio viário disposto nesta ficha pode ser sinalizado ou não, com cones, cavaletes, fita zebrada ou demais dispositivos de uso temporário ou permanente, complementados ou não com placas de sinalização.",
+      "itens": [
+        "1. O bloqueio viário disposto nesta ficha pode ser sinalizado ou não, com cones, cavaletes, fita zebrada ou demais dispositivos de uso temporário ou permanente, complementados ou não com placas de sinalização."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor transpôs bloqueio efetuado com fita zebrada e cavaletes.\n\n2. Condutor transpôs bloqueio viário efetuado com cones.\n\n3. Veículo transitou por faixa reversível não ativada. Via sinalizada com dispositivos temporários.",
+      "itens": [
+        "1. Condutor transpôs bloqueio efetuado com fita zebrada e cavaletes.",
+        "2. Condutor transpôs bloqueio viário efetuado com cones.",
+        "3. Veículo transitou por faixa reversível não ativada. Via sinalizada com dispositivos temporários."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações</strong></p>\n\n<p>que impliquem transpor bloqueio viário, sem autorização.</p>",
     "paginas": [
@@ -11436,30 +11496,32 @@
     "pontuacao": "5",
     "constatacao_infracao": "Possível sem abordagem.",
     "quando_autuar": {
-      "texto": "fiscalização, não se submetendo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis.",
+      "texto": "1. Veículo pesado que não entrar na área destinada à pesagem obrigatória, sinalizada com R-24b, com ou sem complemento.\n\n2. Veículo que se evadir da fiscalização, não se submetendo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis.",
       "itens": [
-        "fiscalização, não se submetendo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis."
+        "1. Veículo pesado que não entrar na área destinada à pesagem obrigatória, sinalizada com R-24b, com ou sem complemento.",
+        "2. Veículo que se evadir da fiscalização, não se submetendo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "606-81, art. 209.\n\n2. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem.",
+      "texto": "1. Veículo que transpuser, sem autorização, bloqueio viário destinado a impedir ou restringir a circulação de veículos e pedestres nos casos definidos no campo quando autuar da ficha 606-81, art. 209.\n\n2. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem.",
       "itens": [
-        "606-81, art. 209.",
+        "1. Veículo que transpuser, sem autorização, bloqueio viário destinado a impedir ou restringir a circulação de veículos e pedestres nos casos definidos no campo quando autuar da ficha 606-81, art. 209.",
         "2. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem."
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "veículo leve tracionando outro veículo.\n\n2. VEÍCULO LEVE - automóvel, utilitário, caminhonete e camioneta.\n\n3. Art. 278. Ao condutor que se evadir da fiscalização, não submetendo veículo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis, será aplicada a penalidade prevista no art. 209, além da obrigação de retornar ao ponto de evasão para fim de pesagem obrigatória.",
+      "texto": "1. VEÍCULO PESADO - ônibus, micro-ônibus, caminhão, caminhão-trator, trator de rodas, trator misto, chassi\u0002 plataforma, motor-casa, reboque ou semirreboque e suas combinações, bem como veículo leve tracionando outro veículo.\n\n2. VEÍCULO LEVE - automóvel, utilitário, caminhonete e camioneta.\n\n3. Art. 278. Ao condutor que se evadir da fiscalização, não submetendo veículo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis, será aplicada a penalidade prevista no art. 209, além da obrigação de retornar ao ponto de evasão para fim de pesagem obrigatória.",
       "itens": [
-        "veículo leve tracionando outro veículo.",
+        "1. VEÍCULO PESADO - ônibus, micro-ônibus, caminhão, caminhão-trator, trator de rodas, trator misto, chassi\u0002 plataforma, motor-casa, reboque ou semirreboque e suas combinações, bem como veículo leve tracionando outro veículo.",
         "2. VEÍCULO LEVE - automóvel, utilitário, caminhonete e camioneta.",
         "3. Art. 278. Ao condutor que se evadir da fiscalização, não submetendo veículo à pesagem obrigatória nos pontos de pesagem, fixos ou móveis, será aplicada a penalidade prevista no art. 209, além da obrigação de retornar ao ponto de evasão para fim de pesagem obrigatória."
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "antes da realização dos procedimentos de pesagem.",
+      "texto": "1. O veículo não adentrou na área de pesagem, local sinalizado com a placa R-24b visível.\n\n2. O veículo se evadiu da área de pesagem sem autorização, antes da realização dos procedimentos de pesagem.",
       "itens": [
-        "antes da realização dos procedimentos de pesagem."
+        "1. O veículo não adentrou na área de pesagem, local sinalizado com a placa R-24b visível.",
+        "2. O veículo se evadiu da área de pesagem sem autorização, antes da realização dos procedimentos de pesagem."
       ]
     },
     "informacoes_complementares": "<p><strong>1. Imagens Ilustrativas:</strong></p>\n\n<table>\n  <tr>\n    <td>\n<img src=\"imagens/ficha606-82_1.png\" alt=\"Ilustração da Ficha 606-82\" />\n    </td>\n    <td>\n<img src=\"imagens/ficha606-82_2.png\" alt=\"Placa R-24b - Passagem Obrigatória\" />\n<p>Placa R-24b</p>\n<p>Passagem Obrigatória</p>\n    </td>\n  </tr>\n</table>",
@@ -11488,31 +11550,28 @@
     "pontuacao": "5",
     "constatacao_infracao": "Possível sem abordagem.",
     "quando_autuar": {
-      "texto": "Tipificação Resumida: Circular com eixos indevidamente Amparo Legal: Art. 209 c/c art. 17, § 5º da Lei 13 Tipificação do Enquadramento: Lei 13.103/2015. Art. 17, § 5º. Fi de Trânsito Brasileiro), os veículo Gravidade: Grave Infrator: Condutor Pontuação: 5 Quando AUTUAR:\n\n1. Veículo de transporte de carga que circular com eixo(s) indevidamente suspenso(s). Informações Complementares: Não há.",
+      "texto": "1. Veículo de transporte de carga que circular com eixo(s) indevidamente suspenso(s). Informações Complementares: Não há.",
       "itens": [
-        "Tipificação Resumida: Circular com eixos indevidamente Amparo Legal: Art. 209 c/c art. 17, § 5º da Lei 13 Tipificação do Enquadramento: Lei 13.103/2015. Art. 17, § 5º. Fi de Trânsito Brasileiro), os veículo Gravidade: Grave Infrator: Condutor Pontuação: 5 Quando AUTUAR:",
         "1. Veículo de transporte de carga que circular com eixo(s) indevidamente suspenso(s). Informações Complementares: Não há."
       ]
     },
     "quando_nao_autuar": {
-      "texto": "FICHA DE FISCALIZ suspensos os veículos de tran .103/2015. cam sujeitos à penalidade pre s de transporte de cargas que Penalidade: Multa Competência: Órgão ou Entidade de Rodoviário. Constatação da Infração: Possível sem abordagem. Quando NÃO Autuar:\n\n1. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem.",
+      "texto": "1. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem.",
       "itens": [
-        "FICHA DE FISCALIZ suspensos os veículos de tran .103/2015. cam sujeitos à penalidade pre s de transporte de cargas que Penalidade: Multa Competência: Órgão ou Entidade de Rodoviário. Constatação da Infração: Possível sem abordagem. Quando NÃO Autuar:",
         "1. Quando utilizado sistema automático não metrológico, para os veículos elencados no inciso VII, do art. 29 do CTB, desde que caracterizados externamente por pintura ou plotagem."
       ]
     },
     "definicoes_procedimentos": {
-      "texto": "AÇÃO sporte de carga. vista no art. 209 da Lei nº 9.503, de circularem com eixos indevidament Medida Administrativa: Não Trânsito Municipal, Estadual e Definições e Procedimentos:\n\n1. VEÍCULO DE CARGA - veículo destinado ao transporte de carga, podendo transportar dois passageiros, exclusive o condutor.r.\n\n2. Na fiscalização do excesso de peso, o limite do PBT/T/PBTC deverá ser descontado do(s) eixo(s) suspenso(s).",
+      "texto": "1. VEÍCULO DE CARGA - veículo destinado ao transporte de carga, podendo transportar dois passageiros, exclusive o condutor.r.\n\n2. Na fiscalização do excesso de peso, o limite do PBT/T/PBTC deverá ser descontado do(s) eixo(s) suspenso(s).",
       "itens": [
-        "AÇÃO sporte de carga. vista no art. 209 da Lei nº 9.503, de circularem com eixos indevidament Medida Administrativa: Não Trânsito Municipal, Estadual e Definições e Procedimentos:",
         "1. VEÍCULO DE CARGA - veículo destinado ao transporte de carga, podendo transportar dois passageiros, exclusive o condutor.r.",
         "2. Na fiscalização do excesso de peso, o limite do PBT/T/PBTC deverá ser descontado do(s) eixo(s) suspenso(s)."
       ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Código do Enquadramento: 606-85 23 de setembro de 1997 (Código e suspensos. Pode Configurar Crime de Trânsito: NÃO Exemplos do Campo de Observações do AIT:\n\n1. O veículo de transporte de carga transitava com o primeiro eixo do semirreboque levantado, com carga de cimento no limite do PBTC.",
+      "texto": "servaç es o :\n\n1. O veículo de transporte de carga transitava com o primeiro eixo do semirreboque levantado, com carga de cimento no limite do PBTC.",
       "itens": [
-        "Código do Enquadramento: 606-85 23 de setembro de 1997 (Código e suspensos. Pode Configurar Crime de Trânsito: NÃO Exemplos do Campo de Observações do AIT:",
+        "servaç es o :",
         "1. O veículo de transporte de carga transitava com o primeiro eixo do semirreboque levantado, com carga de cimento no limite do PBTC."
       ]
     },
@@ -11929,7 +11988,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Trânsito: Crime de",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo que não parar quando a marcha for interceptada por grupo de pessoas. Informações Complementares: Não há.",
       "itens": [
@@ -12136,7 +12195,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo que deixar de dar preferência de passagem a pedestre e a veículo não motorizado, em local não sinalizado com faixa de pedestres, a criança, idoso, pessoa com deficiência e gestante.",
       "itens": [
@@ -12397,7 +12456,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Trânsito: Crime de",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo que, em interseção não sinalizada, deixar de dar preferência àquele que circula pela direita da via transversal.",
       "itens": [
@@ -12548,7 +12607,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "4 p",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Trânsito: Crime de",
+    "constatacao_infracao": "Possível sem abordagem. g p pgp",
     "quando_autuar": {
       "texto": "1. Veículo estacionado que, ao sair da fila de veículos para ingressar na via, deixa de dar preferência a outro veículo que por ela esteja transitando.\n\n2. Veículo estacionado que, ao sair da fila de veículos para ingressar na via, deixa de dar preferência a pedestre que esteja circulando pela trajetória do veículo.\n\n3. Veículo que, ao entrar em fila de veículos estacionados, deixa de dar preferência a veículo que esteja transitando pela via.\n\n4. Veículo que, ao entrar em fila de veículos estacionados, deixa de dar preferência a pedestre que esteja circulando pela trajetória do veículo.",
       "itens": [
@@ -12797,11 +12856,11 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "SIM (Art311CTB) . (Art. 311, CTB)",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Possível sem abordagem. Órgão ou Entidade de Estadual, Municipal e Rodoviário. SIM (Art. 311, CTB)",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Condutor que deixar de reduzir a velocidade do veículo de forma compatível com a segurança do trânsito, em local onde os pedestres estejam organizados em passeatas, cortejos, préstitos e desfiles.\n\n2. Condutor que deixar de reduzir a velocidade do veículo de forma compatível com a segurança do trânsito, próximo a aglomerações: ruas comerciais, eventos (esportivos, musicais, culturais e congêneres), etc.",
       "itens": [
@@ -12864,7 +12923,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não /",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 ,",
@@ -13257,7 +13316,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 p",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Condutor que deixar de reduzir a velocidade do veículo de forma compatível com a segurança do trânsito, ao se aproximar de locais sinalizados com advertência de obras ou trabalhadores na pista.",
       "itens": [
@@ -14174,7 +14233,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "3 p",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Possível sem abordagem. gp çp",
     "quando_autuar": {
       "texto": "1. Veículo transitando em via provida de iluminação pública com o facho de luz alta dos faróis.",
       "itens": [
@@ -14444,7 +14503,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Condutor",
+    "infrator": "Condutor C",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "3 pq",
@@ -14500,7 +14559,7 @@
     "penalidade": "Multa ê(ldl",
     "medida_administrativa": "Não /)",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "3 qqp",
@@ -14556,7 +14615,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "3",
@@ -14611,7 +14670,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "3 ppç",
@@ -14669,7 +14728,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "NÃO o.",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "3 pq",
@@ -14743,7 +14802,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 qq",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem.",
+    "constatacao_infracao": "Possível sem abordagem. gp qjp",
     "quando_autuar": {
       "texto": "1. Veículo com equipamento de som produzindo som audível pelo lado externo, perturbando o sossego público.",
       "itens": [
@@ -14786,7 +14845,7 @@
     "penalidade": "Multa ( )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual). /)",
     "pode_configurar_crime_transito": "Ã NÃO .",
-    "infrator": "Condutor",
+    "infrator": "Condutor C Ó",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "4",
@@ -14832,11 +14891,11 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual) /",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
-    "constatacao_infracao": "Mediante abordagem. Constatação da Infração: Mediante abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Mediante abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo com o lacre ou QR Code da placa:\n\n1.1. não fixado em sua estrutura ou na placa, com indícios de ter sido violado por ação humana;\n\n1.2. diferente do padrão do órgão de trânsito responsável pela lacração do veículo;\n\n1.3. coberto com produto colante (silicone, etc) que impeça sua identificação;\n\n1.4. danificado, arranhado ou riscado por ação humana de tal forma que impeça sua leitura.\n\n1.4. não inserido, raspado, suprimido, falsificado, violado ou adulterado de forma intencional.\n\n2. Veículo com o arame do lacre trançado de forma a simular uma lacração regular.",
       "itens": [
@@ -14892,7 +14951,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO o.",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -14953,7 +15012,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual) /",
     "pode_configurar_crime_transito": "Ã NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -15006,7 +15065,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -15066,7 +15125,7 @@
     "penalidade": "Multa êi(ldli )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual) i /)",
     "pode_configurar_crime_transito": "Ã NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -15131,26 +15190,52 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual) /",
     "pode_configurar_crime_transito": "Ã NÃO o.",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 p",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo transportando pessoa(s) no compartimento de carga ou bagageiro sem autorização, em:\n\n1.1. veículo do tipo “basculante” ou “boiadeiro”;\n\n1.2. caminhão-baú, estando este com as portas abertas ou fechadas;\n\n1.3. guincho transportando carro na prancha, com pessoa em seu interior;\n\n1.4. automóvel, com pessoas em seu porta-malas;\n\n1.5. camioneta/caminhonete com passageiros no compartimento de carga.\n\n2. Veículo transportando criança no compartimento de carga.\n\n3. Veículo do transporte recreativo de passageiros:\n\n3.1. sem autorização do poder concedente para executar o serviço;\n\n3.2. fora do itinerário previsto;\n\n3.3. se o veículo não estiver com as adaptações previstas na autorização do poder concedente.",
+      "itens": [
+        "1. Veículo transportando pessoa(s) no compartimento de carga ou bagageiro sem autorização, em:",
+        "1.1. veículo do tipo “basculante” ou “boiadeiro”;",
+        "1.2. caminhão-baú, estando este com as portas abertas ou fechadas;",
+        "1.3. guincho transportando carro na prancha, com pessoa em seu interior;",
+        "1.4. automóvel, com pessoas em seu porta-malas;",
+        "1.5. camioneta/caminhonete com passageiros no compartimento de carga.",
+        "2. Veículo transportando criança no compartimento de carga.",
+        "3. Veículo do transporte recreativo de passageiros:",
+        "3.1. sem autorização do poder concedente para executar o serviço;",
+        "3.2. fora do itinerário previsto;",
+        "3.3. se o veículo não estiver com as adaptações previstas na autorização do poder concedente."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo de carga transportando pessoa(s) no compartimento de carga com as adaptações regulares previstas na na Resolução Contran nº 508/2014 e devidamente autorizado.\n\n2. Veículo transportando pessoa(s) na parte externa, utilizar enquadramento específico: 694-71, art. 235.",
+      "itens": [
+        "1. Veículo de carga transportando pessoa(s) no compartimento de carga com as adaptações regulares previstas na na Resolução Contran nº 508/2014 e devidamente autorizado.",
+        "2. Veículo transportando pessoa(s) na parte externa, utilizar enquadramento específico: 694-71, art. 235."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Para fins de fiscalização deste enquadramento, o bagageiro equipara-se ao compartimento de carga.\n\n2. BAGAGEIRO: compartimento do veículo destinado exclusivamente ao transporte de bagagens, malas postais e encomendas, com acesso independente do compartimento de passageiros.\n\n3. A carga somente poderá ser transportada em compartimento próprio, separada dos passageiros, que no ônibus é o bagageiro.",
+      "itens": [
+        "1. Para fins de fiscalização deste enquadramento, o bagageiro equipara-se ao compartimento de carga.",
+        "2. BAGAGEIRO: compartimento do veículo destinado exclusivamente ao transporte de bagagens, malas postais e encomendas, com acesso independente do compartimento de passageiros.",
+        "3. A carga somente poderá ser transportada em compartimento próprio, separada dos passageiros, que no ônibus é o bagageiro."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Caminhão basculante, transportando oito pessoas no compartimento de carga.\n\n2. Veículo transportando dois passageiros no bagageiro com porta malas aberto.\n\n3. Veículo transportando passageiros em compartimento de carga sem autorização.\n\n4. Veículo transportando passageiros em compartimento de carga com autorização vencida.\n\n5. Veículo transportando passageiros em compartimento de carga fora do itinerário autorizado.\n\n6. Veículo transportando passageiros em compartimento de carga, de veículo tipo boiadeiro.",
+      "itens": [
+        "1. Caminhão basculante, transportando oito pessoas no compartimento de carga.",
+        "2. Veículo transportando dois passageiros no bagageiro com porta malas aberto.",
+        "3. Veículo transportando passageiros em compartimento de carga sem autorização.",
+        "4. Veículo transportando passageiros em compartimento de carga com autorização vencida.",
+        "5. Veículo transportando passageiros em compartimento de carga fora do itinerário autorizado.",
+        "6. Veículo transportando passageiros em compartimento de carga, de veículo tipo boiadeiro."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações</strong></p>\n\n<p>que impliquem em conduzir o veículo transportando passageiros em compartimento de carga.</p>",
     "paginas": [
@@ -15168,7 +15253,7 @@
     "penalidade": "Multa Cêi(ldlLi )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual) i 14599/23)",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",
@@ -15220,11 +15305,11 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual) /",
     "pode_configurar_crime_transito": "Ã NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pç",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito:",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo registrado, sem uma ou ambas as placas.\n\n2. Veículo dos tipos automóvel, caminhonete, camioneta e utilitário, que efetue transporte de carga, ou de bicicleta, encobrindo, total ou parcialmente, a placa traseira, sem possuir a segunda placa traseira.\n\n3. Veículo que possua engate para reboque, encobrindo a placa traseira, sem possuir a segunda placa, com ou sem lacre, conforme o caso.\n\n4. Veículo com carroceria intercambiável (camper) encobrindo, total ou parcialmente a Placa de Identificação Veicular (PIV) traseira, sem possuir a segunda PIV traseira.",
       "itens": [
@@ -15279,7 +15364,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 g",
@@ -15457,7 +15542,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 pç",
@@ -15588,7 +15673,7 @@
     "penalidade": "Multa êi(ldli )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual). i /)",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "Não Computável",
@@ -15689,7 +15774,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do Veículo para Regularização (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 pçgç",
@@ -15742,7 +15827,7 @@
     "penalidade": "Multa êi(ldli )",
     "medida_administrativa": "Retenção do veículo para Regularização (Vide a Parte Geral deste Manual) i /)",
     "pode_configurar_crime_transito": "NÃO o.",
-    "infrator": "Proprietário - Pontuação: 5 - Quando AUTUAR Tipificação Resumida: Conduzir o veículo sem equipamento obrigatório. - Amparo Legal: Art. 230, IX. - Tipificação do Enquadramento: - Conduzir o veículo sem equipamento obrigatório ou estando este ineficiente ou inoperante. - Penalidade: Multa -",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 g",
@@ -15836,7 +15921,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para Regularização (Vide Parte a Geral deste Manual)",
     "pode_configurar_crime_transito": "NÃO o.",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 g",
@@ -15930,11 +16015,11 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para Regularização (Vide a Parte Geral deste Manual). /",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 g",
-    "constatacao_infracao": "Vide Definições e Procedimentos. Constatação da Infração: Vide Definições e Procedimentos. Pode Configurar Crime Trânsito: NÃO",
+    "constatacao_infracao": "Vide Definições e Procedimentos. gp p",
     "quando_autuar": {
       "texto": "1. Veículo com qualquer um dos equipamentos obrigatórios em desacordo com o estabelecido pelo Contran.\n\n2. Ciclomotores, motonetas, motocicletas e triciclos com pneus reformados (recapagem, recauchutagem ou remoldagem) ou com rodas que apresentem quebras, trincas e deformações.\n\n3. Ônibus ou micro-ônibus com pneus reformados, quer seja pelo processo de recapagem, recauchutagem ou remoldagem, no eixo dianteiro ou com rodas que apresentem quebras, trincas, deformações ou consertos, em qualquer dos eixos do veículo.\n\n4. Conduzir e/ou transportar passageiro em motocicletas, motonetas, ciclomotores, triciclos motorizados de cabine aberta e quadriciclos motorizados de cabine aberta, com capacete fabricado a partir de 01/08/2007, sem:\n\n4.1. a aposição de dispositivo retrorrefletivo de segurança nas partes laterais e traseira do capacete motociclístico;\n\n4.2. o selo de identificação de conformidade ou etiqueta interna com a logomarca do Inmetro, especificada na norma NBR 7471.\n\n5. Conduzir e/ou transportar passageiro em motocicletas, motonetas, ciclomotores, triciclos motorizados de cabine aberta e quadriciclos motorizados de cabine aberta com o capacete com avarias ou danos que comprometam a sua eficiência.\n\n6. Veículo de carga, do tipo carroceria aberta, utilizando a passagem dos dispositivos de fixação pelo lado externo das guardas laterais rebatíveis, exceto quando a carga ocupar todo o compartimento de carga.\n\n7. Veículo utilizando dispositivos de fixação com os pontos de ancoragem não fixados nas travessas da estrutura da carroceria, ou com os pontos de ancoragem em desacordo com os requisitos do Anexo I da Resolução do Contran nº 945/2022.\n\n8. Veículo com o registrador instantâneo e inalterável de velocidade e tempo (cronotacógrafo):\n\n8.1. sem o disco ou a fita diagrama;\n\n8.2. sem o registro das últimas 24 horas;\n\n8.3. com disco diagrama vencido, com sobreposição de grafias ou marcação da parte branca do disco (excluídas as causadas por defeito no equipamento);\n\n8.4. sem o disco ou a fita diagrama reserva, desde que o(a) utilizado(a) não seja suficiente para completar a viagem;\n\n8.5. disco ou fita diagrama com horário incorreto, observada a margem de erro;\n\n8.6. disco diagrama inadequado (24h em tacógrafo de 7 dias ou vice-versa ou disco para velocidade diferente da do tacógrafo);\n\n8.7. disco ou fita diagrama sem o preenchimento dos dados obrigatórios ou com os dados incorretos;\n\n8.8. sem lacre(s) do fabricante ou com este(s) violado(s);\n\n8.9. não verificado pelo Inmetro ou com a verificação vencida;\n\n8.10. com disco diagrama com registros alterados manualmente.\n\n9. Veículos estrangeiros que trafegam com equipamento(s) obrigatório(s) em desacordo com o previsto em convenções ou acordos internacionais ratificados ou assinados pelo Brasil e o país de registro/matrícula do veículo.\n\n10. Motocicletas, Motonetas, Ciclomotores, Triciclos e Quadriciclos com escapamento não original, sem a Certificação do Inmetro, quando for aplicável (Portaria do Inmetro nº 123/2014), em desacordo com a Resolução do Contran nº 958/2022 ou sua(s) sucedânea(s).\n\n11. Pneu:\n\n11.1. sem indicadores de desgastes colocados no fundo do desenho da banda de rodagem;\n\n11.2. sem indicação da capacidade de carga;\n\n11.3. sem a gravação da palavra reformado ou da marca do reformador;\n\n11.4. quando no mesmo eixo e simetricamente montados, que apresentam assimetria no tocante à construção, tamanho e carga ou que sejam montados em aros de dimensões diferentes, salvo se a assimetria é originada pelo uso da roda de reserva, nos casos de emergências.\n\n12. Para-choque traseiro não atende às especificações da Resolução Contran nº 952/2022 ou suas sucedâneas.\n\n13. Veículo transportando bloco de rocha ornamental:\n\n13.1. com linga de corrente e/ou travas em desacordo com as especificações mínimas;\n\n13.2. com linga na qual não seja possível identificar o grau da corrente;\n\n13.3. utilizando linga de corrente com tensionador de alavanca.\n\n14. Veículo transportando chapas serradas:\n\n14.1. com cavaletes em desacordo com as especificações mínimas;\n\n14.2. com cintas têxteis em quantidade, posição de amarração ou carga máxima de trabalho em desacordo com art. 13 da Resolução Contran nº 935/2022;\n\n14.3. utilizando cintas têxteis nas quais não seja possível identificar a carga máxima de trabalho.\n\n15. Veículo transportando chapas serradas com os dispositivos de amarração transversais passando pelo lado externo das guardas laterais, quando existentes, exceto quando a carga ocupar toda a largura da carroceria.\n\n16. Veículo realizando transporte de toras ou de madeira bruta com painéis dianteiro ou traseiro, cantoneira, fueiros ou dispositivos obrigatórios de fixação estiverem em desacordo com as especificações prevista em sua regulamentação.",
       "itens": [
@@ -16051,7 +16136,7 @@
     "penalidade": "Multa Ctêi(ltdlLi )",
     "medida_administrativa": "Retenção do veículo para Regularização (Vide a Parte Geral deste Manual) i 14599/23)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário C Ó p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
@@ -16107,7 +16192,7 @@
     "penalidade": "Multa Cêi(ldlLi )",
     "medida_administrativa": "Retenção do veículo para Regularização (Vide a Parte Geral deste Manual). i 14599/23)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
@@ -16164,7 +16249,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 p",
@@ -16319,7 +16404,7 @@
     "penalidade": "Multa êi(ldli )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual). i /)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 ç",
@@ -16399,7 +16484,7 @@
     "penalidade": "Multa Cêi(ldli )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual). i 99/23)",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário - Pontuação: 5 - Quando AUTUAR 1. Veículo com registrador instantâneo de velocidade e tempo (cronotacógrafo), que Tipificação Resumida: Conduzir veíc c/ registrador instan inalt de velocidade/tempo viciado/defeituoso. - Amparo Legal: Art. 230, XIV. - Tipificação do Enquadramento: Conduzir o veículo com registrador instantâneo inalterável de velocidade e tempo viciado ou defeituoso, - desse aparelho. - Penalidade: Multa -",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
@@ -16747,7 +16832,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 p,",
@@ -16800,7 +16885,7 @@
     "penalidade": "Multa ( )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual). /)",
     "pode_configurar_crime_transito": "NÃO .",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 , p",
@@ -16888,7 +16973,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 , p",
@@ -16934,7 +17019,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5 , p",
@@ -17028,7 +17113,7 @@
     "penalidade": "Multa (5x) )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 çpç",
@@ -17165,7 +17250,7 @@
     "penalidade": "Multa",
     "medida_administrativa": "Não",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "4 ç, ç",
@@ -17317,22 +17402,39 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 , çq",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito: NÃO",
+    "constatacao_infracao": "Possível sem abordagem. gp p",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor transitando com veículo danificando a via, suas instalações e equipamentos, como, por exemplo:\n\n- a) relativamente à via: pavimento, ajardinamento, estrutura de pontes, passarelas, viadutos, etc\n\n- b) relativamente à instalações e equipamentos: bancos, lixeiras, abrigos de ônibus, placas, semáforos etc.",
+      "itens": [
+        "1. Condutor transitando com veículo danificando a via, suas instalações e equipamentos, como, por exemplo:",
+        "- a) relativamente à via: pavimento, ajardinamento, estrutura de pontes, passarelas, viadutos, etc",
+        "- b) relativamente à instalações e equipamentos: bancos, lixeiras, abrigos de ônibus, placas, semáforos etc."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Transitar com veículo derramando sobre a via, carga que esteja transportando. Enquadramento específico: 678-51, art. 231, II, a.\n\n2. Transitar com veículo lançando sobre a via, carga que esteja transportando. Enquadramento específico: 678-52, art. 231, II, a.\n\n3. Transitar com o veículo arrastando sobre a via, carga que esteja transportando. Enquadramento específico: 678-53, art. 231, II, a.\n\n4. Transitar com veículo derramando ou lançando combustível/lubrificante que esteja utilizando. Enquadramento específico: 679-30, art. 231, II, b.\n\n5. Transitar com veículo derramando, lançando ou arrastando sobre a via, qualquer objeto que possa acarretar risco de acidente. Enquadramento específico: 680-70, art. 231, II, c.",
+      "itens": [
+        "1. Transitar com veículo derramando sobre a via, carga que esteja transportando. Enquadramento específico: 678-51, art. 231, II, a.",
+        "2. Transitar com veículo lançando sobre a via, carga que esteja transportando. Enquadramento específico: 678-52, art. 231, II, a.",
+        "3. Transitar com o veículo arrastando sobre a via, carga que esteja transportando. Enquadramento específico: 678-53, art. 231, II, a.",
+        "4. Transitar com veículo derramando ou lançando combustível/lubrificante que esteja utilizando. Enquadramento específico: 679-30, art. 231, II, b.",
+        "5. Transitar com veículo derramando, lançando ou arrastando sobre a via, qualquer objeto que possa acarretar risco de acidente. Enquadramento específico: 680-70, art. 231, II, c."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. VIA - superfície por onde transitam veículos, pessoas e animais, compreendendo a pista, a calçada, o acostamento, ilha e canteiro central, jardins, pontes, passarelas, viadutos, etc.\n\n2. INSTALAÇÕES - equipamentos apostos na via, compreendendo bancos, lixeiras, estrutura para parada de ônibus, placas, semáforos, tachas, tachinhas, tachões, etc.",
+      "itens": [
+        "1. VIA - superfície por onde transitam veículos, pessoas e animais, compreendendo a pista, a calçada, o acostamento, ilha e canteiro central, jardins, pontes, passarelas, viadutos, etc.",
+        "2. INSTALAÇÕES - equipamentos apostos na via, compreendendo bancos, lixeiras, estrutura para parada de ônibus, placas, semáforos, tachas, tachinhas, tachões, etc."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo transitando com o eixo sem roda, danificando a camada asfáltica.\n\n2. Veículo fazendo retorno por sobre canteiro central danificando o ajardinamento existente.\n\n3. A lateral do veículo arrancou a cobertura do abrigo de ônibus.",
+      "itens": [
+        "1. Veículo transitando com o eixo sem roda, danificando a camada asfáltica.",
+        "2. Veículo fazendo retorno por sobre canteiro central danificando o ajardinamento existente.",
+        "3. A lateral do veículo arrancou a cobertura do abrigo de ônibus."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações</strong></p>\n\n<p>que impliquem em transitar com o veículo danificando a via, suas instalações e equipamentos.</p>",
     "paginas": [
@@ -17501,7 +17603,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 , ç",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito NÃO",
+    "constatacao_infracao": "Possível sem abordagem. gp ,",
     "quando_autuar": {
       "texto": "1. Veículo derramando ou lançando sobre a via combustível ou lubrificante que esteja utilizando.",
       "itens": [
@@ -17552,7 +17654,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7 , ç",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito: NÃO",
+    "constatacao_infracao": "Possível sem abordagem. gp qqjqp",
     "quando_autuar": {
       "texto": "1. Veículo derramando qualquer objeto, desde que não seja a carga, que acarreta risco de acidente.\n\n2. Veículo lançando qualquer objeto, desde que não seja a carga,que acarreta risco de acidente.\n\n3. Veículo arrastando qualquer objeto, desde que não seja a carga, que acarreta risco de acidente.",
       "itens": [
@@ -17658,11 +17760,11 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Retenção do veículo para regularização (Vide a Parte Geral deste Manual). /",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
-    "constatacao_infracao": "Mediante abordagem. Constatação da Infração: Mediante abordagem. Pode Configurar Crime de Trânsito: NÃO",
+    "constatacao_infracao": "Mediante abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo ou combinação de veículos transitando com suas dimensões e/ou de sua carga excedendo os limites estabelecidos pela legislação, sem possuir autorização válida.\n\n2. A CVC com mais de duas unidades, incluída a unidade tratora ou qualquer veículo da combinação, com comprimento total acima de 19,80m, sem possuir autorização válida.\n\n3. Quando as CTV e as CTVP e/ou carga estiverem com suas dimensões superiores aos limites estabelecidos legalmente e não possuírem autorização válida, exigida pelo art. 3º da Resolução do Contran nº 735/2018, ou outra que a substituir.\n\n4. Quando a CTV ou CTVP de comprimento superior a 19,80 metros, mesmo dispensada de AET, por deliberação de órgão executivo rodoviário, estiver transitando em trecho rodoviário de pista simples no período noturno com carga na plataforma superior.\n\n5. Combinação de veículos cujas dimensões ou de sua carga excedam os limites estabelecidos pela legislação, que não possui autorização válida que contemple todos os veículos da combinação.\n\n6. VPC com altura superior a 4,60 m e/ou comprimento superior a 21 m, sem possuir autorização válida.\n\n7. Veículos com balanço traseiro superior aos limites estabelecidos pela regulamentação.\n\n8. Automóvel, caminhonete, camioneta ou utilitário transitando com sua carga com suas dimensões superiores aos limites pela Resolução 882/2021, ainda que com AET.\n\n9. Caminhonete e utilitário transportando carga em compartimento de carga com altura superior a duas vezes a largura do veículo, ainda com AET.\n\n10. Combinação de veículo transportador de contêiner formada por caminhão-trator e semirreboque com mais de 18,60m de comprimento transportando contêiner superior a 53 pés ou 16,154m.",
       "itens": [
@@ -18020,7 +18122,7 @@
     "penalidade": "Multa ê (ldl )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual). /)",
     "pode_configurar_crime_transito": "Ã NÃO .",
-    "infrator": "Proprietário - Pontuação: 5 - 1. Veículo ou combinação veículos e/ou carga com dimensões superiores aos Tipificação Resumida: Transitar em desacordo c/ autorização expedida p/veículo c/ dimensões excedentes. - Amparo Legal: - Art. 231, VI. Tipificação do Enquadramento: - Transitar com o veículo em desacordo com a autorização especial, expedida pela autoridade quando a mesma estiver vencida. - Penalidade: Multa -",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
@@ -18088,26 +18190,43 @@
     "penalidade": "Multa Cêi(ldlLi )",
     "medida_administrativa": "Remoção do veículo (Vide a Parte Geral deste Manual). i 14599/23)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "5",
     "constatacao_infracao": "Mediante abordagem.",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo ou combinação de veículos e/ou carga com dimensões excedentes aos limites legais, transitando com autorização vencida.\n\n2. CTV e CTVP e/ou carga estiverem transitando com suas dimensões superiores aos limites estabelecidos legalmente e com AET vencida.",
+      "itens": [
+        "1. Veículo ou combinação de veículos e/ou carga com dimensões excedentes aos limites legais, transitando com autorização vencida.",
+        "2. CTV e CTVP e/ou carga estiverem transitando com suas dimensões superiores aos limites estabelecidos legalmente e com AET vencida."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo ou combinação de veículo transitando com dimensão excedente e em desacordo com a AET, usar enquadramento específico: 684-01, art. 231, VI.\n\n2. Veículo ou combinação de veículo transitando sem AET, com dimensões superiores ao limite legal, utilizar enquadramento específico: 682-31, art. 231, IV.",
+      "itens": [
+        "1. Veículo ou combinação de veículo transitando com dimensão excedente e em desacordo com a AET, usar enquadramento específico: 684-01, art. 231, VI.",
+        "2. Veículo ou combinação de veículo transitando sem AET, com dimensões superiores ao limite legal, utilizar enquadramento específico: 682-31, art. 231, IV."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. AE - Autorização Específica válida por período de um ano.\n\n2. AED - Autorização Específica Definitiva.\n\n3. AET–Autorização Especial de Trânsito.\n\n4. CVC – Combinação de Veículos de Carga.\n\n5. CTV – Combinação para Transporte de Veículos.\n\n6. CTVP – Combinações de Transporte de Veículos e Cargas Paletizadas.\n\n7. VTAV–Veículo de Transporte de Animais Vivos.\n\n8. Os instrumentos ou equipamentos utilizados para a medição de dimensões de veículos ou suas cargas devem estar de acordo com a legislação metrológica em vigor, quando disponíveis. Podendo ser utilizados os atualmente existentes no mercado nacional.",
+      "itens": [
+        "1. AE - Autorização Específica válida por período de um ano.",
+        "2. AED - Autorização Específica Definitiva.",
+        "3. AET–Autorização Especial de Trânsito.",
+        "4. CVC – Combinação de Veículos de Carga.",
+        "5. CTV – Combinação para Transporte de Veículos.",
+        "6. CTVP – Combinações de Transporte de Veículos e Cargas Paletizadas.",
+        "7. VTAV–Veículo de Transporte de Animais Vivos.",
+        "8. Os instrumentos ou equipamentos utilizados para a medição de dimensões de veículos ou suas cargas devem estar de acordo com a legislação metrológica em vigor, quando disponíveis. Podendo ser utilizados os atualmente existentes no mercado nacional."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. CVC transitando com com altura total de 4,50 m, excedendo o limite legal de altura de 4,40 m previsto na regulamentação com a AET vencida.",
+      "itens": [
+        "1. CVC transitando com com altura total de 4,50 m, excedendo o limite legal de altura de 4,40 m previsto na regulamentação com a AET vencida."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras</strong></p>\n\n<p>situações que impliquem transitar com autorização vencida, expedida para veículo com dimensões excedentes.</p>\n\n<p><strong>2. Resolução Contran nº 872/2021: Estabelece os requisitos necessários à circulação de Combinações de Veículos de Carga (CVC)</strong></p>\n\n<table>\n  <tr>\n    <td>\n<p>açúcar.</p>\n    </td>\n    <td>\n<p>-de\u0002</p>\n    </td>\n  </tr>\n</table>\n\n<p><strong>3. Resolução Contran nº 882/2021: Estabelece os limites de pesos e dimensões para veículos que transitem por vias terrestres</strong></p>\n\n<p>e dá outras providências.</p>",
     "paginas": [
@@ -18179,7 +18298,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do veículo (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Municipal, Estadual e Rodoviário. gp,",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "7 pp",
@@ -18392,7 +18511,7 @@
     "penalidade": "Multa ()",
     "medida_administrativa": "Retenção do veículo e transbordo de carga excedente (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Municipal e Rodoviário. gp",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "4 pç",
@@ -18458,7 +18577,7 @@
     "penalidade": "Multa ()",
     "medida_administrativa": "Retenção do veículo e transbordo de carga excedente (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Municipal e Rodoviário. gp",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "5 pç",
@@ -18524,7 +18643,7 @@
     "penalidade": "Multa ()",
     "medida_administrativa": "Retenção do veículo e transbordo de carga excedente (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Municipal e Rodoviário. gp",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "7 pç",
@@ -18659,7 +18778,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do Veículo (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual. g",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "Não Computável",
@@ -18711,7 +18830,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do Veículo (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual. g",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "Não Computável",
@@ -18761,7 +18880,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do Veículo (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual. g",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "Não Computável",
@@ -18812,7 +18931,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Remoção do Veículo (Vide Parte Geral deste Manual)",
     "pode_configurar_crime_transito": "Ã NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual. g",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "Não Computável",
@@ -18969,20 +19088,34 @@
     "pontuacao": "5 gp,",
     "constatacao_infracao": "Possível sem abordagem. g , p",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo transportando pessoa(s), total ou parcialmente, na(s) parte(s) externa(s), sem autorização.\n\n2. Veículo transportando pes soa(s), total ou parcialmente, na(s) parte(s) externa(s), em desacordo com a autorização.",
+      "itens": [
+        "1. Veículo transportando pessoa(s), total ou parcialmente, na(s) parte(s) externa(s), sem autorização.",
+        "2. Veículo transportando pes soa(s), total ou parcialmente, na(s) parte(s) externa(s), em desacordo com a autorização."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo transportando passageiro(s) em compartimento de carga, utilizar enquadramento específico: 656-40, art. 230, II.\n\n2. Quando houver autorização do órgão de trânsito com circunscrição sobre a via, desde que o transporte se dê nas condições previstas nesta autorização.",
+      "itens": [
+        "1. Veículo transportando passageiro(s) em compartimento de carga, utilizar enquadramento específico: 656-40, art. 230, II.",
+        "2. Quando houver autorização do órgão de trânsito com circunscrição sobre a via, desde que o transporte se dê nas condições previstas nesta autorização."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Para fins de fiscalização deste enquadramento, o bagageiro equipara-se ao compartimento de carga.\n\n2. Entende-se por partes externas do veículo todo local que não seja o interior do habitáculo ou do compartimento de carga do veículo.",
+      "itens": [
+        "1. Para fins de fiscalização deste enquadramento, o bagageiro equipara-se ao compartimento de carga.",
+        "2. Entende-se por partes externas do veículo todo local que não seja o interior do habitáculo ou do compartimento de carga do veículo."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo transportando pessoa pendurada na parte externa da porta do passageiro.\n\n2. Veículo com passageiro do banco traseiro com a cabeça pelo lado de fora da janela.\n\n3. Veículo com passageiro com parte do corpo projetada para fora, através do teto solar do veículo.\n\n4. Caminhão transitando com pessoa agarrada à carroceria, se apoiando sobre o para\u0002 choque traseiro.",
+      "itens": [
+        "1. Veículo transportando pessoa pendurada na parte externa da porta do passageiro.",
+        "2. Veículo com passageiro do banco traseiro com a cabeça pelo lado de fora da janela.",
+        "3. Veículo com passageiro com parte do corpo projetada para fora, através do teto solar do veículo.",
+        "4. Caminhão transitando com pessoa agarrada à carroceria, se apoiando sobre o para\u0002 choque traseiro."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações</strong></p>\n\n<p>que impliquem conduzir pessoas nas partes externas do veículo.</p>",
     "paginas": [
@@ -19006,20 +19139,33 @@
     "pontuacao": "5 gp,",
     "constatacao_infracao": "Possível sem abordagem. g , p",
     "quando_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo transportando animal(is), total ou parcialmente, na(s) parte(s) externa(s), sem autorização.\n\n2. Veículo transportando animal(is), total ou parcialmente, na(s) parte(s) externa(s), em desacordo com a autorização.",
+      "itens": [
+        "1. Veículo transportando animal(is), total ou parcialmente, na(s) parte(s) externa(s), sem autorização.",
+        "2. Veículo transportando animal(is), total ou parcialmente, na(s) parte(s) externa(s), em desacordo com a autorização."
+      ]
     },
     "quando_nao_autuar": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Condutor de veículo, inclusive motocicleta, transportando animal entre os braços ou as pernas ou à sua esquerda, utilizar enquadramento específico: 73232, art. 252, II.\n\n2. Quando houver autorização do órgão de trânsito com circunscrição sobre a via, desde que o transporte se dê nas condições previstas nesta autorização.",
+      "itens": [
+        "1. Condutor de veículo, inclusive motocicleta, transportando animal entre os braços ou as pernas ou à sua esquerda, utilizar enquadramento específico: 73232, art. 252, II.",
+        "2. Quando houver autorização do órgão de trânsito com circunscrição sobre a via, desde que o transporte se dê nas condições previstas nesta autorização."
+      ]
     },
     "definicoes_procedimentos": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Entende-se por partes externas do veículo todo local que não seja o interior do habitáculo ou do compartimento de carga do veículo.\n\n2. No caso do transporte de animais de produção, de interesse econômico, de esporte, de lazer ou de exposição observar regulamentação específica (Resolução do Contran nº 791/2020 e sucedâneas).",
+      "itens": [
+        "1. Entende-se por partes externas do veículo todo local que não seja o interior do habitáculo ou do compartimento de carga do veículo.",
+        "2. No caso do transporte de animais de produção, de interesse econômico, de esporte, de lazer ou de exposição observar regulamentação específica (Resolução do Contran nº 791/2020 e sucedâneas)."
+      ]
     },
     "exemplos_observacoes_ait": {
-      "texto": "Não há.",
-      "itens": []
+      "texto": "1. Veículo circulando com um cachorro sobre o capô.\n\n2. Veículo circulando com animal com parte do corpo para fora do veículo.\n\n3. Veículo transportando animal no compartimento de carga aberto, apoiado sobre a borda superior da carroçaria, com parte do corpo projetada para fora do compartimento de carga.",
+      "itens": [
+        "1. Veículo circulando com um cachorro sobre o capô.",
+        "2. Veículo circulando com animal com parte do corpo para fora do veículo.",
+        "3. Veículo transportando animal no compartimento de carga aberto, apoiado sobre a borda superior da carroçaria, com parte do corpo projetada para fora do compartimento de carga."
+      ]
     },
     "informacoes_complementares": "<p><strong>1. O rol de situações descritas no campo “Quando Autuar” é meramente exemplificativo e não exaure e nem exclui outras situações</strong></p>\n\n<p>que impliquem conduzir animais nas partes externas do veículo.</p>",
     "paginas": [
@@ -19397,7 +19543,7 @@
     "penalidade": "Multa )",
     "medida_administrativa": "Recolhimento do Certificado de Registro e do Certificado de Licenciamento Anual. (Vide a Parte Geral deste Manual).",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Proprietário",
+    "infrator": "Proprietário p",
     "competencia": "Órgão ou Entidade de Trânsito Estadual e Rodoviário. g",
     "competencia_alterada_lei_14599": false,
     "pontuacao": "Não Computável g",
@@ -21642,7 +21788,7 @@
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "4",
-    "constatacao_infracao": "Possível sem abordagem. Constatação da Infração: Possível sem abordagem. Pode Configurar Crime de Trânsito: NÃO",
+    "constatacao_infracao": "Possível sem abordagem. gp",
     "quando_autuar": {
       "texto": "1. Veículo parado à noite efetuando embarque ou desembarque de passageiros com as luzes de posição apagadas.",
       "itens": [
@@ -22133,7 +22279,7 @@
     "penalidade": "Multa Cêi(ldlLi )",
     "medida_administrativa": "Retenção do veículo até a regularização (Vide a Parte Geral do Manual) i 14599/23)",
     "pode_configurar_crime_transito": "NÃO",
-    "infrator": "Condutor",
+    "infrator": "Condutor C",
     "competencia": "Órgão ou Entidade de Trânsito Estadual, Municipal e Rodoviário.",
     "competencia_alterada_lei_14599": true,
     "pontuacao": "7",

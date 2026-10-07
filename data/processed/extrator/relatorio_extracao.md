@@ -31,4 +31,6 @@
 - ✅ Nenhuma anomalia crítica ou campo obrigatório vazio detectado.
 
 ## 4. Intervenções do OCR (Visual Fallback)
-- ✅ Nenhuma anomalia detectada que exigisse OCR.
+O motor de OCR visual interveio em 2 campos sujos:
+- **Ficha 518-52** (`infrator`): substituído de `Condutor C Ó` para `Condutor`
+- **Ficha 585-11** (`infrator`): substituído de `Condutor C Ó` para `Condutor`

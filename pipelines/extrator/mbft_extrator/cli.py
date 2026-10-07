@@ -76,7 +76,11 @@ def _processar_uma_ficha_worker(item_args: Tuple[str, dict, str, str, bool, bool
     # Checkpoint
     if f_cache.exists() and not force:
         with open(f_cache, "r", encoding="utf-8") as f:
-            return json.load(f)
+            c_data = json.load(f)
+            if "dados" in c_data and "correcoes" in c_data:
+                return c_data
+            else:
+                return {"dados": c_data, "correcoes": []}
 
     global _WORKER_DOC
     if _WORKER_DOC is None:
@@ -91,9 +95,13 @@ def _processar_uma_ficha_worker(item_args: Tuple[str, dict, str, str, bool, bool
     )
     dados = ficha_obj.model_dump()
 
+    from mbft_extrator.auditoria import AuditoriaGeral
+    correcoes = AuditoriaGeral.correcoes_ocr.copy()
+    AuditoriaGeral.correcoes_ocr.clear()
+
     # Salva checkpoint no cache
     with open(f_cache, "w", encoding="utf-8") as f:
-        json.dump(dados, f, ensure_ascii=False, indent=2)
+        json.dump({"dados": dados, "correcoes": correcoes}, f, ensure_ascii=False, indent=2)
 
     # Se salvar individuais
     if salvar_individuais:
@@ -102,7 +110,7 @@ def _processar_uma_ficha_worker(item_args: Tuple[str, dict, str, str, bool, bool
         with open(pasta_indiv / f"ficha_{m.codigo}.json", "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
 
-    return dados
+    return {"dados": dados, "correcoes": correcoes}
 
 
 def cmd_geral(args):
@@ -164,15 +172,22 @@ def cmd_fichas(args):
     concluidas = 0
     t0 = time.time()
 
+    from mbft_extrator.auditoria import AuditoriaGeral
+    AuditoriaGeral.correcoes_ocr.clear()
+
     if workers <= 1:
         for t in tasks:
-            dados = _processar_uma_ficha_worker(t)
+            result = _processar_uma_ficha_worker(t)
+            dados = result["dados"]
+            AuditoriaGeral.correcoes_ocr.extend(result["correcoes"])
             concluidas += 1
             logger.info(f"[{concluidas}/{total}] Ficha {dados['id']} processada.")
             fichas_extraidas.append(Ficha(**dados))
     else:
         with ProcessPoolExecutor(max_workers=workers) as executor:
-            for dados in executor.map(_processar_uma_ficha_worker, tasks):
+            for result in executor.map(_processar_uma_ficha_worker, tasks):
+                dados = result["dados"]
+                AuditoriaGeral.correcoes_ocr.extend(result["correcoes"])
                 concluidas += 1
                 logger.info(f"[{concluidas}/{total}] Ficha {dados['id']} processada.")
                 fichas_extraidas.append(Ficha(**dados))
