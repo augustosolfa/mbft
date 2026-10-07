@@ -19,9 +19,6 @@ class LayoutAnalyzer:
     # Tolerância vertical para agrupar fragmentos na mesma linha
     Y_LINE_TOLERANCE: float = 3.2
 
-    # Divisões espaciais das 4 colunas normativas pelo centro horizontal (xc)
-    COL_BOUNDS: Tuple[float, float, float] = (165.0, 298.0, 433.0)
-
     # Regex para ignorar cabeçalhos repetitivos impressos no topo de colunas
     RE_COLUMN_HEADER = re.compile(
         r"^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es\s+e\s+procedimentos|exemplos\s+do\s+campo.*):?$",
@@ -42,9 +39,56 @@ class LayoutAnalyzer:
         self.width, self.height = page.get_size()
 
         self.y_top, self.y_bottom, self.ic_y_bound = self.detect_bounds()
+        self.col_bounds = self.detect_column_bounds()
 
-    @classmethod
-    def get_column_channel(cls, x0: float, x1: float) -> int:
+    def detect_column_bounds(self) -> List[float]:
+        """
+        Detecta dinamicamente os limites (X) das colunas buscando as linhas verticais separadoras.
+        Caso as linhas vetoriais não existam na página, utiliza proporções da largura.
+        """
+        w = float(self.width)
+        vlines_x: List[float] = []
+
+        try:
+            for obj in self.page.get_objects():
+                if getattr(obj, "type", None) == 2:  # FPDF_PAGEOBJ_PATH
+                    b = obj.get_bounds()
+                    vw = b[2] - b[0]
+                    vh = b[3] - b[1]
+                    # Traço vertical fino e com altura mínima representativa
+                    if vw < 5.0 and vh > 20.0:
+                        vlines_x.append((b[0] + b[2]) / 2.0)
+        except Exception:
+            pass
+
+        clusters: List[List[float]] = []
+        for x in sorted(vlines_x):
+            if not clusters:
+                clusters.append([x])
+            elif abs(clusters[-1][-1] - x) < 5.0:
+                clusters[-1].append(x)
+            else:
+                clusters.append([x])
+
+        means = [sum(c) / len(c) for c in clusters]
+
+        # Proporções esperadas das 3 divisórias internas: ~28%, ~50% e ~73%
+        expected_pct = [0.28, 0.50, 0.73]
+        bounds: List[float] = []
+        for exp in expected_pct:
+            target = w * exp
+            if means:
+                best = min(means, key=lambda x: abs(x - target))
+                if abs(best - target) < w * 0.05:  # Tolerância de 5% de variância
+                    bounds.append(best)
+                else:
+                    bounds.append(target)
+            else:
+                bounds.append(target)
+
+        return bounds
+
+    def get_column_channel(self, x0: float, x1: float) -> int:
         """
         Calcula o centro horizontal da caixa de texto e atribui o canal de coluna (0 a 3).
         - 0: Quando Autuar
@@ -53,11 +97,11 @@ class LayoutAnalyzer:
         - 3: Exemplos do Campo Observações
         """
         xc = (x0 + x1) / 2.0
-        if xc < cls.COL_BOUNDS[0]:
+        if xc < self.col_bounds[0]:
             return 0
-        elif xc < cls.COL_BOUNDS[1]:
+        elif xc < self.col_bounds[1]:
             return 1
-        elif xc < cls.COL_BOUNDS[2]:
+        elif xc < self.col_bounds[2]:
             return 2
         else:
             return 3
