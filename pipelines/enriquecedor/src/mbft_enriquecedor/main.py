@@ -80,6 +80,13 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
         imagens=f_bruta.imagens
     )
     
+    # Extrair referências legais que estão embutidas nas definições e procedimentos
+    for regra in f_enriquecida.definicoes_procedimentos_itens:
+        artigos_extras = parse_amparo_legal(regra.texto)
+        for art in artigos_extras:
+            if art not in f_enriquecida.artigos_ctb:
+                f_enriquecida.artigos_ctb.append(art)
+                
     return f_enriquecida
 
 

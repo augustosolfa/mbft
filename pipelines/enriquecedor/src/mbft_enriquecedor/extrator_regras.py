@@ -80,6 +80,10 @@ class ExtratorRegrasAtomo:
             else:
                 pass
                 
+            # Descartar o Chunk Fantasma (pai oco que termina em :)
+            if match_pai and not match_sub and texto_item.strip().endswith(":"):
+                continue
+                
             # 1. Aplicar Heurística Lexical (Expressões Regulares)
             regra = self._inferir_via_heuristica(texto_final, secao_origem)
             

@@ -119,8 +119,7 @@ def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
     texto = sanitizar_texto(texto)
     artigos = []
     
-    # Ex: "Art. 330, § 5º e § 6º."
-    # Descobrir o artigo principal
+    # Ex: "Art. 330, § 5º e § 6º." ou "Art. 40... III - "
     match_artigo = REGEX_ARTIGO_AMPARO.search(texto)
     if not match_artigo:
         return []
@@ -128,13 +127,26 @@ def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
     artigo_base = match_artigo.group(1)
     
     # Encontrar os parágrafos mencionados
-    paragrafos = REGEX_PARAGRAFO_AMPARO.findall(texto)
-    
-    if not paragrafos:
+    paragrafos = []
+    for m in REGEX_PARAGRAFO_AMPARO.finditer(texto):
+        p = m.group(1) or m.group(2)
+        if p: paragrafos.append(p)
+        
+    # Encontrar incisos (ex: "III -" ou "inciso III")
+    incisos = []
+    for m in re.finditer(r"\b(?:inciso\s+)?([IVXLCDM]+)(?:\s*-|\b)", texto, re.IGNORECASE):
+        inc = m.group(1).upper()
+        # Validação simples para evitar falsos positivos
+        if inc in ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"]:
+            incisos.append(inc)
+            
+    if not paragrafos and not incisos:
         artigos.append(ReferenciaCTB(artigo=artigo_base))
     else:
         for p in paragrafos:
             artigos.append(ReferenciaCTB(artigo=artigo_base, paragrafo=p))
+        for inc in incisos:
+            artigos.append(ReferenciaCTB(artigo=artigo_base, inciso=inc))
             
     return artigos
 
