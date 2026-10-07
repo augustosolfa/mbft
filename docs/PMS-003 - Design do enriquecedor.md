@@ -156,7 +156,7 @@ Cada uma das 404 fichas é subdividida em chunks estruturados, onde cada chunk r
   ```text
   [INFORMAÇÃO DA INFRAÇÃO]
   Código: {codigo_enquadramento} | Tipificação: {tipificacao_resumida}
-  Amparo Legal: {amparo_legal} | Infrator: {infrator} | Gravidade: {gravidade} | Competência: {competencia}
+  Amparo Legal: {amparo_legal} | Infrator: {infrator} | Gravidade: {gravidade} | Penalidade: {penalidade_original} | Competência: {competencias}
   ```
 - **Tipos de Chunks por Ficha**:
   1. `EMENTA`: Cabeçalho completo, amparo legal e enquadramento formal;

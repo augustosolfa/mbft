@@ -1336,7 +1336,8 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -1496,7 +1497,8 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -7934,9 +7936,7 @@
         "texto": "3. Proprietário ausente ou proprietário pessoa jurídica, que entregar o veículo a condutor sem possuir Curso Especializado ou com este vencido, na forma regulamentada pelo Contran, utilizar enquadramento específico: 778-12, art. 164 c/c 162, VII.",
         "natureza_regra": "EXCECAO_DESVIO",
         "codigos_concomitantes": [],
-        "codigos_redirecionamento": [
-          "778-12"
-        ]
+        "codigos_redirecionamento": []
       },
       {
         "texto": "4. Proprietário que entregar a direção do veículo a condutor que se encontrar em qualquer das hipóteses previstas no campo “Quando NÃO Autuar”, do enquadramento: 774-92, art. 162, VII.",
@@ -8051,10 +8051,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -8068,7 +8070,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "COM_ABORDAGEM"
     ],
@@ -8250,10 +8252,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -8267,7 +8271,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "COM_ABORDAGEM"
     ],
@@ -8435,7 +8439,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "NAO_APLICAVEL"
@@ -8452,7 +8457,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "COM_ABORDAGEM"
     ],
@@ -8648,7 +8653,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "NAO_APLICAVEL"
@@ -8663,7 +8669,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "VIDE_PROCEDIMENTOS"
     ],
@@ -10420,10 +10426,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -10437,7 +10445,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": true,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -10592,10 +10600,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -10609,7 +10619,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": true,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -11388,10 +11398,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -11405,7 +11417,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": true,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -12102,10 +12114,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -12119,7 +12133,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -12309,10 +12323,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -12326,7 +12342,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -12542,10 +12558,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -12559,7 +12577,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -12759,10 +12777,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -12776,7 +12796,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -12971,10 +12991,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -12988,7 +13010,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -13199,10 +13221,11 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -13216,7 +13239,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -13494,10 +13517,11 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -13511,7 +13535,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -13763,10 +13787,11 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -13780,7 +13805,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -14046,10 +14071,11 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -14063,7 +14089,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -14292,10 +14318,11 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -14309,7 +14336,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": true,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -28529,7 +28556,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "NAO_APLICAVEL"
@@ -28546,7 +28574,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -33983,9 +34011,7 @@
         "texto": "3. Veículo que ultrapassa pela contramão nas faixas de pedestre, utilizar enquadramento específico: 593-20, art. 203, II.",
         "natureza_regra": "EXCECAO_DESVIO",
         "codigos_concomitantes": [],
-        "codigos_redirecionamento": [
-          "593-20"
-        ]
+        "codigos_redirecionamento": []
       },
       {
         "texto": "4. Veículo que ultrapassa pela contramão outro veículo nas pontes, viadutos ou túneis, utilizar enquadramento específico: art. 230, III.",
@@ -39613,10 +39639,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -39630,7 +39658,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -40463,9 +40491,7 @@
         "texto": "11.3. Veículo que ultrapassar (pela direita ou pela esquerda, mas na mesma direção) outros veículos parados em em fila (exceto veículos não motorizados), em razão de: qualquer outro obstáculo, utilizar enquadramento específico: 608-44, art. 211.",
         "natureza_regra": "EXCECAO_DESVIO",
         "codigos_concomitantes": [],
-        "codigos_redirecionamento": [
-          "608-44"
-        ]
+        "codigos_redirecionamento": []
       }
     ],
     "definicoes_procedimentos_itens": [
@@ -41035,9 +41061,7 @@
         "texto": "2. O condutor de veículo que não der preferência de passagem, em local semaforizado, ao pedestre ou veículo não motorizado, que tenha iniciado a travessia no foco vermelho veicular e não tenha concluído a travessia, mesmo que o foco veicular esteja no verde, utilizar enquadramento específico: 612-20, art. 214, II.",
         "natureza_regra": "EXCECAO_DESVIO",
         "codigos_concomitantes": [],
-        "codigos_redirecionamento": [
-          "612-20"
-        ]
+        "codigos_redirecionamento": []
       },
       {
         "texto": "3. O condutor de veículo que deixar de dar preferência de passagem, em local não sinalizado com faixa de pedestres, a criança, idoso, pessoa com deficiência e gestante, utilizar enquadramento específico: 614-90, art. 214, III.",
@@ -43007,7 +43031,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "NAO_APLICAVEL"
@@ -43023,7 +43048,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -44770,9 +44795,7 @@
         "texto": "1.5. Condutor que deixar de reduzir a velocidade de forma compatível com a segurança no trânsito, utilizar enquadramento específico: em via rural com faixa de domínio sem cerca: 630-00, art. 220, V;",
         "natureza_regra": "EXCECAO_DESVIO",
         "codigos_concomitantes": [],
-        "codigos_redirecionamento": [
-          "630-00"
-        ]
+        "codigos_redirecionamento": []
       },
       {
         "texto": "1.6. Condutor que deixar de reduzir a velocidade de forma compatível com a segurança no trânsito, utilizar enquadramento específico: ao aproximar-se de curva de pequeno raio: 631-90, art. 220, VI;",
@@ -53808,7 +53831,7 @@
     "pontuacao_valor": 0,
     "pontuacao_suspensiva": false,
     "constatacao_infracao": [
-      "MEDIANTE_ABORDAGEM_OU_NAO"
+      "VIDE_PROCEDIMENTOS"
     ],
     "artigos_ctb": [
       {
@@ -55340,7 +55363,7 @@
     "pontuacao_valor": 5,
     "pontuacao_suspensiva": false,
     "constatacao_infracao": [
-      "MEDIANTE_ABORDAGEM_OU_NAO"
+      "VIDE_PROCEDIMENTOS"
     ],
     "artigos_ctb": [
       {
@@ -59072,7 +59095,7 @@
     "pontuacao_valor": 5,
     "pontuacao_suspensiva": false,
     "constatacao_infracao": [
-      "MEDIANTE_ABORDAGEM_OU_NAO"
+      "VIDE_PROCEDIMENTOS"
     ],
     "artigos_ctb": [
       {
@@ -68600,7 +68623,7 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_CRLV"
     ],
     "infratores": [
       "PROPRIETARIO"
@@ -69539,10 +69562,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -69556,7 +69581,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -69842,10 +69867,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -69859,7 +69886,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -70134,10 +70161,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -70151,7 +70180,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -70416,10 +70445,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -70433,7 +70464,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -70570,10 +70601,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -70587,7 +70620,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -70712,10 +70745,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -70729,7 +70764,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "VIDE_PROCEDIMENTOS"
     ],
@@ -70835,10 +70870,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -70852,7 +70889,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 7,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "COM_ABORDAGEM"
     ],
@@ -80758,7 +80795,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "REMOCAO_VEICULO"
@@ -80775,7 +80813,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -81012,7 +81050,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "REMOCAO_VEICULO"
@@ -81029,7 +81068,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -81258,7 +81297,8 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
       "REMOCAO_VEICULO"
@@ -81275,7 +81315,7 @@
     "competencia_alterada_lei_14599": true,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],
@@ -81681,10 +81721,12 @@
     },
     "gravidade": "GRAVISSIMA",
     "penalidades": [
-      "MULTA"
+      "MULTA",
+      "SUSPENSAO_DIREITO_DIRIGIR"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_VEICULO",
+      "RECOLHIMENTO_CNH"
     ],
     "infratores": [
       "CONDUTOR"
@@ -81698,7 +81740,7 @@
     "competencia_alterada_lei_14599": false,
     "crime_transito": false,
     "pontuacao_valor": 0,
-    "pontuacao_suspensiva": false,
+    "pontuacao_suspensiva": true,
     "constatacao_infracao": [
       "SEM_ABORDAGEM"
     ],

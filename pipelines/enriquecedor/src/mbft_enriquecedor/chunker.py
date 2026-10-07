@@ -13,11 +13,17 @@ def _estimar_tokens(texto: str) -> int:
 def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[ChunkPayload]:
     chunks = []
     
+    prefixo_contexto = (
+        f"[INFORMAÇÃO DA INFRAÇÃO]\n"
+        f"Código: {ficha.id} | Tipificação: {ficha.tipificacao_resumida}\n"
+        f"Amparo Legal: {ficha.amparo_legal} | Infrator: {[i.value for i in ficha.infratores]} | Gravidade: {ficha.gravidade.value} | Penalidade: {ficha.penalidade_original.strip()} | Competência: {[c.value for c in ficha.competencias]}\n\n"
+    )
+    
     # Função auxiliar para processar uma seção
     def _processar_secao(secao_nome: str, itens: List[ItemRegra]):
         for i, item in enumerate(itens):
             # Template Denso
-            texto_contextualizado = f"[Ficha: {ficha.id} - {ficha.tipificacao_resumida}] [Seção: {secao_nome}] {item.texto}"
+            texto_contextualizado = f"{prefixo_contexto}[Seção: {secao_nome}]\n{item.texto}"
             
             chunk_id = f"{ficha.id}_{secao_nome}_ITEM_{i+1}"
             
@@ -58,7 +64,7 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[ChunkPayload]:
         
     # Chunk isolado da ementa / amparo legal
     ementa_texto = f"Amparo Legal: {ficha.amparo_legal} | Infrator: {[i.value for i in ficha.infratores]} | Gravidade: {ficha.gravidade.value}"
-    texto_ementa_contextualizado = f"[Ficha: {ficha.id} - {ficha.tipificacao_resumida}] [Seção: EMENTA] {ementa_texto}"
+    texto_ementa_contextualizado = f"{prefixo_contexto}[Seção: EMENTA]\n{ementa_texto}"
     
     meta_ementa = ChunkMetadados(
         chunk_id=f"{ficha.id}_EMENTA",

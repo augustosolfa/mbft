@@ -46,7 +46,7 @@ class ExtratorRegrasAtomo:
         else:
             self.client = None
 
-    def extrair_itens(self, campo: CampoNormativo, secao_origem: str) -> List[ItemRegra]:
+    def extrair_itens(self, campo: CampoNormativo, secao_origem: str, codigo_enquadramento: str) -> List[ItemRegra]:
         """
         Converte as strings do CampoNormativo em ItemRegra estruturado usando heurísticas,
         com fallback para Gemini caso a estrutura seja complexa.
@@ -85,13 +85,13 @@ class ExtratorRegrasAtomo:
                 continue
                 
             # 1. Aplicar Heurística Lexical (Expressões Regulares)
-            regra = self._inferir_via_heuristica(texto_final, secao_origem)
+            regra = self._inferir_via_heuristica(texto_final, secao_origem, codigo_enquadramento)
             
             # 2. Se a heurística não conseguir determinar a natureza_regra, usa fallback (Gemini)
             if regra.natureza_regra == NaturezaRegraEnum.PROCEDIMENTO_GERAL and "QUANDO_NAO_AUTUAR" in secao_origem.upper():
                 # É suspeito que um item de 'Quando Não Autuar' caia no fallback default de procedimento geral
                 if self.client:
-                    regra_llm = self._inferir_via_llm(texto_final, secao_origem)
+                    regra_llm = self._inferir_via_llm(texto_final, secao_origem, codigo_enquadramento)
                     if regra_llm:
                         regra = regra_llm
             
@@ -99,7 +99,7 @@ class ExtratorRegrasAtomo:
             
         return itens_regras
 
-    def _inferir_via_heuristica(self, texto: str, secao: str) -> ItemRegra:
+    def _inferir_via_heuristica(self, texto: str, secao: str, codigo_enquadramento: str) -> ItemRegra:
         t_upper = texto.upper()
         natureza = NaturezaRegraEnum.PROCEDIMENTO_GERAL
         
@@ -117,15 +117,16 @@ class ExtratorRegrasAtomo:
             natureza = NaturezaRegraEnum.CONCOMITANCIA
         
         # Extração de códigos
-        codigos = expandir_codigos(texto)
+        codigos_encontrados = expandir_codigos(texto)
+        codigos_filtrados = [c for c in codigos_encontrados if c != codigo_enquadramento]
         
         redirecionamentos = []
         concomitantes = []
         
-        if natureza == NaturezaRegraEnum.EXCECAO_DESVIO and codigos:
-            redirecionamentos = codigos
+        if natureza == NaturezaRegraEnum.EXCECAO_DESVIO and codigos_filtrados:
+            redirecionamentos = codigos_filtrados
         elif natureza == NaturezaRegraEnum.CONCOMITANCIA:
-            concomitantes = codigos
+            concomitantes = codigos_filtrados
             
         return ItemRegra(
             texto=texto,
@@ -134,7 +135,7 @@ class ExtratorRegrasAtomo:
             codigos_redirecionamento=redirecionamentos
         )
 
-    def _inferir_via_llm(self, texto: str, secao: str) -> Optional[ItemRegra]:
+    def _inferir_via_llm(self, texto: str, secao: str, codigo_enquadramento: str) -> Optional[ItemRegra]:
         """
         Fallback utilizando o Gemini 2.5 Flash-Lite com Structured Outputs.
         """

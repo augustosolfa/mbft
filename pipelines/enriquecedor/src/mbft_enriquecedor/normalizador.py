@@ -33,7 +33,7 @@ def normalizar_gravidade(texto: str) -> GravidadeEnum:
     return GravidadeEnum.NAO_APLICAVEL
 
 def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
-    t = sanitizar_texto(texto).upper()
+    t = sanitizar_texto(texto).upper().replace("Ã", "A")
     rens = []
     if "MULTA" in t: rens.append(PenalidadeEnum.MULTA)
     if "ADVERTENCIA" in t: rens.append(PenalidadeEnum.ADVERTENCIA_POR_ESCRITO)
@@ -42,12 +42,12 @@ def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
     return rens if rens else [PenalidadeEnum.NAO_APLICAVEL]
 
 def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaEnum]:
-    t = sanitizar_texto(texto).upper().replace("Ç", "C").replace("Ã", "A")
+    t = sanitizar_texto(texto).upper().replace("Ç", "C").replace("Ã", "A").replace("Õ", "O")
     rens = []
     if "RETENCAO" in t: rens.append(MedidaAdministrativaEnum.RETENCAO_VEICULO)
     if "REMOCAO" in t: rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
-    if "RECOLHIMENTO" in t and "CNH" in t: rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CNH)
-    if "RECOLHIMENTO" in t and "CRLV" in t: rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CRLV)
+    if "RECOLHIMENTO" in t and ("CNH" in t or "DOCUMENTO DE HABILITACAO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CNH)
+    if "RECOLHIMENTO" in t and ("CRLV" in t or "LICENCIAMENTO" in t or "CERTIFICADO DE REGISTRO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CRLV)
     if "TRANSBORDO" in t: rens.append(MedidaAdministrativaEnum.TRANSBORDO_CARGA)
     if "ALCOOLEMIA" in t or "TESTE" in t: rens.append(MedidaAdministrativaEnum.REALIZACAO_TESTE_ALCOOLEMIA)
     return rens if rens else [MedidaAdministrativaEnum.NAO_APLICAVEL]
@@ -100,7 +100,7 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
     return infratores, tem_crime, artigos_extraidos
 
 def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
-    t = sanitizar_texto(texto).upper().replace("Ã", "A")
+    t = sanitizar_texto(texto).upper().replace("Ç", "C").replace("Õ", "O").replace("Ã", "A")
     res = []
     if "MEDIANTE ABORDAGEM OU NAO" in t:
         res.append(ConstatacaoInfracaoEnum.MEDIANTE_ABORDAGEM_OU_NAO)
@@ -113,7 +113,7 @@ def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
     if "VIDEOMONITORAMENTO" in t:
         res.append(ConstatacaoInfracaoEnum.VIDEOMONITORAMENTO)
         
-    if "VIDE PROCEDIMENTO" in t or "VIDE OS PROCEDIMENTOS" in t:
+    if "VIDE PROCEDIMENTO" in t or "VIDE OS PROCEDIMENTOS" in t or "VIDE DEFINICOES E PROCEDIMENTOS" in t:
         res.append(ConstatacaoInfracaoEnum.VIDE_PROCEDIMENTOS)
         
     if "NAO APLICAVEL" in t or "NAO SE APLICA" in t:
@@ -165,7 +165,7 @@ def parse_resolucoes_contran(texto: str) -> List[str]:
     matches = regex_contran.findall(texto)
     return matches
 
-def calcular_pontuacao(texto: str) -> Tuple[int, bool]:
+def calcular_pontuacao(texto: str, penalidades_norm: List[PenalidadeEnum]) -> Tuple[int, bool]:
     t = sanitizar_texto(texto).lower()
     valor = 0
     if "7" in t or "sete" in t: valor = 7
@@ -173,5 +173,5 @@ def calcular_pontuacao(texto: str) -> Tuple[int, bool]:
     elif "4" in t or "quatro" in t: valor = 4
     elif "3" in t or "tres" in t or "três" in t: valor = 3
     
-    suspensiva = "suspensão" in t or "suspensao" in t
+    suspensiva = ("suspensão" in t or "suspensao" in t) or (PenalidadeEnum.SUSPENSAO_DIREITO_DIRIGIR in penalidades_norm)
     return valor, suspensiva

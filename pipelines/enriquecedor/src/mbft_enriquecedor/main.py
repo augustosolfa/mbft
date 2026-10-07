@@ -33,7 +33,7 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
     artigos_ctb = parse_amparo_legal(f_bruta.amparo_legal) + artigos_ctb_crime
     
     constatacao_norm = normalizar_constatacao(f_bruta.constatacao_infracao)
-    pts_valor, pts_suspensiva = calcular_pontuacao(f_bruta.pontuacao)
+    pts_valor, pts_suspensiva = calcular_pontuacao(f_bruta.pontuacao, penalidades_norm)
     
     competencia_norm, via_lei_14599 = obter_competencia_atualizada(f_bruta.codigo_enquadramento, f_bruta.competencia)
     competencia_fonte = CompetenciaFonteEnum.RESOLUCAO_LEI_14599 if via_lei_14599 else CompetenciaFonteEnum.MBFT_ORIGINAL
@@ -77,10 +77,10 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
         enquadramentos_correlatos=[],
         termos_chave=[],
         
-        quando_autuar_itens=extrator_regras.extrair_itens(f_bruta.quando_autuar, "QUANDO_AUTUAR"),
-        quando_nao_autuar_itens=extrator_regras.extrair_itens(f_bruta.quando_nao_autuar, "QUANDO_NAO_AUTUAR"),
-        definicoes_procedimentos_itens=extrator_regras.extrair_itens(f_bruta.definicoes_procedimentos, "DEFINICOES_PROCEDIMENTOS"),
-        exemplos_observacoes_ait_itens=extrator_regras.extrair_itens(f_bruta.exemplos_observacoes_ait, "EXEMPLOS_AIT"),
+        quando_autuar_itens=extrator_regras.extrair_itens(f_bruta.quando_autuar, "QUANDO_AUTUAR", f_bruta.codigo_enquadramento),
+        quando_nao_autuar_itens=extrator_regras.extrair_itens(f_bruta.quando_nao_autuar, "QUANDO_NAO_AUTUAR", f_bruta.codigo_enquadramento),
+        definicoes_procedimentos_itens=extrator_regras.extrair_itens(f_bruta.definicoes_procedimentos, "DEFINICOES_PROCEDIMENTOS", f_bruta.codigo_enquadramento),
+        exemplos_observacoes_ait_itens=extrator_regras.extrair_itens(f_bruta.exemplos_observacoes_ait, "EXEMPLOS_AIT", f_bruta.codigo_enquadramento),
         
         informacoes_complementares_html=f_bruta.informacoes_complementares,
         paginas=f_bruta.paginas,
