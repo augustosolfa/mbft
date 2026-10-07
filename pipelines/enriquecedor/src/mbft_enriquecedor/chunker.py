@@ -32,7 +32,7 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[ChunkPayload]:
                 competencia=ficha.competencia.value,
                 natureza_regra=item.natureza_regra,
                 codigos_concomitantes=item.codigos_concomitantes,
-                codigo_redirecionamento=item.codigo_redirecionamento
+                codigos_redirecionamento=item.codigos_redirecionamento
             )
             
             payload = ChunkPayload(

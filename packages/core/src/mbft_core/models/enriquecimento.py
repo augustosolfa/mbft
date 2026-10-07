@@ -60,6 +60,7 @@ class NaturezaRegraEnum(str, Enum):
     EXCECAO_DESVIO = "EXCECAO_DESVIO"
     CONCOMITANCIA = "CONCOMITANCIA"
     PROCEDIMENTO_GERAL = "PROCEDIMENTO_GERAL"
+    EXEMPLO_OBSERVACAO = "EXEMPLO_OBSERVACAO"
 
 
 class ReferenciaCTB(BaseModel):
@@ -72,7 +73,7 @@ class ItemRegra(BaseModel):
     texto: str = Field(..., description="Texto integral do item atômico.")
     natureza_regra: NaturezaRegraEnum
     codigos_concomitantes: List[str] = Field(default_factory=list, description="Lista de códigos (ex.: '507-01') a serem autuados concomitantemente.")
-    codigo_redirecionamento: Optional[str] = Field(None, description="Código de enquadramento para o qual este item redireciona em caso de exceção.")
+    codigos_redirecionamento: List[str] = Field(default_factory=list, description="Lista de códigos para os quais este item redireciona em caso de exceção.")
 
 class FichaEnriquecida(BaseModel):
     id: str = Field(..., description="Código de enquadramento (ex.: '751-01')")
@@ -136,7 +137,7 @@ class ChunkMetadados(BaseModel):
     # Metadados relacionais para busca estruturada
     natureza_regra: Optional[NaturezaRegraEnum] = None
     codigos_concomitantes: List[str] = Field(default_factory=list)
-    codigo_redirecionamento: Optional[str] = None
+    codigos_redirecionamento: List[str] = Field(default_factory=list)
 
 
 class ChunkPayload(BaseModel):

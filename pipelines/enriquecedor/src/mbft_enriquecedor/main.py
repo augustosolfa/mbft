@@ -6,7 +6,7 @@ from mbft_core.models.extracao import Ficha
 from mbft_core.models.enriquecimento import FichaEnriquecida, CompetenciaFonteEnum
 from mbft_enriquecedor.normalizador import (
     normalizar_gravidade, normalizar_penalidades, normalizar_medidas_administrativas,
-    higienizar_infrator_crime, normalizar_constatacao, calcular_pontuacao
+    higienizar_infrator_crime, normalizar_constatacao, calcular_pontuacao, parse_amparo_legal
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
@@ -25,9 +25,11 @@ def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> Fic
     penalidades_norm = normalizar_penalidades(f_bruta.penalidade)
     medidas_norm = normalizar_medidas_administrativas(f_bruta.medida_administrativa)
     
-    infratores_norm, tem_crime, artigos_ctb = higienizar_infrator_crime(
+    infratores_norm, tem_crime, artigos_ctb_crime = higienizar_infrator_crime(
         f_bruta.infrator, f_bruta.pode_configurar_crime_transito
     )
+    
+    artigos_ctb = parse_amparo_legal(f_bruta.amparo_legal) + artigos_ctb_crime
     
     constatacao_norm = normalizar_constatacao(f_bruta.constatacao_infracao)
     pts_valor, pts_suspensiva = calcular_pontuacao(f_bruta.pontuacao)

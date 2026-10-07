@@ -33,7 +33,7 @@ def vetorizar_e_exportar(chunks: List[ChunkPayload], output_path: str):
             "secao": m.secao,
             "competencia": m.competencia,
             "natureza_regra": m.natureza_regra.value if m.natureza_regra else None,
-            "codigo_redirecionamento": m.codigo_redirecionamento,
+            "codigos_redirecionamento": ",".join(m.codigos_redirecionamento) if m.codigos_redirecionamento else None,
             "codigos_concomitantes": ",".join(m.codigos_concomitantes) if m.codigos_concomitantes else None,
             "artigos_ctb_associados": ",".join(m.artigos_ctb_associados) if m.artigos_ctb_associados else None,
             "texto_contextualizado": chunk.texto_contextualizado,

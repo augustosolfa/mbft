@@ -26,7 +26,7 @@ def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
     return rens if rens else [PenalidadeEnum.NAO_APLICAVEL]
 
 def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaEnum]:
-    t = texto.upper()
+    t = texto.upper().replace("Ç", "C").replace("Ã", "A")
     rens = []
     if "RETENCAO" in t: rens.append(MedidaAdministrativaEnum.RETENCAO_VEICULO)
     if "REMOCAO" in t: rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
@@ -84,14 +84,14 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
     return infratores, tem_crime, artigos_extraidos
 
 def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
-    t = texto.upper()
+    t = texto.upper().replace("Ã", "A")
     res = []
-    if "MEDIANTE ABORDAGEM OU NAO" in t or "MEDIANTE ABORDAGEM OU NÃO" in t:
+    if "MEDIANTE ABORDAGEM OU NAO" in t:
         res.append(ConstatacaoInfracaoEnum.MEDIANTE_ABORDAGEM_OU_NAO)
     else:
         if "SEM ABORDAGEM" in t:
             res.append(ConstatacaoInfracaoEnum.SEM_ABORDAGEM)
-        elif "COM ABORDAGEM" in t:
+        elif "COM ABORDAGEM" in t or "MEDIANTE ABORDAGEM" in t:
             res.append(ConstatacaoInfracaoEnum.COM_ABORDAGEM)
             
     if "VIDEOMONITORAMENTO" in t:
@@ -100,6 +100,12 @@ def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
     if not res:
         res.append(ConstatacaoInfracaoEnum.MEDIANTE_ABORDAGEM_OU_NAO)
     return res
+
+def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
+    artigos = []
+    for match in REGEX_ARTIGO_CTB.finditer(texto):
+        artigos.append(ReferenciaCTB(artigo=match.group(2)))
+    return artigos
 
 def calcular_pontuacao(texto: str) -> Tuple[int, bool]:
     """

@@ -11,6 +11,32 @@ from mbft_core.models.enriquecimento import ItemRegra, NaturezaRegraEnum
 # Regex para detectar códigos \d{3}-\d{2}
 REGEX_CODIGO_ENQUADRAMENTO = re.compile(r"\b(\d{3}-\d{2})\b")
 
+# Regex para detectar cabeçalhos de lista "12. " vs "12.1. "
+REGEX_ITEM_PAI = re.compile(r"^(\d+)\.\s+(.*)")
+REGEX_SUB_ITEM = re.compile(r"^(\d+)\.(\d+)\.\s+")
+
+def expandir_codigos(texto: str) -> List[str]:
+    # Expande intervalos como "505-31 a 505-34"
+    codigos_expandidos = set()
+    
+    # 1. Encontrar intervalos com ' a '
+    for match in re.finditer(r"\b(\d{3})-(\d{2})\s+a\s+(?:(\d{3})-)?(\d{2})\b", texto):
+        raiz_ini = match.group(1)
+        desd_ini = int(match.group(2))
+        raiz_fim = match.group(3) if match.group(3) else raiz_ini
+        desd_fim = int(match.group(4))
+        
+        # Só expandimos se a raiz for a mesma
+        if raiz_ini == raiz_fim and desd_ini < desd_fim:
+            for d in range(desd_ini, desd_fim + 1):
+                codigos_expandidos.add(f"{raiz_ini}-{d:02d}")
+                
+    # 2. Adicionar códigos normais encontrados (inclui os que estão separados por 'ou')
+    for match in REGEX_CODIGO_ENQUADRAMENTO.finditer(texto):
+        codigos_expandidos.add(match.group(1))
+        
+    return sorted(list(codigos_expandidos))
+
 class ExtratorRegrasAtomo:
     def __init__(self):
         self.api_key = os.environ.get("GEMINI_API_KEY")
@@ -25,15 +51,41 @@ class ExtratorRegrasAtomo:
         com fallback para Gemini caso a estrutura seja complexa.
         """
         itens_regras = []
+        
+        ultimo_pai_num = None
+        ultimo_pai_texto = None
+        
         for texto_item in campo.itens:
+            # Resolução de herança de pai para filho (Problema 2)
+            texto_final = texto_item
+            
+            match_pai = REGEX_ITEM_PAI.match(texto_item)
+            match_sub = REGEX_SUB_ITEM.match(texto_item)
+            
+            if match_sub:
+                pai_num = match_sub.group(1)
+                if pai_num == ultimo_pai_num and ultimo_pai_texto:
+                    # Injeta o texto do pai no texto do subitem
+                    texto_limpo = re.sub(r"^\d+\.\d+\.\s+", "", texto_item)
+                    texto_final = f"{match_sub.group(0)}{ultimo_pai_texto} {texto_limpo}"
+            elif match_pai:
+                ultimo_pai_num = match_pai.group(1)
+                # O texto do pai é até os dois pontos ou final
+                texto_pai_limpo = match_pai.group(2)
+                if ":" in texto_pai_limpo:
+                    texto_pai_limpo = texto_pai_limpo.split(":")[0] + ":"
+                ultimo_pai_texto = texto_pai_limpo
+            else:
+                pass
+                
             # 1. Aplicar Heurística Lexical (Expressões Regulares)
-            regra = self._inferir_via_heuristica(texto_item, secao_origem)
+            regra = self._inferir_via_heuristica(texto_final, secao_origem)
             
             # 2. Se a heurística não conseguir determinar a natureza_regra, usa fallback (Gemini)
             if regra.natureza_regra == NaturezaRegraEnum.PROCEDIMENTO_GERAL and "QUANDO_NAO_AUTUAR" in secao_origem.upper():
                 # É suspeito que um item de 'Quando Não Autuar' caia no fallback default de procedimento geral
                 if self.client:
-                    regra_llm = self._inferir_via_llm(texto_item, secao_origem)
+                    regra_llm = self._inferir_via_llm(texto_final, secao_origem)
                     if regra_llm:
                         regra = regra_llm
             
@@ -47,7 +99,9 @@ class ExtratorRegrasAtomo:
         
         # Heurística de Seção
         secao_upper = secao.upper()
-        if "QUANDO_AUTUAR" in secao_upper:
+        if "EXEMPLOS" in secao_upper:
+            natureza = NaturezaRegraEnum.EXEMPLO_OBSERVACAO
+        elif "QUANDO_AUTUAR" in secao_upper:
             natureza = NaturezaRegraEnum.HIPOTESE_AUTUACAO
         elif "QUANDO_NAO_AUTUAR" in secao_upper:
             natureza = NaturezaRegraEnum.EXCECAO_DESVIO
@@ -57,15 +111,13 @@ class ExtratorRegrasAtomo:
             natureza = NaturezaRegraEnum.CONCOMITANCIA
         
         # Extração de códigos
-        codigos = REGEX_CODIGO_ENQUADRAMENTO.findall(texto)
-        codigos = list(set(codigos)) # deduplicar
+        codigos = expandir_codigos(texto)
         
-        redirecionamento = None
+        redirecionamentos = []
         concomitantes = []
         
         if natureza == NaturezaRegraEnum.EXCECAO_DESVIO and codigos:
-            # Assume que o primeiro código citado é para onde deve ser lavrado o auto
-            redirecionamento = codigos[0]
+            redirecionamentos = codigos
         elif natureza == NaturezaRegraEnum.CONCOMITANCIA:
             concomitantes = codigos
             
@@ -73,7 +125,7 @@ class ExtratorRegrasAtomo:
             texto=texto,
             natureza_regra=natureza,
             codigos_concomitantes=concomitantes,
-            codigo_redirecionamento=redirecionamento
+            codigos_redirecionamento=redirecionamentos
         )
 
     def _inferir_via_llm(self, texto: str, secao: str) -> Optional[ItemRegra]:
@@ -90,6 +142,7 @@ class ExtratorRegrasAtomo:
             - EXCECAO_DESVIO: Quando descreve uma situação que NÃO é infração, ou que deve autuar em OUTRO artigo (redirecionamento).
             - CONCOMITANCIA: Quando manda autuar concorrentemente com outro código.
             - PROCEDIMENTO_GERAL: Notas, definições ou regras de medição.
+            - EXEMPLO_OBSERVACAO: Sugestão do que escrever no bloco de observações do Auto de Infração.
             """
             
             response = self.client.models.generate_content(
@@ -102,11 +155,8 @@ class ExtratorRegrasAtomo:
                 ),
             )
             if response.parsed:
-                # Retorna o objeto validado pelo SDK
-                # O SDK retorna a instância Pydantic se passamos a classe no response_schema
                 return response.parsed
         except Exception as e:
-            # Em caso de falha do LLM (quota, timeout, parsing err), degrada graciosamente
             print(f"Erro no fallback LLM: {e}")
             pass
         return None
