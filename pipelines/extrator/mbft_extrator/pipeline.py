@@ -97,8 +97,9 @@ def extrair_conteudo_ic(
 
     if possui_tabela and converter and (pag_fim >= pag_ini_ic):
         try:
-            actual_converter = converter() if callable(converter) else converter
-            docling_doc = processar_intervalo_docling(actual_converter, pdf_path, pag_ini_ic, pag_fim)
+            instancia_converter = converter() if callable(converter) else converter
+            conv_padrao = instancia_converter[0] if isinstance(instancia_converter, tuple) else instancia_converter
+            docling_doc = processar_intervalo_docling(conv_padrao, pdf_path, pag_ini_ic, pag_fim)
             for item, lvl in docling_doc.iterate_items():
                 if type(item).__name__ == "TableItem":
                     t_md = item.export_to_markdown(docling_doc)
@@ -138,6 +139,31 @@ def extrair_ficha_completa(
     # 1. Metadados do cabeçalho na primeira página
     page1 = doc[pag_ini - 1]
     meta = extrair_metadados_cabecalho(page1, codigo_padrao=codigo)
+
+    # 1.1 Auditoria Intermediária e OCR Fallback
+    from .validators import detectar_anomalia_cabecalho
+    from .docling_extractor import extrair_metadados_visuais
+    from .auditoria import AuditoriaGeral
+    
+    anomalias = detectar_anomalia_cabecalho(meta)
+    
+    # Resolve o callable (lazy loader) primeiro
+    instancia_converter = converter() if callable(converter) else converter
+    
+    # Extrai o padrao e o ocr
+    conv_padrao = instancia_converter[0] if isinstance(instancia_converter, tuple) else instancia_converter
+    conv_ocr = instancia_converter[1] if isinstance(instancia_converter, tuple) and len(instancia_converter) > 1 else None
+
+    if anomalias and conv_ocr is not None:
+        logger.warning(f"Ficha {codigo} apresentou anomalias {anomalias}. Acionando OCR...")
+        meta_visual = extrair_metadados_visuais(conv_ocr, pdf_path, pag_ini)
+        
+        for campo in anomalias:
+            valor_antigo = meta.get(campo, "")
+            valor_novo = meta_visual.get(campo)
+            if valor_novo:
+                meta[campo] = valor_novo
+                AuditoriaGeral.registrar_correcao_ocr(codigo, campo, valor_antigo, valor_novo)
 
     # 2. Localiza limites de Informações Complementares
     has_ic, ic_start_page, ic_y_bound = detectar_limites_ic(doc, pag_ini, pag_fim)

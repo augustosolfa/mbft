@@ -33,12 +33,14 @@ _WORKER_CONVERTER: Optional[Any] = None
 
 
 def _get_worker_converter():
-    """Inicializa o conversor Docling sob demanda (lazy) na GPU para o worker."""
+    """Inicializa os conversores Docling (padrão e OCR) sob demanda (lazy) na GPU para o worker."""
     global _WORKER_CONVERTER
     if _WORKER_CONVERTER is None:
-        _WORKER_CONVERTER = criar_conversor_docling()
+        from .docling_extractor import criar_conversor_docling, criar_conversor_docling_ocr
+        conv_padrao = criar_conversor_docling()
+        conv_ocr = criar_conversor_docling_ocr()
+        _WORKER_CONVERTER = (conv_padrao, conv_ocr)
     return _WORKER_CONVERTER
-
 
 def _obter_raiz_repo() -> Path:
     """Encontra a raiz do monorepo de forma resiliente."""
