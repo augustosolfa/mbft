@@ -65,7 +65,6 @@ class TestFichaGuardrails(unittest.TestCase):
             "amparo_legal",
             "tipificacao_enquadramento",
             "medida_administrativa",
-            "pode_configurar_crime_transito",
             "pontuacao",
             "constatacao_infracao",
         ]
@@ -84,7 +83,6 @@ class TestFichaGuardrails(unittest.TestCase):
             "amparo_legal",
             "tipificacao_enquadramento",
             "medida_administrativa",
-            "pode_configurar_crime_transito",
             "pontuacao",
             "constatacao_infracao",
         ]
@@ -94,6 +92,22 @@ class TestFichaGuardrails(unittest.TestCase):
             with self.assertRaises(ValidationError, msg=f"Campo {campo} deveria falhar quando omitido") as ctx:
                 Ficha(**dados)
             self.assertIn(campo, str(ctx.exception))
+
+    def test_ficha_crime_transito_none_ou_omitido(self):
+        dados = dict(self.dados_base)
+        dados["pode_configurar_crime_transito"] = None
+        f1 = Ficha(**dados)
+        self.assertIsNone(f1.pode_configurar_crime_transito)
+
+        dados2 = dict(self.dados_base)
+        del dados2["pode_configurar_crime_transito"]
+        f2 = Ficha(**dados2)
+        self.assertIsNone(f2.pode_configurar_crime_transito)
+
+        dados3 = dict(self.dados_base)
+        dados3["pode_configurar_crime_transito"] = ""
+        f3 = Ficha(**dados3)
+        self.assertIsNone(f3.pode_configurar_crime_transito)
 
     def test_validar_consistencia_id_e_codigo(self):
         dados = dict(self.dados_base)

@@ -35,7 +35,10 @@ class Ficha(BaseModel):
     gravidade: str = Field(..., min_length=1, description="Leve, Média, Grave ou Gravíssima")
     penalidade: str = Field(..., min_length=1, description="Penalidade prevista (ex: Multa)")
     medida_administrativa: str = Field(..., min_length=1, description="Medida administrativa cabível")
-    pode_configurar_crime_transito: str = Field(..., min_length=1, description="Indicação de crime de trânsito")
+    pode_configurar_crime_transito: Optional[str] = Field(
+        default=None,
+        description="Indicação de crime de trânsito (ou None se em branco no PDF original)"
+    )
     infrator: str = Field(..., min_length=1, description="Condutor, Proprietário, etc.")
     competencia: Optional[str] = Field(
         default=None,
@@ -75,6 +78,13 @@ class Ficha(BaseModel):
             raise ValueError(
                 "competencia não pode ser string vazia; passe texto válido ou explicitamente None para indicar ausência/alteração pela Lei 14.599/2023"
             )
+        return v
+
+    @field_validator("pode_configurar_crime_transito")
+    @classmethod
+    def validar_crime(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            return None
         return v
 
     @model_validator(mode="after")

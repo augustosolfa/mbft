@@ -6,6 +6,14 @@ import logging
 from typing import Optional, List, Tuple
 from pathlib import Path
 
+# Compatibilidade com Windows Smart App Control: desativa checagem opcional de scipy
+# em transformers para evitar bloqueio de DLLs C-extensions não assinadas (_lbfgsb/_hausdorff)
+try:
+    import transformers.utils.import_utils as _tf_utils
+    _tf_utils.is_scipy_available = lambda: False
+except Exception:
+    pass
+
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.pipeline_options import (
     PdfPipelineOptions,

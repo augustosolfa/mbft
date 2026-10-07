@@ -5,7 +5,7 @@
 - **Total de Páginas do PDF:** 826
 - **Fichas Multipágina (2 ou mais páginas):** 273 (67.6%)
 - **Fichas com Imagens Extraídas:** 140
-- **Total de Imagens Geradas (300 DPI):** 270
+- **Total de Imagens Geradas (PNG Nativas):** 270
 - **Total de Alertas/Anomalias:** 264
 
 ## 2. Casos Canônicos de Validação
@@ -18,7 +18,7 @@
 ### Ficha 599-10
 - **Páginas:** [376, 377]
 - **Quando Autuar (itens):** 2
-- **Definições e Procedimentos (itens):** 3
+- **Definições e Procedimentos (itens):** 2
 - **Imagens associadas:** ['imagens/ficha599-10_1.png', 'imagens/ficha599-10_2.png', 'imagens/ficha599-10_3.png', 'imagens/ficha599-10_4.png', 'imagens/ficha599-10_5.png', 'imagens/ficha599-10_6.png']
 
 ### Ficha 683-11
