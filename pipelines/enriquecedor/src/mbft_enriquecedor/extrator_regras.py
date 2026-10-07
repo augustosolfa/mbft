@@ -7,6 +7,7 @@ import os
 
 from mbft_core.models.extracao import CampoNormativo
 from mbft_core.models.enriquecimento import ItemRegra, NaturezaRegraEnum
+from mbft_enriquecedor.normalizador import sanitizar_texto
 
 # Regex para detectar códigos \d{3}-\d{2}
 REGEX_CODIGO_ENQUADRAMENTO = re.compile(r"\b(\d{3}-\d{2})\b")
@@ -55,7 +56,8 @@ class ExtratorRegrasAtomo:
         ultimo_pai_num = None
         ultimo_pai_texto = None
         
-        for texto_item in campo.itens:
+        for texto_item_bruto in campo.itens:
+            texto_item = sanitizar_texto(texto_item_bruto)
             # Resolução de herança de pai para filho (Problema 2)
             texto_final = texto_item
             

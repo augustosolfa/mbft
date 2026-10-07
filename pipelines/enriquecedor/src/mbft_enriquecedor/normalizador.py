@@ -5,11 +5,25 @@ from mbft_core.models.enriquecimento import (
     InfratorEnum, ConstatacaoInfracaoEnum, ReferenciaCTB
 )
 
-# Regex para limpar vazamento tabular de artigos na coluna de infrator/crime
-REGEX_ARTIGO_CTB = re.compile(r"((?:Art\.?\s*)?(\d{1,3}(?:\s*-[A-Za-z]+)?)\s*do\s*CTB)", re.IGNORECASE)
+# Regex para limpar vazamento tabular de artigos
+REGEX_ARTIGO_CTB_VAZADO = re.compile(r"((?:Art\.?\s*)?(\d{1,3}(?:\s*-[A-Za-z]+)?)\s*do\s*CTB)", re.IGNORECASE)
+# Regex mais flexível para capturar a essência do amparo legal (ex: Art. 330, § 5º e § 6º)
+REGEX_ARTIGO_AMPARO = re.compile(r"Art\.?\s*(\d{1,3}(?:\s*-[A-Za-z]+)?)", re.IGNORECASE)
+REGEX_PARAGRAFO_AMPARO = re.compile(r"(§\s*\d+º?|par[aá]grafo\s+[uú]nico)", re.IGNORECASE)
+
+def sanitizar_texto(texto: str) -> str:
+    if not texto:
+        return ""
+    # Recompor hifenização perdida (Problema 3) ex: "registrar\u0002 se-ão" -> "registrar-se-ão"
+    t = re.sub(r'\u0002\s+', '-', texto)
+    # Recompor "retirá\u0002los" -> "retirá-los"
+    t = re.sub(r'\u0002', '-', t)
+    # Remover quaisquer outros caracteres de controle (0x00-0x1F, 0x7F-0x9F) exceto newline e tab se houver
+    t = re.sub(r'[\x00-\x08\x0b-\x1f\x7f-\x9f]', '', t)
+    return t.strip()
 
 def normalizar_gravidade(texto: str) -> GravidadeEnum:
-    t = texto.upper().replace("Í", "I").replace("É", "E").replace("Á", "A")
+    t = sanitizar_texto(texto).upper().replace("Í", "I").replace("É", "E").replace("Á", "A")
     if "GRAVISSIMA" in t: return GravidadeEnum.GRAVISSIMA
     if "GRAVE" in t: return GravidadeEnum.GRAVE
     if "MEDIA" in t: return GravidadeEnum.MEDIA
@@ -17,7 +31,7 @@ def normalizar_gravidade(texto: str) -> GravidadeEnum:
     return GravidadeEnum.NAO_APLICAVEL
 
 def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
-    t = texto.upper()
+    t = sanitizar_texto(texto).upper()
     rens = []
     if "MULTA" in t: rens.append(PenalidadeEnum.MULTA)
     if "ADVERTENCIA" in t: rens.append(PenalidadeEnum.ADVERTENCIA_POR_ESCRITO)
@@ -26,7 +40,7 @@ def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
     return rens if rens else [PenalidadeEnum.NAO_APLICAVEL]
 
 def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaEnum]:
-    t = texto.upper().replace("Ç", "C").replace("Ã", "A")
+    t = sanitizar_texto(texto).upper().replace("Ç", "C").replace("Ã", "A")
     rens = []
     if "RETENCAO" in t: rens.append(MedidaAdministrativaEnum.RETENCAO_VEICULO)
     if "REMOCAO" in t: rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
@@ -37,34 +51,29 @@ def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaE
     return rens if rens else [MedidaAdministrativaEnum.NAO_APLICAVEL]
 
 def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> Tuple[List[InfratorEnum], bool, List[ReferenciaCTB]]:
-    """
-    Higieniza a coluna de Infrator e de Crime de Trânsito, resolvendo vazamentos tabulares.
-    Retorna (infratores_normalizados, tem_crime, artigos_ctb_extraidos).
-    """
-    texto_combinado = f"{texto_infrator} {texto_crime or ''}".strip()
+    texto_infrator = sanitizar_texto(texto_infrator)
+    texto_crime = sanitizar_texto(texto_crime or "")
+    
+    texto_combinado = f"{texto_infrator} {texto_crime}".strip()
     
     artigos_extraidos = []
-    # Buscar artigos vazados
-    for match in REGEX_ARTIGO_CTB.finditer(texto_combinado):
-        # match.group(2) contém o número do artigo (ex: 306)
+    for match in REGEX_ARTIGO_CTB_VAZADO.finditer(texto_combinado):
         artigos_extraidos.append(ReferenciaCTB(artigo=match.group(2)))
     
     # Remover o vazamento do texto do infrator
-    texto_infrator_limpo = REGEX_ARTIGO_CTB.sub("", texto_infrator).strip()
+    texto_infrator_limpo = REGEX_ARTIGO_CTB_VAZADO.sub("", texto_infrator).strip()
     texto_infrator_limpo = texto_infrator_limpo.replace("SIM", "").replace("NÃO", "").replace("NAO", "").strip()
     
-    # Validar se é crime
     tem_crime = False
-    if "SIM" in (texto_crime or "").upper() or "SIM" in texto_infrator.upper():
+    if "SIM" in texto_crime.upper() or "SIM" in texto_infrator.upper():
         tem_crime = True
     if artigos_extraidos:
         tem_crime = True
         
-    # Normalizar Infrator
-    t_inf = texto_infrator_limpo.upper()
+    # Normalizar Infrator (removendo acentos para não perder JURÍDICA / FÍSICA)
+    t_inf = texto_infrator_limpo.upper().replace("Í", "I").replace("Á", "A").replace("Ó", "O")
     infratores = []
     
-    # Tratamento para Condutor E Proprietário / OU
     if "CONDUTOR" in t_inf and "PROPRIETARIO" in t_inf:
         infratores.append(InfratorEnum.CONDUTOR_OU_PROPRIETARIO)
     else:
@@ -78,13 +87,12 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
     if "PEDESTRE" in t_inf: infratores.append(InfratorEnum.PEDESTRE)
     
     if not infratores:
-        # Fallback genérico caso a limpeza tenha esvaziado o campo
-        infratores.append(InfratorEnum.CONDUTOR)
+        infratores.append(InfratorEnum.NAO_IDENTIFICADO)
         
     return infratores, tem_crime, artigos_extraidos
 
 def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
-    t = texto.upper().replace("Ã", "A")
+    t = sanitizar_texto(texto).upper().replace("Ã", "A")
     res = []
     if "MEDIANTE ABORDAGEM OU NAO" in t:
         res.append(ConstatacaoInfracaoEnum.MEDIANTE_ABORDAGEM_OU_NAO)
@@ -97,21 +105,41 @@ def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
     if "VIDEOMONITORAMENTO" in t:
         res.append(ConstatacaoInfracaoEnum.VIDEOMONITORAMENTO)
         
+    if "VIDE PROCEDIMENTO" in t or "VIDE OS PROCEDIMENTOS" in t:
+        res.append(ConstatacaoInfracaoEnum.VIDE_PROCEDIMENTOS)
+        
+    if "NAO APLICAVEL" in t or "NAO SE APLICA" in t:
+        res.append(ConstatacaoInfracaoEnum.NAO_APLICAVEL)
+        
     if not res:
         res.append(ConstatacaoInfracaoEnum.MEDIANTE_ABORDAGEM_OU_NAO)
     return res
 
 def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
+    texto = sanitizar_texto(texto)
     artigos = []
-    for match in REGEX_ARTIGO_CTB.finditer(texto):
-        artigos.append(ReferenciaCTB(artigo=match.group(2)))
+    
+    # Ex: "Art. 330, § 5º e § 6º."
+    # Descobrir o artigo principal
+    match_artigo = REGEX_ARTIGO_AMPARO.search(texto)
+    if not match_artigo:
+        return []
+        
+    artigo_base = match_artigo.group(1)
+    
+    # Encontrar os parágrafos mencionados
+    paragrafos = REGEX_PARAGRAFO_AMPARO.findall(texto)
+    
+    if not paragrafos:
+        artigos.append(ReferenciaCTB(artigo=artigo_base))
+    else:
+        for p in paragrafos:
+            artigos.append(ReferenciaCTB(artigo=artigo_base, paragrafo=p))
+            
     return artigos
 
 def calcular_pontuacao(texto: str) -> Tuple[int, bool]:
-    """
-    Retorna a pontuação (int) e se gera suspensão direta (bool).
-    """
-    t = texto.lower()
+    t = sanitizar_texto(texto).lower()
     valor = 0
     if "7" in t or "sete" in t: valor = 7
     elif "5" in t or "cinco" in t: valor = 5
