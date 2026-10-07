@@ -40,7 +40,7 @@ Este documento especifica o **Enriquecedor** (Etapa 2 do PMS-001), pipeline *bat
   * Fornecer pacote modular `pipelines/enriquecedor` integrado ao UV Workspace da raiz, com CLI própria (`mbft-enriquecedor`) e relatório automatizado de auditoria (`relatorio_enriquecimento.md`).
 
 * **Não Objetivos (Non-Goals):**
-  * Não é meta usar LLMs para inferência ou extração no enriquecimento; toda a extração de informação e normalização de atributos é estritamente determinística, baseada em regras, regex compiladas e tabelas de de-para, garantindo 100% de reprodutibilidade e zero custo operacional de chamadas de API.
+  * Não é meta processar toda a base via LLM indiscriminadamente. A prioridade absoluta e a primeira camada de extração devem ser sempre os métodos programáticos e determinísticos (regex e tabelas de de-para). O uso de modelos de linguagem (LLMs) é permitido e restrito *estritamente a uma camada de fallback* para inferir os dados apenas nos casos anômalos onde o método programático se mostrar deficiente.
   * Não é meta realizar a persistência em banco de dados relacional SQL ou no Cloudflare Vectorize (escopo estrito da Carga / PMS-004).
   * Não é meta responder perguntas ou expor endpoints HTTP em tempo real (escopo do Recuperador / PMS-005 e Gerador / PMS-006).
 
@@ -205,7 +205,17 @@ Em suma, o Enriquecedor materializa os seguintes contratos:
 
 ---
 
-### 3.8. Formatos de Saída e Persistência Intermediária
+### 3.8. Fallback de Extração via LLM (Gemini 2.5 Flash-Lite)
+
+Para os casos anômalos onde as expressões regulares ou a tabela canônica não consigam extrair os dados com precisão, o Enriquecedor aciona uma camada de fallback via API utilizando o modelo **Gemini 2.5 Flash-Lite** (`gemini-2.5-flash-lite`).
+
+- **Custo-Benefício e Escala:** O `gemini-2.5-flash-lite` foi escolhido por sua altíssima velocidade e custo marginal próximo de zero (US$ 0,05 por 1M tokens de entrada e US$ 0,20 por 1M tokens de saída), não competindo pelos recursos da VRAM local usada para vetorização.
+- **Estruturação Pydantic:** O fallback utiliza recursos de *Structured Outputs* para injetar a inferência perfeitamente nos atributos faltantes do esquema canônico.
+- **Auditoria Explícita:** A intervenção do LLM é salva no JSON final através dos atributos recém-adicionados `campos_inferidos_por_llm` e ativando o modo `revisao_manual_necessaria = True`.
+
+---
+
+### 3.9. Formatos de Saída e Persistência Intermediária
 
 Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
@@ -224,8 +234,8 @@ Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
 ## 4. Alternativas Consideradas
 
-* **Extração de Informação via LLM em Lote (Zero-shot / Few-shot):**
-  * *Por que foi rejeitada:* O custo financeiro de APIs externas, a latência de rede e a imprevisibilidade de alucinação jurídica tornam o uso de LLMs desvantajoso para extração de dados normativos explícitos. O MBFT segue padrões redacionais sistemáticos, permitindo que analisadores léxicos e expressões regulares compiladas atinjam 100% de acurácia com custo marginal zero e auditabilidade absoluta.
+* **Extração de Informação Exclusivamente via LLM (Zero-shot / Few-shot):**
+  * *Por que foi rejeitada:* A dependência integral de LLMs aumenta o custo de processamento, a latência e traz um risco alto de alucinação jurídica. Optou-se por uma arquitetura híbrida inteligente: o analisador léxico e expressões regulares atuam como primeira barreira (garantindo velocidade, custo zero e acurácia exata), e o LLM atua *apenas como fallback de segurança* para estruturar pontualmente as fichas anômalas que fugirem do padrão.
 * **Modelo de Embeddings `text-embedding-3-small` da OpenAI:**
   * *Por que foi rejeitado:* Embora ofereça alta qualidade semântica, introduz acoplamento estrito a uma API comercial proprietária e incorre em custos recorrentes tanto na etapa *batch* quanto em cada requisição de consulta no *runtime*. O modelo aberto `BAAI/bge-m3` atinge desempenho de recuperação comparável ou superior em textos jurídicos em português e já possui suporte de execução gratuita na infraestrutura do Cloudflare Workers AI.
 * **Granularidade de Ficha Monolítica (1 vetor por ficha de fiscalização):**

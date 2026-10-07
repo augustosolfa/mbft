@@ -77,6 +77,10 @@ class FichaEnriquecida(BaseModel):
     informacoes_complementares_html: str
     paginas: List[int]
     imagens: List[str]
+    
+    # Metadados de Fallback de IA
+    campos_inferidos_por_llm: List[str] = Field(default_factory=list, description="Lista de campos onde a extração determinística falhou e o LLM atuou como fallback")
+    revisao_manual_necessaria: bool = Field(default=False, description="True se a ficha sofreu intervenção de LLM e precisa de auditoria humana")
 
 
 class ChunkMetadados(BaseModel):
