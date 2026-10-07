@@ -93,10 +93,20 @@ Os dados extraídos do PDF trazem variações textuais que dificultam filtros fa
 | `gravidade` | `LEVE`, `MEDIA`, `GRAVE`, `GRAVISSIMA`, `NAO_APLICAVEL` | Remoção de acentos e correspondência exata de tokens; "Não aplicável" para infrações de trânsito específicas (ex.: obras/eventos). |
 | `penalidade` | `MULTA`, `ADVERTENCIA_POR_ESCRITO`, `SUSPENSAO_DIREITO_DIRIGIR`, `CASSAÇÃO_CNH`, `NAO_APLICAVEL` | Decomposição de listas em array de enums quando houver múltiplas penalidades previstas. |
 | `medida_administrativa` | `RETENCAO_VEICULO`, `REMOCAO_VEICULO`, `RECOLHIMENTO_CNH`, `RECOLHIMENTO_CRLV`, `TRANSBORDO_CARGA`, `REALIZACAO_TESTE_ALCOOLEMIA`, `NAO_APLICAVEL` | Normalização de variações redacionais do manual para conjunto fechado de medidas do CTB. |
-| `pode_configurar_crime_transito` | `True` / `False` | Mapeamento direto de `"SIM"` / `"NÃO"`. |
-| `infrator` | `CONDUTOR`, `PROPRIETARIO`, `CONDUTOR_OU_PROPRIETARIO`, `PESSOA_FISICA_OU_JURIDICA`, `EMBARCADOR`, `TRANSPORTADOR`, `PEDESTRE` | Unificação de termos compostos e plurais para valores canônicos. |
+| `pode_configurar_crime_transito` | `True` / `False` | Mapeamento booleano rigoroso (`True`/`False`), absorvendo menções a artigos penais vazados (ex.: Art. 306 do CTB) e gerando objetos `ReferenciaCTB`. Ver subseção 3.2.1. |
+| `infrator` | `CONDUTOR`, `PROPRIETARIO`, `CONDUTOR_OU_PROPRIETARIO`, `PESSOA_FISICA_OU_JURIDICA`, `EMBARCADOR`, `TRANSPORTADOR`, `PEDESTRE` | Unificação de termos compostos e plurais para valores canônicos após remoção de vazamentos tabulares de artigos penais. |
 | `pontuacao` | `valor`: int (0, 3, 4, 5, 7); `especial_sem_pontos`: bool; `pontuacao_suspensiva`: bool | Infrações com suspensão direta (ex.: Art. 165) ou cometidas por pessoa jurídica sem pontuação recebem flags dedicadas. |
 | `constatacao_infracao` | `COM_ABORDAGEM`, `SEM_ABORDAGEM`, `MEDIANTE_ABORDAGEM_OU_NAO`, `VIDEOMONITORAMENTO` | Normalização de termos descritivos de abordagem do agente. |
+
+#### 3.2.1. Sanitização do Deslocamento Tabular entre "Pode Configurar Crime" e "Infrator"
+
+Em conformidade com o princípio de separação arquitetural estrita entre etapas (PMS-002 vs. PMS-003), o Extrator não aplica heurísticas semânticas nem limpezas de conteúdo, entregando a saída de texto exatamente como a formatação tabular do PDF original apresentou. A higienização e resolução do vazamento entre as colunas adjacentes de "Crime" e "Infrator" é de responsabilidade exclusiva do **Enriquecedor**:
+
+1. **Vazamento do Leiaute Físico (PDF)**: No PDF impresso do MBFT, os campos "Pode Configurar Crime de Trânsito" e "Infrator" ocupam células adjacentes. Na extração tabular pura, é comum que citações penais (ex.: `Art. 306 do CTB`, `Art. 309 do CTB`) ou o termo de resposta (`SIM` / `NÃO`) vazem para dentro da coluna do Infrator (ex.: `"Condutor Art. 306 do CTB"` ou `"SIM Condutor"`).
+2. **Processamento no Enriquecedor**:
+   - **Parser Regex**: Aplicar o padrão `r"((?:Art\.?\s*)?(\d{1,3}(?:\s*-[A-Za-z]+)?)\s*do\s*CTB)"` sobre o valor bruto `infrator` (e subsidiariamente sobre `pode_configurar_crime_transito`).
+   - **Higienização do Infrator**: Remover o fragmento do artigo do texto de `infrator`, eliminando resquícios de pontuação e traços soltos antes de classificá-lo no vocabulário controlado de `InfratorEnum`. O valor original não tratado permanece arquivado em `infrator_original` para fins de auditoria forense.
+   - **Resolução de Crime**: Mapear `crime_transito = True` quando houver artigo penal identificado ou termo `"SIM"`, e estruturar a menção correspondente na lista de `artigos_ctb` como `ReferenciaCTB(artigo=numero_artigo)`.
 
 ---
 

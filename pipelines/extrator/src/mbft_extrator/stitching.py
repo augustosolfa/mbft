@@ -74,16 +74,6 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
             crime = m_sim_nao.group(1).upper()
             infrator = m_sim_nao.group(2).strip()
 
-    # Tratamento de vazamento de Artigo de Trânsito do Crime para Infrator
-    m_art = re.search(r"((?:Art\.?\s*)?\d{3}(?:\s*-[A-Za-z]+)?\s*do\s*CTB)", infrator, re.IGNORECASE)
-    if m_art:
-        artigo = m_art.group(1).strip()
-        if not artigo.lower().startswith("art"):
-            artigo = "Art. " + artigo
-        infrator = infrator.replace(m_art.group(0), "").strip()
-        if artigo not in crime:
-            crime = f"{crime} {artigo}".strip()
-
     cod = meta.get("codigo_enquadramento", "")
     m_cod = re.search(r"([0-9]{3}\s*-\s*[0-9]{1,2})", cod)
     if m_cod:
