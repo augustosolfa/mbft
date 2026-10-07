@@ -44,7 +44,7 @@ uv run python pipelines/extrator/scripts/comparar_versoes.py
 
 ---
 
-## 3. Estrutura do Código-Fonte (`src/mbft_extrator/`)
+## 3. Estrutura do Código-Fonte (`mbft_extrator/`)
 
 - **`cli.py`**: Ponto de entrada CLI e orquestração de workers paralelos.
 - **`pipeline.py`**: Orquestrador principal da extração de uma ficha completa.
