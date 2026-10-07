@@ -997,7 +997,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "I",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       },
       {
@@ -1371,7 +1383,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "II",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -1532,7 +1556,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "II",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -1700,7 +1736,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "III",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       },
       {
@@ -1884,7 +1932,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "III",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       },
       {
@@ -2065,7 +2125,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "V",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       },
       {
@@ -2906,7 +2978,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VII",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -3376,7 +3460,19 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VII",
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "162",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "164",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -3557,12 +3653,6 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "I",
-        "alinea": null
-      },
-      {
-        "artigo": "310",
-        "paragrafo": null,
         "inciso": null,
         "alinea": null
       },
@@ -3570,6 +3660,12 @@
         "artigo": "162",
         "paragrafo": null,
         "inciso": "I",
+        "alinea": null
+      },
+      {
+        "artigo": "310",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -3743,12 +3839,6 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "310",
-        "paragrafo": null,
         "inciso": null,
         "alinea": null
       },
@@ -3756,6 +3846,12 @@
         "artigo": "162",
         "paragrafo": null,
         "inciso": "II",
+        "alinea": null
+      },
+      {
+        "artigo": "310",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -3933,12 +4029,6 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "310",
-        "paragrafo": null,
         "inciso": null,
         "alinea": null
       },
@@ -3946,6 +4036,12 @@
         "artigo": "162",
         "paragrafo": null,
         "inciso": "II",
+        "alinea": null
+      },
+      {
+        "artigo": "310",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -4124,7 +4220,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "III",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -4318,7 +4414,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "III",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -4514,7 +4610,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "V",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -4721,7 +4817,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -4906,7 +5002,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -5092,7 +5188,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -5286,7 +5382,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -5481,7 +5577,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VII",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -5682,7 +5778,7 @@
       {
         "artigo": "163",
         "paragrafo": null,
-        "inciso": "VII",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -5863,12 +5959,6 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "I",
-        "alinea": null
-      },
-      {
-        "artigo": "310",
-        "paragrafo": null,
         "inciso": null,
         "alinea": null
       },
@@ -5876,6 +5966,12 @@
         "artigo": "162",
         "paragrafo": null,
         "inciso": "I",
+        "alinea": null
+      },
+      {
+        "artigo": "310",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -6042,12 +6138,6 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "310",
-        "paragrafo": null,
         "inciso": null,
         "alinea": null
       },
@@ -6055,6 +6145,12 @@
         "artigo": "162",
         "paragrafo": null,
         "inciso": "II",
+        "alinea": null
+      },
+      {
+        "artigo": "310",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -6223,12 +6319,6 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "310",
-        "paragrafo": null,
         "inciso": null,
         "alinea": null
       },
@@ -6236,6 +6326,12 @@
         "artigo": "162",
         "paragrafo": null,
         "inciso": "II",
+        "alinea": null
+      },
+      {
+        "artigo": "310",
+        "paragrafo": null,
+        "inciso": null,
         "alinea": null
       }
     ],
@@ -6405,7 +6501,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "III",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -6587,7 +6683,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "III",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -6760,7 +6856,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "V",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -6960,7 +7056,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -7138,7 +7234,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -7317,7 +7413,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -7501,7 +7597,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "VI",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -7682,7 +7778,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "VII",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -7882,7 +7978,7 @@
       {
         "artigo": "164",
         "paragrafo": null,
-        "inciso": "VII",
+        "inciso": null,
         "alinea": null
       },
       {
@@ -8873,6 +8969,18 @@
       },
       {
         "artigo": "165",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "195",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "252",
         "paragrafo": null,
         "inciso": "III",
         "alinea": null
@@ -13281,18 +13389,6 @@
         "alinea": null
       },
       {
-        "artigo": "530",
-        "paragrafo": null,
-        "inciso": "III",
-        "alinea": null
-      },
-      {
-        "artigo": "531",
-        "paragrafo": null,
-        "inciso": "IV",
-        "alinea": null
-      },
-      {
         "artigo": "176",
         "paragrafo": null,
         "inciso": "V",
@@ -13544,24 +13640,6 @@
         "artigo": "176",
         "paragrafo": null,
         "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "528",
-        "paragrafo": null,
-        "inciso": "I",
-        "alinea": null
-      },
-      {
-        "artigo": "530",
-        "paragrafo": null,
-        "inciso": "III",
-        "alinea": null
-      },
-      {
-        "artigo": "531",
-        "paragrafo": null,
-        "inciso": "IV",
         "alinea": null
       },
       {
@@ -13835,18 +13913,6 @@
         "alinea": null
       },
       {
-        "artigo": "531",
-        "paragrafo": null,
-        "inciso": "IV",
-        "alinea": null
-      },
-      {
-        "artigo": "532",
-        "paragrafo": null,
-        "inciso": "V",
-        "alinea": null
-      },
-      {
         "artigo": "225",
         "paragrafo": null,
         "inciso": "I",
@@ -14101,27 +14167,9 @@
         "alinea": null
       },
       {
-        "artigo": "528",
-        "paragrafo": null,
-        "inciso": "I",
-        "alinea": null
-      },
-      {
         "artigo": "176",
         "paragrafo": null,
         "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "530",
-        "paragrafo": null,
-        "inciso": "III",
-        "alinea": null
-      },
-      {
-        "artigo": "532",
-        "paragrafo": null,
-        "inciso": "V",
         "alinea": null
       },
       {
@@ -14348,21 +14396,9 @@
         "alinea": null
       },
       {
-        "artigo": "528",
-        "paragrafo": null,
-        "inciso": "I",
-        "alinea": null
-      },
-      {
         "artigo": "176",
         "paragrafo": null,
         "inciso": "II",
-        "alinea": null
-      },
-      {
-        "artigo": "530",
-        "paragrafo": null,
-        "inciso": "III",
         "alinea": null
       },
       {
@@ -26956,18 +26992,6 @@
         "paragrafo": null,
         "inciso": "I",
         "alinea": null
-      },
-      {
-        "artigo": "1",
-        "paragrafo": null,
-        "inciso": null,
-        "alinea": null
-      },
-      {
-        "artigo": "4",
-        "paragrafo": null,
-        "inciso": "IV",
-        "alinea": null
       }
     ],
     "resolucoes_contran": [
@@ -29009,6 +29033,12 @@
       {
         "artigo": "186",
         "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "186",
+        "paragrafo": null,
         "inciso": "I",
         "alinea": null
       },
@@ -29233,6 +29263,12 @@
       "SEM_ABORDAGEM"
     ],
     "artigos_ctb": [
+      {
+        "artigo": "186",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
       {
         "artigo": "186",
         "paragrafo": null,
@@ -29644,6 +29680,12 @@
       {
         "artigo": "186",
         "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "186",
+        "paragrafo": null,
         "inciso": "I",
         "alinea": null
       },
@@ -29813,6 +29855,12 @@
     "artigos_ctb": [
       {
         "artigo": "193",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "186",
         "paragrafo": null,
         "inciso": null,
         "alinea": null
@@ -30008,6 +30056,12 @@
       {
         "artigo": "186",
         "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "186",
+        "paragrafo": null,
         "inciso": "I",
         "alinea": null
       },
@@ -30167,6 +30221,12 @@
     "artigos_ctb": [
       {
         "artigo": "193",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "186",
         "paragrafo": null,
         "inciso": null,
         "alinea": null
@@ -35991,6 +36051,12 @@
       },
       {
         "artigo": "35",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "39",
         "paragrafo": "Parágrafo único",
         "inciso": null,
         "alinea": null
@@ -39270,6 +39336,12 @@
     "artigos_ctb": [
       {
         "artigo": "209",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "17",
         "paragrafo": "§ 5º",
         "inciso": null,
         "alinea": null
@@ -39518,12 +39590,6 @@
       {
         "artigo": "209-A",
         "paragrafo": null,
-        "inciso": null,
-        "alinea": null
-      },
-      {
-        "artigo": "1",
-        "paragrafo": "§ 1º",
         "inciso": null,
         "alinea": null
       }
@@ -65978,6 +66044,12 @@
       {
         "artigo": "233",
         "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "123",
+        "paragrafo": null,
         "inciso": "I",
         "alinea": null
       }
@@ -66137,6 +66209,12 @@
       {
         "artigo": "233",
         "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "123",
+        "paragrafo": null,
         "inciso": "II",
         "alinea": null
       }
@@ -66284,6 +66362,12 @@
     "artigos_ctb": [
       {
         "artigo": "233",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "123",
         "paragrafo": null,
         "inciso": "III",
         "alinea": null
@@ -66440,6 +66524,12 @@
     "artigos_ctb": [
       {
         "artigo": "233",
+        "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "123",
         "paragrafo": null,
         "inciso": "IV",
         "alinea": null
@@ -69390,7 +69480,7 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "NAO_APLICAVEL"
+      "RECOLHIMENTO_PLACAS"
     ],
     "infratores": [
       "PESSOA_FISICA_OU_JURIDICA"
@@ -81748,6 +81838,12 @@
       {
         "artigo": "278",
         "paragrafo": null,
+        "inciso": null,
+        "alinea": null
+      },
+      {
+        "artigo": "210",
+        "paragrafo": "§ único",
         "inciso": null,
         "alinea": null
       }

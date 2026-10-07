@@ -8,8 +8,8 @@ from mbft_core.models.enriquecimento import (
 # Regex para limpar vazamento tabular de artigos
 REGEX_ARTIGO_CTB_VAZADO = re.compile(r"((?:Art\.?\s*)?(\d{1,3}(?:\s*-[A-Za-z]+)?)\s*do\s*CTB)", re.IGNORECASE)
 # Regex mais flexível para capturar a essência do amparo legal (ex: Art. 330, § 5º e § 6º)
-REGEX_ARTIGO_AMPARO = re.compile(r"Art\.?\s*(\d{1,3}(?:\s*-[A-Za-z]+)?)", re.IGNORECASE)
-REGEX_PARAGRAFO_AMPARO = re.compile(r"(§\s*\d+º?|par[aá]grafo\s+[uú]nico)", re.IGNORECASE)
+REGEX_ARTIGO_AMPARO = re.compile(r"(?:Art\.?|c/c)\s*(\d{1,3}(?:\s*-[A-Za-z]+)?)\b(?!\s*-\d{2})", re.IGNORECASE)
+REGEX_PARAGRAFO_AMPARO = re.compile(r"(§\s*\d+º?|par[aá]grafo\s+[uú]nico|§\s*[uú]nico)", re.IGNORECASE)
 
 def sanitizar_texto(texto: str) -> str:
     if not texto:
@@ -48,6 +48,7 @@ def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaE
     if "REMOCAO" in t: rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
     if "RECOLHIMENTO" in t and ("CNH" in t or "DOCUMENTO DE HABILITACAO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CNH)
     if "RECOLHIMENTO" in t and ("CRLV" in t or "LICENCIAMENTO" in t or "CERTIFICADO DE REGISTRO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CRLV)
+    if "RECOLHIMENTO" in t and "PLACA" in t: rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_PLACAS)
     if "TRANSBORDO" in t: rens.append(MedidaAdministrativaEnum.TRANSBORDO_CARGA)
     if "ALCOOLEMIA" in t or "TESTE" in t: rens.append(MedidaAdministrativaEnum.REALIZACAO_TESTE_ALCOOLEMIA)
     return rens if rens else [MedidaAdministrativaEnum.NAO_APLICAVEL]
@@ -127,34 +128,46 @@ def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
     texto = sanitizar_texto(texto)
     artigos = []
     
-    # Ex: "Art. 330, § 5º e § 6º." ou "Art. 40... III - "
-    match_artigo = REGEX_ARTIGO_AMPARO.search(texto)
-    if not match_artigo:
+    # Se mencionar outras Leis, cortamos a string para não capturar incisos de lá (Bug da Ficha 606-85)
+    texto_ctb = re.split(r'\b(?:da\s+)?Lei\b', texto, flags=re.IGNORECASE)[0]
+    
+    # Ex: "Art. 330, § 5º e § 6º." ou "Art. 233 c/c 123"
+    artigos_encontrados = list(REGEX_ARTIGO_AMPARO.finditer(texto_ctb))
+    if not artigos_encontrados:
         return []
         
-    artigo_base = match_artigo.group(1)
-    
-    # Encontrar os parágrafos mencionados
+    # Encontrar os parágrafos mencionados no trecho do CTB
     paragrafos = []
-    for m in REGEX_PARAGRAFO_AMPARO.finditer(texto):
-        p = m.group(1) or m.group(2)
+    for m in REGEX_PARAGRAFO_AMPARO.finditer(texto_ctb):
+        p = m.group(1) or m.group(2) or m.group(3)
         if p: paragrafos.append(p)
         
-    # Encontrar incisos (ex: "III -" ou "inciso III")
+    # Encontrar incisos (ex: "III -" ou "inciso III") no trecho do CTB
     incisos = []
-    for m in re.finditer(r"\b(?:inciso\s+)?([IVXLCDM]+)(?:\s*-|\b)", texto, re.IGNORECASE):
+    for m in re.finditer(r"\b(?:inciso\s+)?([IVXLCDM]+)(?:\s*-|\b)", texto_ctb, re.IGNORECASE):
         inc = m.group(1).upper()
-        # Validação simples para evitar falsos positivos
         if inc in ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"]:
             incisos.append(inc)
             
-    if not paragrafos and not incisos:
-        artigos.append(ReferenciaCTB(artigo=artigo_base))
-    else:
-        for p in paragrafos:
-            artigos.append(ReferenciaCTB(artigo=artigo_base, paragrafo=p))
-        for inc in incisos:
-            artigos.append(ReferenciaCTB(artigo=artigo_base, inciso=inc))
+    # Processar cada artigo encontrado
+    for i, match_artigo in enumerate(artigos_encontrados):
+        art_num = match_artigo.group(1).strip()
+        
+        # Só aplicamos parágrafos e incisos ao PRIMEIRO artigo (ou ao artigo principal, assumindo que os c/c são acessórios limpos)
+        # Na verdade, se houver c/c, às vezes os incisos são do segundo artigo. O mais seguro é associar tudo ao último artigo listado, ou a cada um?
+        # É mais seguro vincular os parágrafos e incisos extraídos a todos os artigos ou ao último.
+        # No cenário do MBFT, "c/c 162, I", o inciso "I" se refere a "162". Então o último artigo da lista é o alvo preferencial dos incisos residuais.
+        if i == len(artigos_encontrados) - 1:
+            if not paragrafos and not incisos:
+                artigos.append(ReferenciaCTB(artigo=art_num))
+            else:
+                for p in paragrafos:
+                    artigos.append(ReferenciaCTB(artigo=art_num, paragrafo=p))
+                for inc in incisos:
+                    artigos.append(ReferenciaCTB(artigo=art_num, inciso=inc))
+        else:
+            # Artigos anteriores (geralmente base) entram limpos
+            artigos.append(ReferenciaCTB(artigo=art_num))
             
     return artigos
 
