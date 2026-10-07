@@ -8,6 +8,8 @@ from typing import List, Dict, Tuple, Optional, Any
 
 import pypdfium2 as pdfium
 from .models import CampoNormativo
+from .layout_analyzer import LayoutAnalyzer
+from .text_joiner import TextJoiner, _join_line_fragments, unificar_linhas_e_hifens
 
 logger = logging.getLogger("MBFT-Stitching")
 
@@ -74,16 +76,6 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
             crime = m_sim_nao.group(1).upper()
             infrator = m_sim_nao.group(2).strip()
 
-    # Tratamento de vazamento de Artigo de Trânsito do Crime para Infrator
-    m_art = re.search(r"((?:Art\.?\s*)?\d{3}(?:\s*-[A-Za-z]+)?\s*do\s*CTB)", infrator, re.IGNORECASE)
-    if m_art:
-        artigo = m_art.group(1).strip()
-        if not artigo.lower().startswith("art"):
-            artigo = "Art. " + artigo
-        infrator = infrator.replace(m_art.group(0), "").strip()
-        if artigo not in crime:
-            crime = f"{crime} {artigo}".strip()
-
     cod = meta.get("codigo_enquadramento", "")
     m_cod = re.search(r"([0-9]{3}\s*-\s*[0-9]{1,2})", cod)
     if m_cod:
@@ -91,148 +83,40 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
     elif codigo_padrao:
         meta["codigo_enquadramento"] = codigo_padrao
 
-    if not crime:
-        crime = "NÃO"
-
     meta["infrator"] = infrator
-    meta["pode_configurar_crime_transito"] = crime
+    meta["pode_configurar_crime_transito"] = crime.strip() if crime and crime.strip() else None
+
+    comp = meta.get("competencia", "").strip()
+    if not comp:
+        meta["competencia"] = None
+        meta["competencia_alterada_lei_14599"] = True
+    else:
+        meta["competencia"] = comp
 
     return meta
 
 
-def _join_line_fragments(frags: List[Tuple[float, float, str]]) -> str:
-    """
-    Junta fragmentos de texto na mesma linha horizontal com tolerância espacial.
-    """
-    if not frags:
-        return ""
-    res = [frags[0][2]]
-    for i in range(1, len(frags)):
-        prev_x1 = frags[i - 1][1]
-        curr_x0 = frags[i][0]
-        curr_txt = frags[i][2]
-        gap = curr_x0 - prev_x1
-        if gap < 2.5 and not res[-1].endswith(" ") and not curr_txt.startswith(" "):
-            res.append(curr_txt)
-        else:
-            res.append(" " + curr_txt)
-    joined = "".join(res)
-    # Corrige quebras em códigos como "502 - 91" -> "502-91"
-    joined = re.sub(r"(\d+)\s*-\s*(\d+)", r"\1-\2", joined)
-    return re.sub(r"\s+", " ", joined).strip()
-
-
-def extrair_linhas_colunas_pagina(page: pdfium.PdfPage, is_first_page: bool) -> Tuple[Dict[int, List[str]], Optional[float]]:
+def extrair_linhas_colunas_pagina(
+    page: pdfium.PdfPage, is_first_page: bool
+) -> Tuple[Dict[int, List[str]], Optional[float]]:
     """
     Extrai as linhas de texto distribuídas nos 4 canais de colunas do MBFT.
+    Utiliza LayoutAnalyzer para análise geométrica e TextJoiner para unificação espacial.
     Retorna também o Y do início de Informações Complementares, se presente na página.
     """
-    tp = page.get_textpage()
-    num_rects = tp.count_rects()
-    w, h = page.get_size()
-
-    y_top = h
-    y_bottom = 0.0
-    ic_y_bound = None
-
-    # Localiza se a seção "Informações Complementares" se inicia nesta página como título de seção
-    # Deve estar na margem esquerda (r[0] < 60) para não coincidir com menções no corpo das colunas
-    for i in range(num_rects):
-        r = tp.get_rect(i)
-        txt = tp.get_text_bounded(*r).strip()
-        if r[0] < 60 and re.match(r"^informa[cç][oõ]es\s+complementares:?$", txt, re.IGNORECASE):
-            y_bottom = max(y_bottom, r[3])
-            ic_y_bound = r[3]
-
-    # Na primeira página, localiza a linha dos títulos das colunas ("Quando Autuar")
-    if is_first_page:
-        for i in range(num_rects):
-            r = tp.get_rect(i)
-            txt = tp.get_text_bounded(*r).strip()
-            if re.search(r"quando\s+autuar", txt, re.IGNORECASE):
-                y_top = min(y_top, r[1])
-
-    def col_channel(x0: float, x1: float) -> int:
-        xc = (x0 + x1) / 2
-        if xc < 165:
-            return 0
-        elif xc < 298:
-            return 1
-        elif xc < 433:
-            return 2
-        else:
-            return 3
-
-    page_boxes: Dict[int, List[Tuple[Tuple[float, float, float, float], str]]] = {0: [], 1: [], 2: [], 3: []}
-    for i in range(num_rects):
-        r = tp.get_rect(i)  # (x0, y0, x1, y1)
-        if is_first_page and r[1] > 715:
-            continue
-        if r[1] >= y_bottom and r[3] <= y_top:
-            txt = tp.get_text_bounded(*r).strip()
-            if not txt:
-                continue
-            # Ignora cabeçalhos de coluna repetitivos
-            if re.search(
-                r"^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es\s+e\s+procedimentos|exemplos\s+do\s+campo.*):?$",
-                txt,
-                re.IGNORECASE,
-            ):
-                continue
-            ch = col_channel(r[0], r[2])
-            page_boxes[ch].append((r, txt))
+    analyzer = LayoutAnalyzer(page=page, is_first_page=is_first_page)
+    clustered = analyzer.cluster_lines()
 
     cols_lines: Dict[int, List[str]] = {0: [], 1: [], 2: [], 3: []}
-    for ch in range(4):
-        boxes = page_boxes[ch]
-        if not boxes:
-            continue
-
-        b_yc = [(b[0], (b[0][1] + b[0][3]) / 2, b[1]) for b in boxes]
-        b_yc.sort(key=lambda item: -item[1])
-
+    for ch, line_clusters in clustered.items():
         lines = []
-        curr_line: List[Tuple[float, float, str]] = []
-        curr_y: Optional[float] = None
-        for r, yc, txt in b_yc:
-            if curr_y is None or abs(yc - curr_y) <= 3.2:
-                curr_line.append((r[0], r[2], txt))
-                curr_y = yc if len(curr_line) == 1 else (curr_y + yc) / 2
-            else:
-                curr_line.sort(key=lambda x: x[0])
-                line_str = _join_line_fragments(curr_line)
-                if line_str:
-                    lines.append(line_str)
-                curr_line = [(r[0], r[2], txt)]
-                curr_y = yc
-        if curr_line:
-            curr_line.sort(key=lambda x: x[0])
-            line_str = _join_line_fragments(curr_line)
+        for line_frags in line_clusters:
+            line_str = TextJoiner.join_horizontal_fragments(line_frags)
             if line_str:
                 lines.append(line_str)
-
         cols_lines[ch] = lines
 
-    return cols_lines, ic_y_bound
-
-
-def unificar_linhas_e_hifens(lines: List[str]) -> str:
-    """
-    Unifica uma sequência de linhas de texto corrido, removendo quebras duras e
-    reunindo palavras hifenizadas no final da linha (ex: 'cruzamen-' + 'to' -> 'cruzamento').
-    """
-    if not lines:
-        return ""
-    texto = lines[0].strip()
-    for l in lines[1:]:
-        l = l.strip()
-        if not l:
-            continue
-        if texto.endswith("-") and not texto.endswith(" -"):
-            texto = texto[:-1] + l
-        else:
-            texto = texto + " " + l
-    return texto
+    return cols_lines, analyzer.ic_y_bound
 
 
 def processar_coluna_normativa(lines: List[str]) -> CampoNormativo:

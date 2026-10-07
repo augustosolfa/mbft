@@ -80,53 +80,19 @@ O extrator atua de ponta a ponta sobre o PDF em pipeline sequencial:
 
 ### Contrato de Dados e Guardrail de Saída (`mbft-core`)
 
-O contrato de dados das fichas reside no pacote neutro compartilhado `packages/core` (`mbft-core`), servindo como guardrail estrito de validação da saída do Extrator e contrato de entrada do Enriquecedor (PMS-003), sem acoplar os pipelines consumidores às dependências pesadas de PDF/visão computacional:
+O contrato de dados das fichas reside no pacote neutro compartilhado `packages/core` (`mbft-core`), servindo como guardrail estrito de validação da saída do Extrator e contrato de entrada do Enriquecedor (PMS-003), sem acoplar os pipelines consumidores às dependências pesadas de PDF/visão computacional.
 
-```python
-from typing import List
-from pydantic import BaseModel, Field, field_validator, model_validator
+A fim de evitar a defasagem de documentação (*document drift*), os esquemas Pydantic brutos não são transcritos neste documento. Eles podem ser encontrados em sua fonte canônica de verdade: `packages/core/src/mbft_core/models/extracao.py`.
 
-class CampoNormativo(BaseModel):
-    texto: str = Field(default="Não há.", description="Texto contínuo ou Markdown completo da seção.")
-    itens: List[str] = Field(default_factory=list, description="Lista de itens, alíneas ou regras identificados na coluna.")
+Em suma, o modelo `Ficha` extrai e consolida:
+- **Identificadores**: `id` e `codigo_enquadramento` (validados para manter consistência absoluta).
+- **Tipificação**: `tipificacao_resumida`, `tipificacao_enquadramento`, e `amparo_legal`.
+- **Atributos Punitivos/Administrativos originais**: textos literais sobre gravidade, penalidade, medida administrativa, infrator e pontuação.
+- **Campos Normativos (Markdown e listas)**: `quando_autuar`, `quando_nao_autuar`, `definicoes_procedimentos` e `exemplos_observacoes_ait` (modelados como `CampoNormativo`, que armazena tanto a renderização do texto corrido quanto os itens fragmentados).
+- **Dados Ricos e Rastros Visuais**: `informacoes_complementares` (em HTML semântico com recriação de tabelas e injeção inline de imagens) e a lista de `imagens` associadas com seus respectivos `paginas` do PDF original.
 
-class Ficha(BaseModel):
-    id: str = Field(..., description="Identificador único, igual ao Código do Enquadramento (ex.: 751-01)")
-    tipificacao_resumida: str = Field(..., description="Título / tipificação resumida da infração")
-    codigo_enquadramento: str = Field(..., description="Código de enquadramento da infração (ex.: 751-01)")
-    amparo_legal: str = ""
-    tipificacao_enquadramento: str = ""
-    gravidade: str = ""
-    penalidade: str = ""
-    medida_administrativa: str = ""
-    pode_configurar_crime_transito: str = "NÃO"
-    infrator: str = ""
-    competencia: str = Field(default="", description="Pode ser vazia devido a alterações normativas")
-    competencia_alterada_lei_14599: bool = False
-    pontuacao: str = ""
-    constatacao_infracao: str = ""
-    quando_autuar: CampoNormativo = Field(default_factory=CampoNormativo)
-    quando_nao_autuar: CampoNormativo = Field(default_factory=CampoNormativo)
-    definicoes_procedimentos: CampoNormativo = Field(default_factory=CampoNormativo)
-    exemplos_observacoes_ait: CampoNormativo = Field(default_factory=CampoNormativo)
-    informacoes_complementares: str = Field(default="<p>Não há.</p>", description="HTML semântico higienizado")
-    paginas: List[int] = Field(default_factory=list, description="Páginas do PDF (1-indexadas) de onde a ficha foi extraída")
-    imagens: List[str] = Field(default_factory=list, description="Caminhos relativos das imagens gravadas em data/processed/ (ex.: 'imagens/ficha768-42_1.png')")
+Uma rotina de validação acoplada inferirá automaticamente a *flag* `competencia_alterada_lei_14599` sempre que detectar inconsistências no campo de competência causadas pelas lacunas de revisão no PDF original.
 
-    @field_validator("codigo_enquadramento")
-    @classmethod
-    def validar_consistencia_id(cls, v: str, info) -> str:
-        id_val = info.data.get("id")
-        if id_val and v != id_val:
-            raise ValueError(f"codigo_enquadramento ('{v}') deve ser idêntico ao id ('{id_val}')")
-        return v
-
-    @model_validator(mode="after")
-    def inferir_competencia_lei_14599(self) -> "Ficha":
-        if not self.competencia.strip():
-            self.competencia_alterada_lei_14599 = True
-        return self
-```
 
 ---
 

@@ -69,7 +69,7 @@ mbft/
         ├── .cache_extracao/     # Checkpoints intermediários (ignorado no git)
         ├── scripts/             # Scripts utilitários e de auditoria
         │   └── comparar_versoes.py # Script de auditoria regressiva v1 vs v2
-        ├── src/mbft_extrator/   # Código-fonte modular do extrator
+        ├── mbft_extrator/       # Código-fonte modular do extrator
         └── tests/               # Casos de teste benchmark e renders visuais
 ```
 

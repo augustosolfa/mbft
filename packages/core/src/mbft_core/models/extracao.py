@@ -3,7 +3,7 @@ Modelos de dados para a etapa de extração do MBFT.
 Serve como guardrail de saída do Extrator e guardrail de entrada do Enriquecedor.
 """
 
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
@@ -27,23 +27,29 @@ class Ficha(BaseModel):
     Modelo representativo de uma Ficha de Fiscalização completa do MBFT.
     Atua como contrato canônico de saída do Extrator e entrada do Enriquecedor.
     """
-    id: str = Field(..., description="Identificador único da ficha, igual ao Código do Enquadramento (ex: '768-42')")
-    tipificacao_resumida: str = Field(..., description="Título / tipificação resumida da infração")
-    codigo_enquadramento: str = Field(..., description="Código de enquadramento da infração (ex: '768-42')")
-    amparo_legal: str = Field(default="", description="Artigo e inciso do CTB")
-    tipificacao_enquadramento: str = Field(default="", description="Descrição completa do enquadramento legal")
-    gravidade: str = Field(default="", description="Leve, Média, Grave ou Gravíssima")
-    penalidade: str = Field(default="", description="Penalidade prevista (ex: Multa)")
-    medida_administrativa: str = Field(default="", description="Medida administrativa cabível")
-    pode_configurar_crime_transito: str = Field(default="NÃO", description="Indicação de crime de trânsito")
-    infrator: str = Field(default="", description="Condutor, Proprietário, etc.")
-    competencia: str = Field(default="", description="Órgão ou entidade executiva competente")
+    id: str = Field(..., min_length=1, description="Identificador único da ficha, igual ao Código do Enquadramento (ex: '768-42')")
+    tipificacao_resumida: str = Field(..., min_length=1, description="Título / tipificação resumida da infração")
+    codigo_enquadramento: str = Field(..., min_length=1, description="Código de enquadramento da infração (ex: '768-42')")
+    amparo_legal: str = Field(..., min_length=1, description="Artigo e inciso do CTB")
+    tipificacao_enquadramento: str = Field(..., min_length=1, description="Descrição completa do enquadramento legal")
+    gravidade: str = Field(..., min_length=1, description="Leve, Média, Grave ou Gravíssima")
+    penalidade: str = Field(..., min_length=1, description="Penalidade prevista (ex: Multa)")
+    medida_administrativa: str = Field(..., min_length=1, description="Medida administrativa cabível")
+    pode_configurar_crime_transito: Optional[str] = Field(
+        default=None,
+        description="Indicação de crime de trânsito (ou None se em branco no PDF original)"
+    )
+    infrator: str = Field(..., min_length=1, description="Condutor, Proprietário, etc.")
+    competencia: Optional[str] = Field(
+        default=None,
+        description="Órgão ou entidade executiva competente (ou None se pendente/alterada pela Lei 14.599)"
+    )
     competencia_alterada_lei_14599: bool = Field(
         default=False,
         description="Indica se a competência da ficha foi alterada pela Lei n. 14.599/23"
     )
-    pontuacao: str = Field(default="", description="Pontos a computar na CNH")
-    constatacao_infracao: str = Field(default="", description="Com abordagem, Sem abordagem, etc.")
+    pontuacao: str = Field(..., min_length=1, description="Pontos a computar na CNH")
+    constatacao_infracao: str = Field(..., min_length=1, description="Com abordagem, Sem abordagem, etc.")
     
     quando_autuar: CampoNormativo = Field(default_factory=CampoNormativo)
     quando_nao_autuar: CampoNormativo = Field(default_factory=CampoNormativo)
@@ -65,9 +71,25 @@ class Ficha(BaseModel):
             raise ValueError(f"codigo_enquadramento ('{v}') deve ser idêntico ao id ('{id_val}')")
         return v
 
+    @field_validator("competencia")
+    @classmethod
+    def validar_competencia(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            raise ValueError(
+                "competencia não pode ser string vazia; passe texto válido ou explicitamente None para indicar ausência/alteração pela Lei 14.599/2023"
+            )
+        return v
+
+    @field_validator("pode_configurar_crime_transito")
+    @classmethod
+    def validar_crime(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            return None
+        return v
+
     @model_validator(mode="after")
     def inferir_competencia_lei_14599(self) -> "Ficha":
-        if not self.competencia.strip():
+        if self.competencia is None:
             self.competencia_alterada_lei_14599 = True
         return self
 

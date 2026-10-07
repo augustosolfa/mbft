@@ -11,10 +11,10 @@ Uso:
 import sys
 from pathlib import Path
 
-# Garante que src/ esteja no sys.path se executado diretamente sem instalação prévia
-src_dir = Path(__file__).resolve().parent / "src"
-if str(src_dir) not in sys.path:
-    sys.path.insert(0, str(src_dir))
+# Garante que a pasta do pacote esteja no sys.path se executado diretamente sem instalação prévia
+pkg_dir = Path(__file__).resolve().parent
+if str(pkg_dir) not in sys.path:
+    sys.path.insert(0, str(pkg_dir))
 
 from mbft_extrator.cli import main
 
