@@ -30,7 +30,6 @@ def run_build():
     
     # Configura Jinja2
     env = Environment(loader=FileSystemLoader(templates_dir))
-    template_index = env.get_template("index.html")
     template_ficha = env.get_template("ficha.html")
     
     # Carrega e converte os dados
@@ -49,11 +48,24 @@ def run_build():
         out_ficha = fichas_out_dir / f"{ficha.codigo_enquadramento}.html"
         out_ficha.write_text(html_ficha, encoding="utf-8")
         
-    # Gera HTML do Índice
-    html_index = template_index.render(fichas=fichas)
+    # Gera HTML da Lista Completa
+    template_lista = env.get_template("lista.html")
+    html_lista = template_lista.render(fichas=fichas)
+    out_lista = output_dir / "lista.html"
+    out_lista.write_text(html_lista, encoding="utf-8")
+    
+    # Processa e copia o index.html (Portal estático com busca RAG)
+    template_index = env.get_template("index.html")
+    html_index = template_index.render()
     out_index = output_dir / "index.html"
     out_index.write_text(html_index, encoding="utf-8")
     
+    # Processa e copia o chat.html (puramente estático)
+    template_chat = env.get_template("chat.html")
+    html_chat = template_chat.render()
+    out_chat = output_dir / "chat.html"
+    out_chat.write_text(html_chat, encoding="utf-8")
+
     print(f"Build concluído com sucesso! {len(fichas)} fichas geradas em: {output_dir}")
 
 if __name__ == "__main__":
