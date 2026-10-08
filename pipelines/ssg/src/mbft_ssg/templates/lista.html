@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Índice - MBFT{% endblock %}
+
+{% block content %}
+<h2>Índice de Fichas de Enquadramento</h2>
+<p>Listagem completa das {{ fichas|length }} infrações catalogadas no Manual Brasileiro de Fiscalização de Trânsito.</p>
+
+<div class="grid">
+  <div>
+    <label>Busca por texto:
+      <input type="search" id="busca" placeholder="Buscar código ou termo..." onkeyup="filtrarTabela()">
+    </label>
+  </div>
+  <div>
+    <label>Gravidade:
+      <select id="filtro-gravidade" onchange="filtrarTabela()">
+        <option value="">Todas</option>
+        <option value="LEVE">Leve</option>
+        <option value="MEDIA">Média</option>
+        <option value="GRAVE">Grave</option>
+        <option value="GRAVISSIMA">Gravíssima</option>
+      </select>
+    </label>
+  </div>
+  <div>
+    <label>Infrator:
+      <select id="filtro-infrator" onchange="filtrarTabela()">
+        <option value="">Todos</option>
+        <option value="CONDUTOR">Condutor</option>
+        <option value="PROPRIETARIO">Proprietário</option>
+        <option value="PEDESTRE">Pedestre</option>
+      </select>
+    </label>
+  </div>
+  <div>
+    <label>Atributos:
+      <select id="filtro-atributos" onchange="filtrarTabela()">
+        <option value="">Qualquer</option>
+        <option value="crime">Pode configurar crime</option>
+        <option value="suspensiva">Pontuação Suspensiva</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<figure style="margin-top: 1rem;">
+  <table id="tabela-fichas" role="grid">
+    <thead>
+      <tr>
+        <th scope="col">Código</th>
+        <th scope="col">Artigo</th>
+        <th scope="col">Tipificação Resumida</th>
+        <th scope="col">Gravidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ficha in fichas %}
+      <tr 
+        data-gravidade="{{ ficha.gravidade.value }}" 
+        data-infratores="{% for infrator in ficha.infratores %}{{ infrator.value }} {% endfor %}"
+        data-crime="{{ 'true' if ficha.crime_transito else 'false' }}"
+        data-suspensiva="{{ 'true' if ficha.pontuacao_suspensiva else 'false' }}"
+      >
+        <td><a href="fichas/{{ ficha.codigo_enquadramento }}.html">{{ ficha.codigo_enquadramento }}</a></td>
+        <td>{{ ficha.amparo_legal }}</td>
+        <td>{{ ficha.tipificacao_resumida }}</td>
+        <td>{{ ficha.gravidade.value }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</figure>
+
+<script>
+function filtrarTabela() {
+  const buscaTxt = document.getElementById("busca").value.toUpperCase();
+  const filtroGravidade = document.getElementById("filtro-gravidade").value.toUpperCase();
+  const filtroInfrator = document.getElementById("filtro-infrator").value.toUpperCase();
+  const filtroAtributos = document.getElementById("filtro-atributos").value;
+
+  const table = document.getElementById("tabela-fichas");
+  const tr = table.getElementsByTagName("tr");
+
+  for (let i = 1; i < tr.length; i++) {
+    const row = tr[i];
+    
+    // 1. Filtro de Texto
+    let matchTexto = false;
+    const tds = row.getElementsByTagName("td");
+    for (let j = 0; j < tds.length; j++) {
+      if (tds[j]) {
+        const txtValue = tds[j].textContent || tds[j].innerText;
+        if (txtValue.toUpperCase().indexOf(buscaTxt) > -1) {
+          matchTexto = true;
+          break;
+        }
+      }
+    }
+
+    // 2. Filtro de Enum/Bools (via data-attributes)
+    const gravidade = row.getAttribute('data-gravidade');
+    const infratores = row.getAttribute('data-infratores');
+    const crime = row.getAttribute('data-crime');
+    const suspensiva = row.getAttribute('data-suspensiva');
+
+    let matchGravidade = (filtroGravidade === "" || gravidade === filtroGravidade);
+    let matchInfrator = (filtroInfrator === "" || infratores.includes(filtroInfrator));
+    
+    let matchAtributo = true;
+    if (filtroAtributos === "crime" && crime !== "true") matchAtributo = false;
+    if (filtroAtributos === "suspensiva" && suspensiva !== "true") matchAtributo = false;
+
+    // Combinação Final (AND logic)
+    if (matchTexto && matchGravidade && matchInfrator && matchAtributo) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  }
+}
+</script>
+{% endblock %}

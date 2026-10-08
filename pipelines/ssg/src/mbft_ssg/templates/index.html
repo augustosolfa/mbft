@@ -1,56 +1,132 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do MBFT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .hero { text-align: center; padding: 4rem 0; }
+        .search-box { max-width: 600px; margin: 0 auto 2rem auto; }
+        .result-card { margin-bottom: 1rem; border-left: 4px solid var(--pico-primary); padding-left: 1rem; }
+        .nav-cards { display: flex; gap: 1rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap; }
+        .nav-cards article { min-width: 250px; flex: 1; max-width: 300px; text-align: center; }
+        #loading { display: none; text-align: center; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <section class="hero">
+            <h1 style="margin-bottom: 0;">Busca MBFT</h1>
+            <p>Manual Brasileiro de Fiscalização de Trânsito</p>
+        </section>
 
-{% block title %}Índice - MBFT{% endblock %}
+        <section class="search-box">
+            <form id="search-form" role="search">
+                <input type="search" id="busca-input" placeholder="Ex: cinto de segurança, celular, película..." required minlength="2" maxlength="200">
+                <input type="submit" value="Buscar" id="btn-buscar">
+            </form>
+            
+            <div id="loading" aria-busy="true">Realizando busca vetorial...</div>
+            
+            <div id="resultados-container">
+                <!-- Resultados injetados via JS -->
+            </div>
+        </section>
 
-{% block content %}
-<h2>Índice de Fichas de Enquadramento</h2>
-<p>Listagem completa das {{ fichas|length }} infrações catalogadas no Manual Brasileiro de Fiscalização de Trânsito.</p>
+        <section class="nav-cards">
+            <article>
+                <header>Fichas Completas</header>
+                <p>Navegue pela listagem de todas as infrações catalogadas.</p>
+                <a href="lista.html" role="button" class="outline">Ver Tabela</a>
+            </article>
+            <article>
+                <header>Oráculo (IA)</header>
+                <p>Faça uma pergunta complexa para nossa IA treinada com o MBFT.</p>
+                <a href="chat.html" role="button">Abrir Chat</a>
+            </article>
+        </section>
+    </main>
 
-<input type="search" id="busca" placeholder="Buscar código ou termo..." onkeyup="filtrarTabela()" style="margin-bottom: 1rem;">
+    <script>
+        const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+            ? "http://127.0.0.1:8000" 
+            : "https://api.mbft.exemplo.com"; 
 
-<figure>
-  <table id="tabela-fichas" role="grid">
-    <thead>
-      <tr>
-        <th scope="col">Código</th>
-        <th scope="col">Artigo</th>
-        <th scope="col">Tipificação Resumida</th>
-        <th scope="col">Gravidade</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for ficha in fichas %}
-      <tr>
-        <td><a href="fichas/{{ ficha.codigo_enquadramento }}.html">{{ ficha.codigo_enquadramento }}</a></td>
-        <td>{{ ficha.amparo_legal }}</td>
-        <td>{{ ficha.tipificacao_resumida }}</td>
-        <td>{{ ficha.gravidade.value }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</figure>
+        const form = document.getElementById('search-form');
+        const input = document.getElementById('busca-input');
+        const btn = document.getElementById('btn-buscar');
+        const loading = document.getElementById('loading');
+        const container = document.getElementById('resultados-container');
 
-<script>
-function filtrarTabela() {
-  var input, filter, table, tr, td, i, j, txtValue;
-  input = document.getElementById("busca");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("tabela-fichas");
-  tr = table.getElementsByTagName("tr");
-  for (i = 1; i < tr.length; i++) {
-    tr[i].style.display = "none";
-    td = tr[i].getElementsByTagName("td");
-    for (j = 0; j < td.length; j++) {
-      if (td[j]) {
-        txtValue = td[j].textContent || td[j].innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-          break;
-        }
-      }
-    }
-  }
-}
-</script>
-{% endblock %}
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = input.value.trim();
+            if(!query) return;
+
+            btn.disabled = true;
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/busca/?q=${encodeURIComponent(query)}`);
+                if (!res.ok) throw new Error("Erro na API de Busca");
+                
+                const data = await res.json();
+                
+                if (data.resultados.length === 0) {
+                    container.innerHTML = '<p><em>Nenhum trecho relevante encontrado.</em></p>';
+                } else {
+                    data.resultados.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'result-card';
+                        
+                        const pHeader = document.createElement('p');
+                        pHeader.style.marginBottom = '0.5rem';
+                        
+                        if (item.url) {
+                            const a = document.createElement('a');
+                            // Garantir que a URL só comece com /fichas/ para previnir javascript:
+                            if (item.url.startsWith('/fichas/')) {
+                                a.href = item.url;
+                                a.target = '_blank';
+                                const strong = document.createElement('strong');
+                                strong.textContent = `Abrir Ficha ${item.codigo}`;
+                                a.appendChild(strong);
+                                pHeader.appendChild(a);
+                            } else {
+                                const strong = document.createElement('strong');
+                                strong.textContent = `Código: ${item.codigo}`;
+                                pHeader.appendChild(strong);
+                            }
+                        } else {
+                            const strong = document.createElement('strong');
+                            strong.textContent = `Código: ${item.codigo}`;
+                            pHeader.appendChild(strong);
+                        }
+
+                        const pTrecho = document.createElement('p');
+                        pTrecho.style.fontSize = '0.9em';
+                        pTrecho.style.color = 'var(--pico-muted-color)';
+                        pTrecho.style.whiteSpace = 'pre-wrap';
+                        pTrecho.textContent = item.trecho;
+
+                        div.appendChild(pHeader);
+                        div.appendChild(pTrecho);
+                        container.appendChild(div);
+                    });
+                }
+            } catch(err) {
+                container.innerHTML = '';
+                const pErr = document.createElement('p');
+                pErr.style.color = 'red';
+                pErr.textContent = `Falha ao realizar busca: ${err.message}`;
+                container.appendChild(pErr);
+            } finally {
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

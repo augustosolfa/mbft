@@ -25,7 +25,7 @@ Esta PMS descreve a criação de um módulo de geração de site estático (SSG 
   * Desenvolver um pipeline batch capaz de gerar uma página HTML para cada Ficha de Enquadramento.
   * Gerar uma página de índice (`index.html`) contendo a lista completa de infrações e regras gerais.
   * Utilizar `Jinja2` como motor de templates.
-  * Embutir design minimalista e responsivo (usando CSS simples ou utilitário).
+  * Embutir design minimalista e responsivo usando um framework classless via CDN (Pico.css), eliminando a necessidade de builds de Node.js.
   * Criar URLs previsíveis que poderão ser referenciadas posteriormente pela API de busca (ex: `/fichas/518-51.html`).
 
 * **Não Objetivos (Non-Goals):**
@@ -51,15 +51,20 @@ Para facilitar a integração futura com o Recuperador/API, adotaremos a seguint
 
 ```text
 site/
-├── index.html                 # Índice principal com listagem/tabela geral
-├── css/                       # Estilos globais
+├── index.html                 # Portal principal com busca vetorial (RAG API)
+├── lista.html                 # Tabela com todas as infrações e filtro avançado em JS
+├── chat.html                  # Interface estática do chat conectada ao Ticketizador
+├── imagens/                   # Cópia das ilustrações extraídas (300 DPI)
 └── fichas/
     ├── 518-51.html            # Rota /fichas/518-51.html
-    ├── 518-52.html
     └── ...
 ```
 
-### 3.3. Composição de Dados
+### 3.3. Filtragem Multi-critério Client-Side (Vanilla JS)
+Na página `lista.html`, os modelos JSON não são apenas exibidos como texto. Durante o *build*, o Jinja2 insere atributos invisíveis nas linhas da tabela (`data-gravidade`, `data-infratores`, `data-crime`). 
+No frontend, um script em Javascript puro lê caixas de seleção (`<select>`) de Enums/Booleanos e faz o filtro usando operações lógicas (AND) instantâneas direto no DOM do navegador do usuário. Isso fornece busca hiper-rápida na listagem completa com **Custo Zero** de nuvem, já que a API nunca é invocada para tabelas de domínio.
+
+### 3.4. Composição de Dados
 
 O motor de *templates* consumirá as classes pydantic definidas em `mbft-core`. Campos tipicamente difíceis de visualizar no JSON bruto (como medidas administrativas, flags booleanas de recolhimento de CNH) serão transformados em seções visuais ("badges" ou painéis de destaque) na interface HTML.
 
@@ -74,5 +79,5 @@ O motor de *templates* consumirá as classes pydantic definidas em `mbft-core`. 
 
 ## 5. Preocupações Transversais
 
-* **Imagens a 300 DPI:** O Extrator (PMS-002) gera imagens das placas associadas aos enquadramentos. O script SSG deverá garantir que o diretório de `imagens/` seja copiado (ou linkado) adequadamente para a pasta final de build (`site/assets/`), garantindo que a renderização ocorra corretamente em dispositivos móveis e de alta densidade de pixels.
+* **Imagens a 300 DPI:** O Extrator (PMS-002) gera imagens das placas associadas aos enquadramentos. O script SSG copia o diretório completo para a pasta final de build (`site/imagens/`), garantindo que a renderização ocorra corretamente em dispositivos móveis. As tags HTML brutas oriundas da extração (`informacoes_complementares_html`) também são injetadas de forma segura (`| safe`) para manter tabelas e laudos originais.
 * **Tamanho de Build e Cache:** Como são centenas de fichas (aprox. 500+ infrações catalogadas), o script de SSG rodará em fração de segundos graças ao Python, mas o tamanho final do diretório deverá ser avaliado para respeitar os limites de upload do provedor de hospedagem estática.

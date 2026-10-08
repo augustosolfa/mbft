@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente IA - MBFT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .chat-container { max-width: 800px; margin: 2rem auto; }
+        #timer-container { display: none; text-align: center; margin: 1rem 0; padding: 1rem; background: var(--pico-mark-background-color); border-radius: 8px;}
+        .countdown { font-size: 2rem; font-weight: bold; font-family: monospace; }
+        #resposta-container { display: none; margin-top: 2rem; }
+        #loading { display: none; text-align: center; margin: 2rem 0; }
+    </style>
+</head>
+<body>
+    <main class="container chat-container">
+        <nav>
+            <ul>
+                <li><strong>Oráculo MBFT (Strict RAG)</strong></li>
+            </ul>
+            <ul>
+                <li><a href="index.html">← Voltar ao Índice</a></li>
+            </ul>
+        </nav>
+
+        <article>
+            <header>Faça sua pergunta sobre Fiscalização de Trânsito</header>
+            <form id="chat-form">
+                <fieldset>
+                    <label>
+                        Sua dúvida:
+                        <textarea id="pergunta" name="pergunta" rows="3" placeholder="Ex: É infração se o passageiro traseiro não usar cinto de segurança em carro de aplicativo?" required minlength="5" maxlength="500"></textarea>
+                    </label>
+                    <label>
+                        Senha VIP (Opcional):
+                        <input type="password" id="priority-token" placeholder="Deixe em branco para usar a fila global pública">
+                    </label>
+                </fieldset>
+                
+                <button type="submit" id="btn-enviar">Consultar Inteligência Artificial</button>
+            </form>
+
+            <div id="timer-container">
+                <h3>Aguardando na Fila Global</h3>
+                <p>Para evitar abusos e manter o serviço gratuito, processamos apenas 1 pergunta por minuto no mundo.</p>
+                <div class="countdown" id="countdown">--:--</div>
+                <progress id="progress-bar" value="0" max="100"></progress>
+            </div>
+
+            <div id="loading" aria-busy="true">
+                O Oráculo está lendo o Manual e redigindo a resposta. Por favor, aguarde...
+            </div>
+
+            <div id="resposta-container">
+                <h3>Resposta Oficial:</h3>
+                <blockquote id="resposta-texto"></blockquote>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        // Em produção, isso apontaria para o domínio do Workers. No dev, usamos a porta local.
+        const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
+            ? "http://127.0.0.1:8000" 
+            : "https://api.mbft.exemplo.com"; // Substituir pelo URL de prod real
+
+        const form = document.getElementById('chat-form');
+        const btnEnviar = document.getElementById('btn-enviar');
+        const timerContainer = document.getElementById('timer-container');
+        const countdownEl = document.getElementById('countdown');
+        const progressEl = document.getElementById('progress-bar');
+        const loadingEl = document.getElementById('loading');
+        const respostaContainer = document.getElementById('resposta-container');
+        const respostaTexto = document.getElementById('resposta-texto');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pergunta = document.getElementById('pergunta').value;
+            const priorityToken = document.getElementById('priority-token').value;
+
+            // Prepara UI
+            btnEnviar.disabled = true;
+            respostaContainer.style.display = 'none';
+            timerContainer.style.display = 'block';
+            countdownEl.innerText = "Solicitando ticket...";
+
+            try {
+                // 1. Pede o Ticket
+                const headers = {};
+                if (priorityToken) {
+                    headers['priority-token'] = priorityToken;
+                }
+                
+                const ticketRes = await fetch(`${API_BASE}/ticket/`, {
+                    method: 'POST',
+                    headers: headers
+                });
+
+                if (!ticketRes.ok) throw new Error("Falha ao obter ticket. Você pode estar bloqueado pelo WAF.");
+                
+                const ticketData = await ticketRes.json();
+                const jwt = ticketData.ticket;
+                // Parse seguro suportando Safari/velhos (removendo Z e ajustando)
+                const validAfter = new Date(ticketData.valid_after);
+
+                // 2. Loop de Timer visual
+                const timerInterval = setInterval(async () => {
+                    const agora = new Date();
+                    const diffMs = validAfter - agora;
+                    
+                    if (diffMs <= 0) {
+                        // Tempo expirou! Hora de fazer a pergunta.
+                        clearInterval(timerInterval);
+                        timerContainer.style.display = 'none';
+                        loadingEl.style.display = 'block';
+
+                        try {
+                            const chatRes = await fetch(`${API_BASE}/chat/`, {
+                                method: 'POST',
+                                headers: {
+                                    'x-ticket': jwt,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ pergunta: pergunta })
+                            });
+                            
+                            const chatData = await chatRes.json();
+                            
+                            loadingEl.style.display = 'none';
+                            if (chatRes.ok) {
+                                respostaTexto.innerText = chatData.resposta;
+                                respostaContainer.style.display = 'block';
+                            } else {
+                                respostaTexto.innerText = "Erro: " + (chatData.detail || "Falha na geração.");
+                                respostaContainer.style.display = 'block';
+                            }
+                        } catch (err) {
+                            loadingEl.style.display = 'none';
+                            respostaTexto.innerText = "Erro de conexão com o Oráculo: " + err.message;
+                            respostaContainer.style.display = 'block';
+                        } finally {
+                            btnEnviar.disabled = false;
+                        }
+                        
+                    } else {
+                        // Atualiza Timer
+                        const segundosRestantes = Math.ceil(diffMs / 1000);
+                        countdownEl.innerText = `${segundosRestantes}s`;
+                        
+                        // Assumimos 60s como max pra barra de progresso ficar bonitinha
+                        let progresso = ((60 - segundosRestantes) / 60) * 100;
+                        if(progresso < 0) progresso = 0;
+                        if(progresso > 100) progresso = 100;
+                        progressEl.value = progresso;
+                    }
+                }, 500);
+
+            } catch (err) {
+                btnEnviar.disabled = false;
+                timerContainer.style.display = 'none';
+                
+                let msg = err.message;
+                if (msg.includes("Failed to fetch")) {
+                    msg = "Não foi possível conectar à API. O servidor FastAPI (Uvicorn) está rodando na porta 8000?";
+                }
+                
+                respostaTexto.innerHTML = '';
+                const spanErr = document.createElement('span');
+                spanErr.style.color = 'red';
+                const strongErr = document.createElement('strong');
+                strongErr.textContent = 'Erro: ';
+                spanErr.appendChild(strongErr);
+                spanErr.appendChild(document.createTextNode(msg));
+                respostaTexto.appendChild(spanErr);
+                respostaContainer.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
