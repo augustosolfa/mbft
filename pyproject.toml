@@ -15,6 +15,7 @@ dependencies = [
     "mbft-recuperador",
     "mbft-gerador",
     "mbft-ssg",
+    "mbft-api",
 ]
 
 [tool.uv.sources]
@@ -25,9 +26,10 @@ mbft-indexador = { workspace = true }
 mbft-recuperador = { workspace = true }
 mbft-gerador = { workspace = true }
 mbft-ssg = { workspace = true }
+mbft-api = { workspace = true }
 
 [tool.uv.workspace]
-members = ["pipelines/*", "packages/*"]
+members = ["pipelines/*", "packages/*", "apps/*"]
 
 [[tool.uv.index]]
 name = "pytorch-cu132"
