@@ -36,7 +36,11 @@ Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fil
 3. Ao solicitar um ticket, um `UPDATE` atômico ajusta a data `next_available` para `max(now(), next_available) + 1 minuto`. O usuário recebe um token JWT assinado criptograficamente contendo a data/hora exata em que seu ticket se torna válido.
 4. Ao chamar a rota `/chat`, o ticket é decodificado (stateless). Se a hora atual for menor que a do ticket, a API recusa com `429 Too Many Requests` avisando o tempo restante. 
 
-### 2.3. Vias Expressas (VIP / Prioridades)
+### 2.3. Prevenção de Esgotamento de Fila (WAF)
+Para impedir que um usuário mal-intencionado peça inúmeros tickets em loop (empurrando a fila global horas para o futuro), a rota `/ticket` será protegida nativamente pelo **Cloudflare WAF (Web Application Firewall) - Rate Limiting**.
+Uma regra bloqueará requisições excessivas (ex: máximo de 1 por minuto) vindas do mesmo IP antes mesmo que elas alcancem o Worker ou faturem leitura no banco D1, garantindo custo zero contra abusos. No lado do cliente, o ticket será persistido no `LocalStorage` do navegador.
+
+### 2.4. Vias Expressas (VIP / Prioridades)
 Para evitar que a cota global bloqueie usos em apresentação, especialização ou familiares, o Ticketizador aceitará um parâmetro/header de autenticação especial (`priority_token`).
 As senhas de privilégio serão configuradas via **Segredos de Ambiente** no painel da Cloudflare (ex: `TOKEN_ADMIN`, `TOKEN_TESTES`).
 
