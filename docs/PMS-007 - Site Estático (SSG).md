@@ -51,15 +51,20 @@ Para facilitar a integração futura com o Recuperador/API, adotaremos a seguint
 
 ```text
 site/
-├── index.html                 # Índice principal com listagem/tabela geral e JS de busca local
+├── index.html                 # Portal principal com busca vetorial (RAG API)
+├── lista.html                 # Tabela com todas as infrações e filtro avançado em JS
+├── chat.html                  # Interface estática do chat conectada ao Ticketizador
 ├── imagens/                   # Cópia das ilustrações extraídas (300 DPI)
 └── fichas/
     ├── 518-51.html            # Rota /fichas/518-51.html
-    ├── 518-52.html
     └── ...
 ```
 
-### 3.3. Composição de Dados
+### 3.3. Filtragem Multi-critério Client-Side (Vanilla JS)
+Na página `lista.html`, os modelos JSON não são apenas exibidos como texto. Durante o *build*, o Jinja2 insere atributos invisíveis nas linhas da tabela (`data-gravidade`, `data-infratores`, `data-crime`). 
+No frontend, um script em Javascript puro lê caixas de seleção (`<select>`) de Enums/Booleanos e faz o filtro usando operações lógicas (AND) instantâneas direto no DOM do navegador do usuário. Isso fornece busca hiper-rápida na listagem completa com **Custo Zero** de nuvem, já que a API nunca é invocada para tabelas de domínio.
+
+### 3.4. Composição de Dados
 
 O motor de *templates* consumirá as classes pydantic definidas em `mbft-core`. Campos tipicamente difíceis de visualizar no JSON bruto (como medidas administrativas, flags booleanas de recolhimento de CNH) serão transformados em seções visuais ("badges" ou painéis de destaque) na interface HTML.
 

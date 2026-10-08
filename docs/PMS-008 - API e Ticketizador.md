@@ -40,7 +40,12 @@ Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fil
 Para impedir que um usuário mal-intencionado peça inúmeros tickets em loop (empurrando a fila global horas para o futuro), a rota `/ticket` será protegida nativamente pelo **Cloudflare WAF (Web Application Firewall) - Rate Limiting**.
 Uma regra bloqueará requisições excessivas (ex: máximo de 1 por minuto) vindas do mesmo IP antes mesmo que elas alcancem o Worker ou faturem leitura no banco D1, garantindo custo zero contra abusos. No lado do cliente, o ticket será persistido no `LocalStorage` do navegador.
 
-### 2.4. Vias Expressas (VIP / Prioridades)
+### 2.4. Blindagem de API: Limites de Caracteres e CORS
+Além do rate limiting, a API possui salvaguardas rigorosas contra *Prompt Injection* e abuso de infraestrutura:
+* **Validação de Tamanho (FastAPI Query):** A rota de `/busca` limita estritamente `q` a **200 caracteres**, e a rota de `/chat` limita `pergunta` a **500 caracteres**. Textos fora desse escopo são rejeitados instantaneamente no *Edge* sem acionar modelos, poupando tokens e barrando *payloads* gigantes ou ataques DDoS de strings enormes.
+* **Política CORS Estrita:** A configuração do `CORSMiddleware` abandonou o curinga `allow_origins=["*"]`. A API aceita requisições exclusivamente dos domínios oficiais (ex: `https://mbft.exemplo.com`) e ambientes locais (`localhost`). Isso inviabiliza que desenvolvedores terceiros embutam o frontend do MBFT em seus sites para sugar nossa fila ou conta da IA.
+
+### 2.5. Vias Expressas (VIP / Prioridades)
 Para evitar que a cota global bloqueie usos em apresentação, especialização ou familiares, o Ticketizador aceitará um parâmetro/header de autenticação especial (`priority_token`).
 As senhas de privilégio serão configuradas via **Segredos de Ambiente** no painel da Cloudflare (ex: `TOKEN_ADMIN`, `TOKEN_TESTES`).
 
