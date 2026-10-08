@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Ficha {{ ficha.codigo_enquadramento }} - {{ ficha.tipificacao_resumida }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ul>
+    <li><a href="../index.html">Início</a></li>
+    <li>Ficha {{ ficha.codigo_enquadramento }}</li>
+  </ul>
+</nav>
+
+<article>
+    <header>
+        <h2>{{ ficha.codigo_enquadramento }} - {{ ficha.tipificacao_resumida }}</h2>
+        <p><strong>Artigo CTB:</strong> {{ ficha.amparo_legal }}</p>
+    </header>
+
+    <section>
+        <h3>Tipificação do Enquadramento</h3>
+        <blockquote>{{ ficha.tipificacao_enquadramento }}</blockquote>
+    </section>
+
+    <div class="grid">
+        <div>
+            <strong>Gravidade:</strong> 
+            <span class="badge {% if ficha.gravidade.name == 'GRAVISSIMA' %}badge-danger{% elif ficha.gravidade.name == 'GRAVE' %}badge-warning{% endif %}">
+                {{ ficha.gravidade.value }}
+            </span>
+            <br>
+            <strong>Pontuação:</strong> {{ ficha.pontuacao_valor }} pontos
+        </div>
+        <div>
+            <strong>Penalidades:</strong><br>
+            {% for penalidade in ficha.penalidades %}
+                <span class="badge">{{ penalidade.value }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div>
+            <strong>Infratores:</strong><br>
+            {% for infrator in ficha.infratores %}
+                <span class="badge">{{ infrator.value }}</span>
+            {% endfor %}
+        </div>
+        <div>
+            <strong>Medidas Administrativas:</strong><br>
+            {% for medida in ficha.medidas_administrativas %}
+                <span class="badge">{{ medida.value }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr>
+    
+    <section>
+        <h3>Quando Autuar</h3>
+        <ul>
+            {% for regra in ficha.quando_autuar_itens %}
+                <li>{{ regra.texto }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section>
+        <h3>Quando NÃO Autuar</h3>
+        <ul>
+            {% for regra in ficha.quando_nao_autuar_itens %}
+                <li>{{ regra.texto }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section>
+        <h3>Definições e Procedimentos</h3>
+        <ul>
+            {% for regra in ficha.definicoes_procedimentos_itens %}
+                <li>{{ regra.texto }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if ficha.imagens %}
+    <section>
+        <h3>Ilustrações</h3>
+        <div class="grid">
+            {% for img in ficha.imagens %}
+                <img src="../imagens/{{ img }}" alt="Ilustração da Ficha" style="max-height: 300px; border: 1px solid #ccc; padding: 0.5rem; background: white;">
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</article>
+{% endblock %}

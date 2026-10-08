@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Índice - MBFT{% endblock %}
+
+{% block content %}
+<h2>Índice de Fichas de Enquadramento</h2>
+<p>Listagem completa das {{ fichas|length }} infrações catalogadas no Manual Brasileiro de Fiscalização de Trânsito.</p>
+
+<input type="search" id="busca" placeholder="Buscar código ou termo..." onkeyup="filtrarTabela()" style="margin-bottom: 1rem;">
+
+<figure>
+  <table id="tabela-fichas" role="grid">
+    <thead>
+      <tr>
+        <th scope="col">Código</th>
+        <th scope="col">Artigo</th>
+        <th scope="col">Tipificação Resumida</th>
+        <th scope="col">Gravidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ficha in fichas %}
+      <tr>
+        <td><a href="fichas/{{ ficha.codigo_enquadramento }}.html">{{ ficha.codigo_enquadramento }}</a></td>
+        <td>{{ ficha.amparo_legal }}</td>
+        <td>{{ ficha.tipificacao_resumida }}</td>
+        <td>{{ ficha.gravidade.value }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</figure>
+
+<script>
+function filtrarTabela() {
+  var input, filter, table, tr, td, i, j, txtValue;
+  input = document.getElementById("busca");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("tabela-fichas");
+  tr = table.getElementsByTagName("tr");
+  for (i = 1; i < tr.length; i++) {
+    tr[i].style.display = "none";
+    td = tr[i].getElementsByTagName("td");
+    for (j = 0; j < td.length; j++) {
+      if (td[j]) {
+        txtValue = td[j].textContent || td[j].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+          break;
+        }
+      }
+    }
+  }
+}
+</script>
+{% endblock %}

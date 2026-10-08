@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MBFT{% endblock %}</title>
+    <!-- Pico.css classless -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+    <style>
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.2rem;
+            background-color: var(--pico-primary-background);
+            color: var(--pico-primary-inverse);
+        }
+        .badge-warning {
+            background-color: #ff9800;
+            color: #fff;
+        }
+        .badge-danger {
+            background-color: #f44336;
+            color: #fff;
+        }
+        main {
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <hgroup>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">MBFT</a></h1>
+            <p>Manual Brasileiro de Fiscalização de Trânsito</p>
+        </hgroup>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <hr>
+        <p><small>Gerado pelo Módulo SSG (PMS-007).</small></p>
+    </footer>
+</body>
+</html>
