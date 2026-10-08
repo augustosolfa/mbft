@@ -38,11 +38,11 @@ Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fil
 
 ### 2.3. Vias Expressas (VIP / Prioridades)
 Para evitar que a cota global bloqueie usos em apresentação, especialização ou familiares, o Ticketizador aceitará um parâmetro/header de autenticação especial (`priority_token`).
-As senhas de privilégio serão configuradas via **Segredos de Ambiente** no painel da Cloudflare (ex: `TOKEN_ESPOSA`, `TOKEN_POS`).
+As senhas de privilégio serão configuradas via **Segredos de Ambiente** no painel da Cloudflare (ex: `TOKEN_ADMIN`, `TOKEN_TESTES`).
 
 * **Fluxo Padrão:** +60 segundos de espera na Fila Global.
-* **Fluxo Especialização (`TOKEN_POS`):** Ticket com +10 segundos de espera.
-* **Fluxo Esposa (`TOKEN_ESPOSA`):** Ticket imediato (fura-fila).
+* **Fluxo Especial/Testes (`TOKEN_TESTES`):** Ticket com +10 segundos de espera.
+* **Fluxo Admin (`TOKEN_ADMIN`):** Ticket imediato (fura-fila).
 
 ---
 
