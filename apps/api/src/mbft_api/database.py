@@ -30,11 +30,15 @@ def get_db(request: Request) -> Any:
     env = request.scope.get("env", {})
     if "DB" in env:
         # Retorna o binding D1 nativo do Cloudflare
-        return env["DB"]
+        yield env["DB"]
     else:
         # Ambiente Local (Uvicorn)
         init_local_db()
-        return sqlite3.connect(LOCAL_DB_PATH, check_same_thread=False)
+        conn = sqlite3.connect(LOCAL_DB_PATH, check_same_thread=False)
+        try:
+            yield conn
+        finally:
+            conn.close()
 
 class FilaRepository:
     def __init__(self, db: Any):
@@ -46,13 +50,13 @@ class FilaRepository:
         """
         Avança a fila global de forma atômica e retorna o novo horário ISO.
         """
-        query = f'''
+        query = '''
             UPDATE fila_global 
             SET next_available = datetime(
                 max(
-                    strftime('%s', next_available), 
-                    strftime('%s', 'now')
-                ) + {segundos}, 
+                    CAST(strftime('%s', next_available) AS INTEGER), 
+                    CAST(strftime('%s', 'now') AS INTEGER)
+                ) + ?, 
                 'unixepoch'
             ) 
             WHERE id = 1 
@@ -61,14 +65,14 @@ class FilaRepository:
         
         if self.is_local:
             cursor = self.db.cursor()
-            cursor.execute(query)
+            cursor.execute(query, (segundos,))
             row = cursor.fetchone()
             self.db.commit()
             return row[0] if row else ""
         else:
             # Bindings do Cloudflare D1 em Python
-            # A API pyodide do Cloudflare mapeia prepare().first()
-            stmt = self.db.prepare(query)
+            # A API pyodide do Cloudflare mapeia prepare().bind().first()
+            stmt = self.db.prepare(query).bind(segundos)
             result = await stmt.first()
             return result["next_available"] if result else ""
 

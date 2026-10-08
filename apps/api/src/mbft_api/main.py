@@ -9,6 +9,14 @@ from mbft_recuperador.buscador import BuscadorHibrido
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import sys
+    if sys.platform == "emscripten":
+        print("Ambiente Pyodide (Cloudflare Workers) detectado. Pulando adaptadores locais pesados (PyTorch/SQLite).")
+        app.state.buscador = None
+        app.state.gerador = None
+        yield
+        return
+        
     print("Inicializando modelos pesados do Recuperador (Modo Local)...")
     try:
         from mbft_recuperador.local_adapters import LocalSqliteDB, NumpyVectorDB, PyTorchEmbedder

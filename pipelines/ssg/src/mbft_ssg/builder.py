@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 # Importa a tipagem do mbft-core
 from mbft_core.models.enriquecimento import FichaEnriquecida
@@ -29,7 +29,10 @@ def run_build():
         shutil.copytree(imagens_src, imagens_dst)
     
     # Configura Jinja2
-    env = Environment(loader=FileSystemLoader(templates_dir))
+    env = Environment(
+        loader=FileSystemLoader(templates_dir),
+        autoescape=select_autoescape(["html", "xml"])
+    )
     template_ficha = env.get_template("ficha.html")
     
     # Carrega e converte os dados

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, HTTPException, Query
 router = APIRouter(prefix="/busca", tags=["Busca"])
 
 @router.get("/")
-async def buscar(request: Request, q: str = Query(..., min_length=2, max_length=200), limit: int = 5):
+async def buscar(request: Request, q: str = Query(..., min_length=2, max_length=200), limit: int = Query(5, ge=1, le=50)):
     buscador = getattr(request.app.state, "buscador", None)
     if not buscador:
         # TODO: Se estivermos na nuvem (Cloudflare), instanciar o BuscadorHibrido

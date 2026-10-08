@@ -116,11 +116,13 @@
                         loadingEl.style.display = 'block';
 
                         try {
-                            const chatRes = await fetch(`${API_BASE}/chat/?pergunta=${encodeURIComponent(pergunta)}`, {
+                            const chatRes = await fetch(`${API_BASE}/chat/`, {
                                 method: 'POST',
                                 headers: {
-                                    'x-ticket': jwt
-                                }
+                                    'x-ticket': jwt,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ pergunta: pergunta })
                             });
                             
                             const chatData = await chatRes.json();
@@ -163,7 +165,14 @@
                     msg = "Não foi possível conectar à API. O servidor FastAPI (Uvicorn) está rodando na porta 8000?";
                 }
                 
-                respostaTexto.innerHTML = `<span style="color: red;"><strong>Erro:</strong> ${msg}</span>`;
+                respostaTexto.innerHTML = '';
+                const spanErr = document.createElement('span');
+                spanErr.style.color = 'red';
+                const strongErr = document.createElement('strong');
+                strongErr.textContent = 'Erro: ';
+                spanErr.appendChild(strongErr);
+                spanErr.appendChild(document.createTextNode(msg));
+                respostaTexto.appendChild(spanErr);
                 respostaContainer.style.display = 'block';
             }
         });

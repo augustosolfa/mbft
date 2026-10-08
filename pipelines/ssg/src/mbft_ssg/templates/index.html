@@ -81,20 +81,47 @@
                         const div = document.createElement('div');
                         div.className = 'result-card';
                         
-                        let header = `<strong>Código: ${item.codigo}</strong>`;
+                        const pHeader = document.createElement('p');
+                        pHeader.style.marginBottom = '0.5rem';
+                        
                         if (item.url) {
-                            header = `<a href="${item.url}" target="_blank"><strong>Abrir Ficha ${item.codigo}</strong></a>`;
+                            const a = document.createElement('a');
+                            // Garantir que a URL só comece com /fichas/ para previnir javascript:
+                            if (item.url.startsWith('/fichas/')) {
+                                a.href = item.url;
+                                a.target = '_blank';
+                                const strong = document.createElement('strong');
+                                strong.textContent = `Abrir Ficha ${item.codigo}`;
+                                a.appendChild(strong);
+                                pHeader.appendChild(a);
+                            } else {
+                                const strong = document.createElement('strong');
+                                strong.textContent = `Código: ${item.codigo}`;
+                                pHeader.appendChild(strong);
+                            }
+                        } else {
+                            const strong = document.createElement('strong');
+                            strong.textContent = `Código: ${item.codigo}`;
+                            pHeader.appendChild(strong);
                         }
 
-                        div.innerHTML = `
-                            <p style="margin-bottom: 0.5rem;">${header}</p>
-                            <p style="font-size: 0.9em; color: var(--pico-muted-color); white-space: pre-wrap;">${item.trecho}</p>
-                        `;
+                        const pTrecho = document.createElement('p');
+                        pTrecho.style.fontSize = '0.9em';
+                        pTrecho.style.color = 'var(--pico-muted-color)';
+                        pTrecho.style.whiteSpace = 'pre-wrap';
+                        pTrecho.textContent = item.trecho;
+
+                        div.appendChild(pHeader);
+                        div.appendChild(pTrecho);
                         container.appendChild(div);
                     });
                 }
             } catch(err) {
-                container.innerHTML = `<p style="color: red;">Falha ao realizar busca: ${err.message}</p>`;
+                container.innerHTML = '';
+                const pErr = document.createElement('p');
+                pErr.style.color = 'red';
+                pErr.textContent = `Falha ao realizar busca: ${err.message}`;
+                container.appendChild(pErr);
             } finally {
                 btn.disabled = false;
                 loading.style.display = 'none';

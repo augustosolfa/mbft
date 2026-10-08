@@ -1,0 +1,46 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mbft-api",
+  "main": "src/mbft_api/main.py",
+  "compatibility_date": "2026-10-08",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "python_workers"
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1.0
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.05
+    }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mbft-d1",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "vectorize": [
+    {
+      "binding": "VECTORIZE",
+      "index_name": "mbft-embeddings"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "KV_TICKETS",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+}
