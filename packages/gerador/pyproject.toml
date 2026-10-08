@@ -1,0 +1,25 @@
+[project]
+name = "mbft-gerador"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "google-genai>=2.28.0",
+    "mbft-core",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+mbft-core = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "python-dotenv>=1.2.4",
+]
