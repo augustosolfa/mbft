@@ -135,24 +135,4 @@ class FichaEnriquecida(BaseModel):
     revisao_manual_necessaria: bool = Field(default=False, description="True se a ficha sofreu intervenção de LLM e precisa de auditoria humana")
 
 
-class ChunkMetadados(BaseModel):
-    chunk_id: str = Field(..., description="Identificador unívoco do chunk (ex.: '751-01_QUANDO_AUTUAR_ITEM_1' ou 'PG_CAP_02_SEC_01')")
-    tipo_documento: str = Field(..., description="'FICHA' ou 'PARTE_GERAL'")
-    origem_id: str = Field(..., description="Código da ficha ou ID do capítulo da Parte Geral")
-    secao: str = Field(..., description="Nome da seção temática (ex.: 'QUANDO_NAO_AUTUAR')")
-    item_numero: Optional[int] = Field(None, description="Número posicional do item atômico dentro da seção")
-    hierarquia_titulos: List[str] = Field(default_factory=list)
-    paginas: List[int]
-    artigos_ctb_associados: List[str] = Field(default_factory=list)
-    competencias: List[str] = Field(default_factory=list)
-    
-    # Metadados relacionais para busca estruturada
-    natureza_regra: Optional[NaturezaRegraEnum] = None
-    codigos_concomitantes: List[str] = Field(default_factory=list)
-    codigos_redirecionamento: List[str] = Field(default_factory=list)
 
-
-class ChunkPayload(BaseModel):
-    metadados: ChunkMetadados
-    texto_contextualizado: str = Field(..., description="Texto final entregue ao modelo de embedding (Template Denso)")
-    tokens_estimados: int
