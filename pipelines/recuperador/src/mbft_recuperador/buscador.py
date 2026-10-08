@@ -45,13 +45,15 @@ class BuscadorHibrido:
         return resultados_finais
         
     async def recuperar_contexto(self, pergunta: str, limit: int = 5) -> List[Dict[str, Any]]:
+        # O pool precisa ser fundo o suficiente para o RRF funcionar
+        pool_size = max(limit * 10, 60)
+        
         # 1. Vetoriza a pergunta
         vetor = await self.ai_client.embed_query(pergunta)
         
-        # 2. Executa as buscas (Idealmente executado de forma paralela usando asyncio.gather)
-        # Por questão de legibilidade do algoritmo base, mantemos em sequência (ou pode-se usar gather).
-        dense_results = await self.vector_db.buscar_similares(vetor, limit=limit)
-        sparse_results = await self.relational_db.buscar_fts(pergunta, limit=limit)
+        # 2. Executa as buscas
+        dense_results = await self.vector_db.buscar_similares(vetor, limit=pool_size)
+        sparse_results = await self.relational_db.buscar_fts(pergunta, limit=pool_size)
         
         # 3. Mescla via RRF
         rrf_results = self._aplicar_rrf(dense_results, sparse_results)
