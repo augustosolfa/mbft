@@ -15,6 +15,7 @@ members = [
     "mbft-gerador",
     "mbft-indexador",
     "mbft-recuperador",
+    "mbft-ssg",
     "mbft-workspace",
 ]
 
@@ -1174,6 +1175,21 @@ dev = [
 ]
 
 [[package]]
+name = "mbft-ssg"
+version = "0.1.0"
+source = { editable = "pipelines/ssg" }
+dependencies = [
+    { name = "jinja2" },
+    { name = "mbft-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "mbft-core", editable = "packages/core" },
+]
+
+[[package]]
 name = "mbft-workspace"
 version = "0.1.0"
 source = { virtual = "." }
@@ -1184,6 +1200,7 @@ dependencies = [
     { name = "mbft-gerador" },
     { name = "mbft-indexador" },
     { name = "mbft-recuperador" },
+    { name = "mbft-ssg" },
 ]
 
 [package.metadata]
@@ -1194,6 +1211,7 @@ requires-dist = [
     { name = "mbft-gerador", editable = "packages/gerador" },
     { name = "mbft-indexador", editable = "pipelines/indexador" },
     { name = "mbft-recuperador", editable = "packages/recuperador" },
+    { name = "mbft-ssg", editable = "pipelines/ssg" },
 ]
 
 [[package]]
