@@ -1,37 +1,48 @@
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, Request, HTTPException
 from typing import Any, Optional
 import jwt
 import datetime
-from ..database import get_db
+from ..database import get_db, FilaRepository
+import os
 
 router = APIRouter(prefix="/ticket", tags=["Ticketizador"])
 
-JWT_SECRET = "MUDAR_EM_PRODUCAO" # Em prod, ler de env
-
 @router.post("/")
 async def solicitar_ticket(
+    request: Request,
     priority_token: Optional[str] = Header(None),
     db: Any = Depends(get_db)
 ):
-    # Lógica simplificada. Aqui leremos as variáveis de ambiente em prod.
-    token_admin = "fura_fila_secreto"
-    token_testes = "testes_secreto"
+    env = request.scope.get("env", os.environ)
+    JWT_SECRET = env.get("JWT_SECRET", "MUDAR_EM_PRODUCAO")
+    token_admin = env.get("TOKEN_ADMIN", "admin123")
+    token_testes = env.get("TOKEN_TESTES", "testes123")
     
     agora = datetime.datetime.utcnow()
+    repo = FilaRepository(db)
     
     if priority_token == token_admin:
-        next_available = agora
+        # Fura-fila imediato
+        next_available_str = agora.isoformat()
     elif priority_token == token_testes:
-        next_available = agora + datetime.timedelta(seconds=10)
+        # Fila rápida (+10s) global. Como é teste, podemos só somar no repo
+        next_available_str = await repo.avancar_fila_global(segundos=10)
     else:
-        # Fila Global (+60s)
-        # TODO: Implementar o UPDATE no SQLite/D1
-        next_available = agora + datetime.timedelta(seconds=60)
+        # Fila Global padrão (+60s)
+        next_available_str = await repo.avancar_fila_global(segundos=60)
+        
+    # Se retornou nulo (banco não inicializado)
+    if not next_available_str:
+        next_available_str = agora.isoformat()
+        
+    # O banco retorna 'YYYY-MM-DD HH:MM:SS', precisamos garantir que está em ISO para o frontend
+    if "T" not in next_available_str:
+        next_available_str = next_available_str.replace(" ", "T") + "Z"
         
     ticket = jwt.encode(
-        {"valid_after": next_available.isoformat()},
+        {"valid_after": next_available_str},
         JWT_SECRET,
         algorithm="HS256"
     )
     
-    return {"ticket": ticket, "valid_after": next_available.isoformat()}
+    return {"ticket": ticket, "valid_after": next_available_str}

@@ -34,4 +34,41 @@ def get_db(request: Request) -> Any:
     else:
         # Ambiente Local (Uvicorn)
         init_local_db()
-        return sqlite3.connect(LOCAL_DB_PATH)
+        return sqlite3.connect(LOCAL_DB_PATH, check_same_thread=False)
+
+class FilaRepository:
+    def __init__(self, db: Any):
+        self.db = db
+        # Se db possuir o atributo 'cursor', é o SQLite local. Caso contrário, é o D1.
+        self.is_local = hasattr(self.db, "cursor")
+
+    async def avancar_fila_global(self, segundos: int = 60) -> str:
+        """
+        Avança a fila global de forma atômica e retorna o novo horário ISO.
+        """
+        query = f'''
+            UPDATE fila_global 
+            SET next_available = datetime(
+                max(
+                    strftime('%s', next_available), 
+                    strftime('%s', 'now')
+                ) + {segundos}, 
+                'unixepoch'
+            ) 
+            WHERE id = 1 
+            RETURNING next_available;
+        '''
+        
+        if self.is_local:
+            cursor = self.db.cursor()
+            cursor.execute(query)
+            row = cursor.fetchone()
+            self.db.commit()
+            return row[0] if row else ""
+        else:
+            # Bindings do Cloudflare D1 em Python
+            # A API pyodide do Cloudflare mapeia prepare().first()
+            stmt = self.db.prepare(query)
+            result = await stmt.first()
+            return result["next_available"] if result else ""
+
