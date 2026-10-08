@@ -72,5 +72,7 @@ O pacote `mbft-recuperador` materializar-se-á sob a arquitetura de **Monólito 
   O uso de Injeção de Dependência protege a lógica de negócio do ecossistema proprietário da Cloudflare. A matemática do *Reciprocal Rank Fusion* (RRF) poderá ser testada em pipelines de CI/CD instantâneos sem mock servers rebuscados ou necessidade de conexão de rede.
 * **Performance e Latência na Borda:**
   Dado que o Pyodide possui tempos de *Cold Start* limitados e penalidades em processamento intensivo de CPU, a escolha do RRF matemático — que avalia posições de listas — mitiga o risco de *Timeout* que acompanharia o processamento de um LLM de Reranking pesado.
+* **Armadilhas de Tokenização Lexical (Wildcards em FTS5):**
+  Como validado nos testes de aderência com SQLite em memória, a busca híbrida depende da profundidade do *pool* de candidatos de cada banco (e.g. resgatar Top 60 antes de fundir para Top 5 via RRF). Além disso, há distorções na tokenização padrão: injetar curingas (`*`) indiscriminadamente em buscas exatas pode causar *false positives* (e.g. buscar `"I*"` e o FTS5 priorizar os incisos `"II"` e `"III"` por frequência de termo). Estratégias futuras de *query expansion* no Gerador LLM (PMS-006) ou ajuste fino no SQL deverão contornar esse ruído.
 * **Tipagem Estrita e Confiabilidade:**
   As interfaces e contratos de troca de dados dependem fortemente do módulo `mbft-core`, blindando a borda contra falhas silenciosas ou desvios inesperados nos JSONs de comunicação.
