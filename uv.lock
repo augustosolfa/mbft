@@ -12,6 +12,8 @@ members = [
     "mbft-core",
     "mbft-enriquecedor",
     "mbft-extrator",
+    "mbft-indexador",
+    "mbft-recuperador",
     "mbft-workspace",
 ]
 
@@ -1095,18 +1097,56 @@ requires-dist = [
 ]
 
 [[package]]
-name = "mbft-workspace"
+name = "mbft-indexador"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "pipelines/indexador" }
 dependencies = [
     { name = "mbft-core" },
-    { name = "mbft-extrator" },
+    { name = "pyyaml" },
+    { name = "sentence-transformers" },
+    { name = "torch" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "mbft-core", editable = "packages/core" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "sentence-transformers", specifier = ">=3.0.0" },
+    { name = "torch" },
+    { name = "tqdm" },
+]
+
+[[package]]
+name = "mbft-recuperador"
+version = "0.1.0"
+source = { editable = "pipelines/recuperador" }
+dependencies = [
+    { name = "mbft-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "mbft-core", editable = "packages/core" }]
+
+[[package]]
+name = "mbft-workspace"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "mbft-core" },
+    { name = "mbft-enriquecedor" },
+    { name = "mbft-extrator" },
+    { name = "mbft-indexador" },
+    { name = "mbft-recuperador" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "mbft-core", editable = "packages/core" },
+    { name = "mbft-enriquecedor", editable = "pipelines/enriquecedor" },
     { name = "mbft-extrator", editable = "pipelines/extrator" },
+    { name = "mbft-indexador", editable = "pipelines/indexador" },
+    { name = "mbft-recuperador", editable = "pipelines/recuperador" },
 ]
 
 [[package]]

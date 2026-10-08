@@ -17,76 +17,70 @@ No fluxo de extração e RAG do Manual Brasileiro de Fiscalização de Trânsito
 
 Para viabilizar este ciclo ágil de experimentação, foi criado o **Indexador**.
 
-Este pipeline *batch* atua exclusivamente (nesta primeira fase) sobre:
-1. `fichas_enriquecidas.json` (proveniente do Enriquecedor).
-*(Nota: O chunking e vetorização da Parte Geral aguardam a extração prévia de regras globais pelo Enriquecedor, não fazendo parte deste escopo inicial).*
-
-As principais responsabilidades deste módulo são:
-1. **Segmentação Semântica Contextualizada (Chunking)**: Fracionar as 404 fichas por seções temáticas autônomas, utilizando prefixos curtos para ancoragem semântica e delegando campos administrativos para metadados estruturados.
-2. **Geração de Embeddings Densos**: Calcular vetores densos (1024 dimensões em `float32`) utilizando o modelo `BAAI/bge-m3` com aceleração por hardware (PyTorch CUDA).
-3. **Serialização e Carga**: Gravar os vetores em formato **NDJSON (JSONL)** e promover a carga nos repositórios do ambiente de runtime (Cloudflare D1 via SQL para metadados/FTS5 e Cloudflare Vectorize para busca semântica).
+Este pipeline *batch* atua exclusivamente sobre os dados estáticos previamente extraídos, aplicando as diretrizes de quebra semântica, gerando vetores densos via modelo de inteligência artificial na GPU local e exportando o formato final para carga na nuvem.
 
 ---
 
-## 2. Granularidade de Segmentação e Metadados
+## 2. Objetivos e Não Objetivos
 
-Para busca vetorial em RAG jurídico, prefixos monolíticos muito longos causam distorção e diluição vetorial (*attention dilution*), aproximando artificialmente chunks diferentes da mesma ficha. O Indexador adota uma abordagem enxuta:
+* **Objetivos (Goals):**
+  * Desenvolver um pipeline de processamento *batch* (`mbft-indexador`) para ingerir as `fichas_enriquecidas.json`.
+  * Aplicar **Segmentação Semântica Contextualizada (Chunking)**, fracionando as 404 fichas por seções temáticas autônomas e injetando prefixos curtos para ancoragem semântica.
+  * Gerar vetores densos (1024 dimensões) localmente via modelo `BAAI/bge-m3` acelerado por hardware (CUDA).
+  * Serializar o artefato em formato NDJSON (JSONL) para promover a ingestão nativa no Cloudflare Vectorize e D1.
+  * Fornecer scripts de implantação (*deploy*) via CLI para sincronização dos dados com a nuvem (Wrangler).
 
-### A. Prefixo de Contexto e Metadados
-O texto que passará pelo modelo de embedding receberá apenas as ancoragens indispensáveis de domínio e seção:
+* **Não Objetivos (Non-Goals):**
+  * Não é meta processar ou vetorizar a "Parte Geral" normativa nesta fase (isso aguardará a estruturação de regras globais pelo Enriquecedor).
+  * Não é meta operar em tempo real nem expor rotas HTTP. O Indexador é estritamente um construtor de *assets* estáticos.
+  * Não é meta implementar lógicas de Busca Híbrida ou LLM; estas pertencem ao Recuperador (PMS-005).
 
-- **Prefixo Enxuto**:
+---
+
+## 3. Design da Solução
+
+### 3.1. Granularidade de Segmentação e Metadados
+Para busca vetorial em RAG jurídico, prefixos monolíticos muito longos causam distorção e diluição vetorial (*attention dilution*), aproximando artificialmente chunks diferentes da mesma ficha. O Indexador adota uma abordagem enxuta separando texto vetorizável de filtros de metadados.
+
+* **Prefixo Enxuto**: O texto a ser embeddado recebe apenas ancoragens críticas:
   ```text
   [Infração {codigo_enquadramento} - {tipificacao_resumida} | {amparo_legal} | {secao}]
   ```
   *(Exemplo: `[Infração 501-0 - Dirigir sem CNH | Art. 162, I | Quando Autuar]`)*
 
-Dessa forma, o prefixo consome apenas ~20 tokens. Atributos administrativos pesados (como `gravidade`, `penalidade`, `infrator`, `competencia`) **não** entram no texto vetorizado; eles são gravados como **Metadados Estruturados** no Cloudflare Vectorize e no SQLite para atuarem como filtros exatos (*pre-filtering*).
+* **Tipos de Chunks por Ficha**: Fragmentados pelas seções (que preenchem a variável `{secao}`):
+  `EMENTA`, `QUANDO_AUTUAR`, `QUANDO_NAO_AUTUAR`, `DEFINICOES_PROCEDIMENTOS`, `EXEMPLOS_AIT`, `INFORMACOES_COMPLEMENTARES`.
 
-### B. Tipos de Chunks por Ficha
-As fichas são fragmentadas pelas seguintes seções (que preenchem a variável `{secao}` no prefixo):
-1. `EMENTA`: Cabeçalho completo e enquadramento formal;
-2. `QUANDO_AUTUAR`: Itens normativos de lavratura do auto;
-3. `QUANDO_NAO_AUTUAR`: Exceções e infrações subsidiárias;
-4. `DEFINICOES_PROCEDIMENTOS`: Rotinas operacionais e medições;
-5. `EXEMPLOS_AIT`: Textos padronizados para observações do auto;
-6. `INFORMACOES_COMPLEMENTARES`: Texto de notas técnicas.
+Atributos administrativos (ex: `gravidade`, `infrator`, `competencia`) são excluídos da vetorização e registrados como **Metadados Estruturados** para viabilizar *pre-filtering* exato.
 
----
+### 3.2. Geração de Embeddings (`BAAI/bge-m3`)
+* **Modelo**: `BAAI/bge-m3`.
+* **Dimensão**: 1024 floats de 32 bits (normalizados L2).
+* **Limitações da Borda vs Processamento Local**:
+  O Indexador gera os embeddings na GPU (FP32). O Recuperador (PMS-005) rodará na Cloudflare consumindo cotas de Neurons e modelos tipicamente quantizados (FP16/INT8). Assume-se que a divergência vetorial residual é tolerável para métricas de similaridade de cosseno.
 
-## 3. Geração de Embeddings (`BAAI/bge-m3`)
-
-- **Modelo**: `BAAI/bge-m3`.
-- **Dimensão Vetorial**: 1024 floats de 32 bits (normalizados em norma L2).
-- **Justificativa e Paridade Cloudflare**:
-  - O Indexador processa os embeddings localmente na GPU (FP32). 
-  - A arquitetura prevê que o **Recuperador (PMS-005)** utilizará o modelo `@cf/baai/bge-m3` via Cloudflare Workers AI para inferir a pergunta do usuário.
-  - **Atenção (Limitações da Borda):** O modelo da Cloudflare não tem custo zero (consome a cota de Neurons da conta) e tipicamente opera quantizado (FP16/INT8) para otimizar latência, não havendo paridade *bit a bit* exata com o vetor gerado localmente em FP32. Contudo, para métricas de similaridade por cosseno, essa variação decimal é tolerável.
-- **Preparação para Busca Híbrida**: O modelo `bge-m3` possui capacidades excepcionais de recuperação *sparse* (lexical). Como a API do Cloudflare Vectorize foca no armazenamento denso, a estratégia de busca híbrida consistirá em cruzar a busca densa (Vectorize) com a busca textual exata (FTS5 do SQLite), fundindo os resultados através de um modelo de reranking (ex: `bge-reranker-base`) na Etapa do Recuperador (PMS-005).
+### 3.3. Contratos de Dados e Artefatos
+As 404 fichas geram aproximadamente 1.600 a 2.500 chunks. Considerando os vetores de ponto flutuante, o artefato consome ~15 MB.
+* **Formato de Saída (`embeddings_mbft.jsonl`)**: NDJSON. É o formato nativo e obrigatório exigido pelo CLI do Cloudflare Wrangler (`wrangler vectorize insert`).
+* **Schema**:
+  - `id` (`string`);
+  - `values` (`array<float32>`);
+  - `metadata` (`object` com filtros administrativos e texto).
 
 ---
 
-## 4. Contratos de Dados e Artefatos (`mbft-core`)
-
-A base do MBFT extraída gera aproximadamente 2.400 a 2.500 chunks para as 404 fichas. Considerando 1024 dimensões de `float32` e os metadados, o volume total de dados gerado é de apenas cerca de **12 a 15 MB**.
-
-1. **Formato de Saída (`embeddings_mbft.jsonl`)**: Ao invés de formatos binários complexos, optou-se pelo arquivo NDJSON (JSONL). Além da simplicidade e baixo overhead para arquivos da ordem de 15 MB, este é o formato nativo exigido pelo CLI do Cloudflare Wrangler para cargas em massa no Vectorize.
-2. Estrutura de cada linha JSONL:
-   - `id` (`string`, chave primária do chunk);
-   - `values` (`array<float32>`, dimensão fixa 1024);
-   - `metadata` (`object`):
-     - `origem_id` (ficha de origem);
-     - `secao`;
-     - `codigo`;
-     - `artigo`;
-     - `texto_contextualizado` (o fragmento com prefixo que foi vetorizado);
-     - Demais filtros administrativos (`gravidade`, `competencia`, etc).
-
----
-
-## 5. Alternativas Consideradas
+## 4. Alternativas Consideradas
 
 * **Apache Parquet para Armazenamento Local:**
-  * *Por que foi rejeitado:* Embora traga tipagem estrita e compressão, o Parquet demonstrou-se excessivo (*overengineering*) para os modestos ~15 MB do dataset. O JSONL atende perfeitamente à limitação de RAM e integra-se diretamente à ferramenta nativa da Cloudflare.
+  * *Por que foi rejeitado:* Embora traga tipagem estrita e compressão, o Parquet demonstrou-se excessivo (*overengineering*) para os modestos ~15 MB do dataset. O JSONL atende perfeitamente à limitação de RAM local e integra-se nativamente e sem fricção à ferramenta da Cloudflare.
 * **Prefixo Contextual Monolítico:**
-  * *Por que foi rejeitado:* Injetar todo o cabedal burocrático (70-90 tokens de competência, valores, infrator, etc.) no texto do *chunk* causava aproximação indevida dos vetores de uma mesma ficha. A separação entre "texto mínimo vetorizável" e "metadados estruturados" resolve o problema de atenção diluída.
+  * *Por que foi rejeitado:* Injetar todo o cabedal burocrático (70-90 tokens listando valores, competências e infratores) no texto do *chunk* causava aproximação indevida dos vetores de uma mesma ficha, anulando as especificidades das infrações. A separação estrita resolve a atenção diluída.
+
+---
+
+## 5. Preocupações Transversais
+
+* **Gerenciamento de Memória (VRAM):**
+  Como o motor utiliza `sentence-transformers` sobre PyTorch (CUDA), processar centenas de blocos simultaneamente excederia rapidamente os limites de VRAM da RTX 4070. O design prevê a orquestração via lotes paramétricos (*batch size* de 32 a 64), garantindo estabilidade no pipeline *batch*.
+* **Qualidade e Validação Contínua (Recall@K):**
+  A adoção de estratégias como o prefixo enxuto requer métricas de prova matemática. O pacote do Indexador possui um laboratório de testes embutido (RAG Offline) suportado por listas YAML de "casos de aderência", monitorando regressões na capacidade do espaço denso em localizar a resposta correta no Top 1 e Top 5.

@@ -18,12 +18,18 @@ def main():
     parser.add_argument("--output", "-o", type=str, default="../../data/processed/indexador/embeddings_mbft.jsonl", help="Caminho de saída para o JSONL de embeddings.")
     parser.add_argument("--batch-size", "-b", type=int, default=32, help="Tamanho do batch para inferência do modelo na GPU.")
     parser.add_argument("--skip-embeddings", action="store_true", help="Faz apenas o chunking e salva metadados sem calcular os vetores densos (para debug rápido).")
+    parser.add_argument("--deploy", action="store_true", help="Faz o upload do JSONL gerado para o Cloudflare Vectorize via wrangler.")
     
     args = parser.parse_args()
     
     input_path = Path(args.input)
     output_path = Path(args.output)
-    
+
+    if args.deploy:
+        from mbft_indexador.deploy import fazer_deploy_vectorize
+        fazer_deploy_vectorize(output_path)
+        return
+
     if not input_path.exists():
         logger.error(f"Arquivo de entrada não encontrado: {input_path}")
         return

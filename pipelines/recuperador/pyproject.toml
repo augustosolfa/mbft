@@ -1,0 +1,18 @@
+[project]
+name = "mbft-recuperador"
+version = "0.1.0"
+description = "Biblioteca core de Busca Híbrida do MBFT (Vectorize + D1) via RRF."
+authors = [
+    {name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "mbft-core",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mbft_recuperador"]
