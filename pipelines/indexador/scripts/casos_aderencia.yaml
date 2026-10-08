@@ -1,0 +1,164 @@
+casos:
+  - query: "iniciar obra na via que atrapalha pedestres sem permissão"
+    expected: ["751-01"]
+  
+  - query: "condutor dirigindo sem possuir CNH"
+    expected: ["501-00", "501-0"] # Aceitando variações dependendo de como o código está formatado
+    
+  - query: "Art. 162 I"
+    expected: ["501-00", "501-0"]
+    
+  - query: "entregar veículo a pessoa não habilitada"
+    expected: ["506-10", "506-1"]
+    
+  - query: "exceder velocidade em mais de 50%"
+    expected: ["747-10"]
+    
+  - query: "dirigir sob influência de álcool"
+    expected: ["516-91"]
+    
+  - query: "recusa em fazer o bafômetro"
+    expected: ["757-90"]
+
+# --- Eventos e Obras na Via (Art. 95) ---
+  - query: "promover vaquejada ou romaria na via pública sem autorização do órgão de trânsito"
+    expected: ["751-02"]
+
+  - query: "obra em via pública realizada com permissão porém sem a sinalização obrigatória de cones"
+    expected: ["752-81"]
+
+  - query: "evento em via pública sem a devida sinalização para desviar o fluxo de veículos"
+    expected: ["752-82"]
+
+  # --- Habilitação e Restrições do Condutor (Art. 162) ---
+  - query: "condutor flagrado dirigindo veículo com a carteira de habilitação cassada"
+    expected: ["502-91"]
+
+  - query: "motorista conduzindo automóvel durante o período de cumprimento de suspensão da CNH"
+    expected: ["502-92"]
+
+  - query: "motorista com habilitação categoria B dirigindo caminhão de carga pesada"
+    expected: ["503-71"]
+
+  - query: "condutor com Permissão para Dirigir categoria B flagrado pilotando motocicleta"
+    expected: ["503-72"]
+
+  - query: "conduzir veículo com a validade da CNH vencida há mais de 30 dias"
+    expected: ["504-50"]
+
+  - query: "motorista com restrição médica no prontuário da CNH dirigindo sem óculos de grau"
+    expected: ["505-31"]
+
+  - query: "condutor com anotação na CNH de uso obrigatório de prótese auditiva flagrado sem o aparelho"
+    expected: ["505-32"]
+
+  - query: "veículo sem a adaptação de comando no volante ou câmbio automático exigida na CNH"
+    expected: ["505-34"]
+
+  - query: "motorista de transporte escolar atuando na rota sem possuir o curso especializado CETE"
+    expected: ["774-91"]
+
+  - query: "dirigir veículo com pendência na realização do curso de reciclagem após cumprir suspensão"
+    expected: ["774-92"]
+
+  # --- Entregar Direção (Proprietário Presente - Art. 163) ---
+  - query: "proprietário no veículo entregando a direção para condutor com habilitação cassada"
+    expected: ["507-01"]
+
+  - query: "proprietário presente que entrega a condução do carro a pessoa com direito de dirigir suspenso"
+    expected: ["507-02"]
+
+  - query: "proprietário presente entregando a direção de caminhão pesado para quem possui apenas CNH categoria B"
+    expected: ["508-81"]
+
+  - query: "proprietário no banco do passageiro entregando o veículo a amigo com CNH vencida há dois meses"
+    expected: ["509-60"]
+
+  - query: "proprietário no carro entrega a direção a condutor sem óculos corretivos exigidos na habilitação"
+    expected: ["510-01"]
+
+  # --- Permitir Posse/Condução (Proprietário Ausente / PJ - Art. 164) ---
+  - query: "empresa ou proprietário ausente que permitiu que pessoa sem habilitação dirigisse o veículo"
+    expected: ["511-80"]
+
+  - query: "proprietário ausente que permitiu a posse e condução do carro a pessoa com CNH cassada"
+    expected: ["512-61"]
+
+  - query: "pessoa jurídica que permitiu a condução do veículo da frota por funcionário com a CNH suspensa"
+    expected: ["512-62"]
+
+  - query: "proprietário ausente que permitiu a condução de caminhão a motorista com carteira B"
+    expected: ["513-41"]
+
+  - query: "proprietário ausente que autorizou parente com CNH vencida há mais de 30 dias a conduzir o automóvel"
+    expected: ["514-20"]
+
+  - query: "proprietário ausente que permitiu a posse do veículo a pessoa sem lentes corretoras obrigatórias"
+    expected: ["515-01"]
+
+  # --- Substâncias, Exame Toxicológico e Estado Físico (Arts. 165 a 166) ---
+  - query: "motorista dirigindo sob efeito de drogas ilícitas ou entorpecentes com alteração psicomotora"
+    expected: ["516-92"]
+
+  - query: "caminhoneiro categoria C conduzindo caminhão com exame toxicológico periódico vencido há mais de 30 dias"
+    expected: ["764-10"]
+
+  - query: "motorista profissional com EAR renovando CNH categoria D sem comprovar exame toxicológico periódico"
+    expected: ["765-00"]
+
+  - query: "proprietário entrega a chave do veículo a pessoa com sinais evidentes de sonolência extrema ou choque psíquico"
+    expected: ["517-70"]
+
+  # --- Cinto de Segurança e Dispositivos de Retenção (Arts. 167 e 168) ---
+  - query: "motorista dirigindo automóvel de passeio sem colocar o cinto de segurança"
+    expected: ["518-51"]
+
+  - query: "passageiro no banco traseiro do veículo flagrado sem usar o cinto de segurança"
+    expected: ["518-52"]
+
+  - query: "criança pequena de 2 anos sendo transportada no colo do passageiro dianteiro em automóvel"
+    expected: ["519-30"]
+
+  - query: "criança de 5 anos no banco traseiro sem o uso do assento de elevação obrigatório"
+    expected: ["519-30"]
+
+  # --- Cuidados Indispensáveis, Ameaça e Arremesso de Detritos (Arts. 169 a 172) ---
+  - query: "motorista folheando livro ou lendo revista apoiada no volante com o carro em movimento"
+    expected: ["520-70"]
+
+  - query: "veículo transitando na via com a tampa do porta-malas ou uma das portas abertas"
+    expected: ["520-70"]
+
+  - query: "motorista acelerando o carro em direção a pedestre para intimidar ou apressar a travessia na faixa"
+    expected: ["521-51"]
+
+  - query: "mudar bruscamente a trajetória do carro jogando a frente para intimidar e fechar outro veículo"
+    expected: ["521-52"]
+
+  - query: "passar com o carro em poça de água na pista de propósito para molhar pedestres na calçada"
+    expected: ["522-31"]
+
+  - query: "arremessar deliberadamente água ou detritos da pista contra outro automóvel em movimento"
+    expected: ["522-32"]
+
+  - query: "ocupante de veículo atirando lata de cerveja ou restos de comida pela janela na via pública"
+    expected: ["523-11"]
+
+  - query: "condutor descarrega e abandona móveis velhos ou entulho de obra na pista de rolamento"
+    expected: ["523-12"]
+
+  # --- Disputa, Exibição e Acidentes (Arts. 173 a 178) ---
+  - query: "dois motoristas disputando racha de velocidade em via pública por decisão repentina"
+    expected: ["524-00"]
+
+  - query: "organizar e promover nas redes sociais campeonato clandestino de corrida de carros na rua"
+    expected: ["525-81"]
+
+  - query: "arrancar com o veículo bruscamente cantando pneus no sinal verde de forma exibicionista"
+    expected: ["527-41"]
+
+  - query: "manobra perigosa de cavalo de pau ou zerinho com deslizamento de pneus na pista"
+    expected: ["527-42"]
+
+  - query: "motorista que atropelou pedestre e fugiu do local sem prestar ou providenciar socorro à vítima"
+    expected: ["528-20"]

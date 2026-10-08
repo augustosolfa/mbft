@@ -9,6 +9,8 @@ from .enriquecimento import (
     CompetenciaFonteEnum,
     ReferenciaCTB,
     FichaEnriquecida,
+)
+from .indexacao import (
     ChunkMetadados,
     ChunkPayload,
 )
