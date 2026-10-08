@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "google-genai>=2.28.0",
     "mbft-core",
 ]
 
@@ -17,3 +18,8 @@ build-backend = "uv_build"
 
 [tool.uv.sources]
 mbft-core = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "python-dotenv>=1.2.4",
+]

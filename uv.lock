@@ -12,6 +12,7 @@ members = [
     "mbft-core",
     "mbft-enriquecedor",
     "mbft-extrator",
+    "mbft-gerador",
     "mbft-indexador",
     "mbft-recuperador",
     "mbft-workspace",
@@ -1106,6 +1107,29 @@ requires-dist = [
 ]
 
 [[package]]
+name = "mbft-gerador"
+version = "0.1.0"
+source = { editable = "packages/gerador" }
+dependencies = [
+    { name = "google-genai" },
+    { name = "mbft-core" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "google-genai", specifier = ">=2.28.0" },
+    { name = "mbft-core", editable = "packages/core" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "python-dotenv", specifier = ">=1.2.4" }]
+
+[[package]]
 name = "mbft-indexador"
 version = "0.1.0"
 source = { editable = "pipelines/indexador" }
@@ -1129,7 +1153,7 @@ requires-dist = [
 [[package]]
 name = "mbft-recuperador"
 version = "0.1.0"
-source = { editable = "pipelines/recuperador" }
+source = { editable = "packages/recuperador" }
 dependencies = [
     { name = "mbft-core" },
 ]
@@ -1157,6 +1181,7 @@ dependencies = [
     { name = "mbft-core" },
     { name = "mbft-enriquecedor" },
     { name = "mbft-extrator" },
+    { name = "mbft-gerador" },
     { name = "mbft-indexador" },
     { name = "mbft-recuperador" },
 ]
@@ -1166,8 +1191,9 @@ requires-dist = [
     { name = "mbft-core", editable = "packages/core" },
     { name = "mbft-enriquecedor", editable = "pipelines/enriquecedor" },
     { name = "mbft-extrator", editable = "pipelines/extrator" },
+    { name = "mbft-gerador", editable = "packages/gerador" },
     { name = "mbft-indexador", editable = "pipelines/indexador" },
-    { name = "mbft-recuperador", editable = "pipelines/recuperador" },
+    { name = "mbft-recuperador", editable = "packages/recuperador" },
 ]
 
 [[package]]
