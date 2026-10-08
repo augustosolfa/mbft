@@ -28,5 +28,23 @@ async def fazer_pergunta(pergunta: str, request: Request, x_ticket: str = Header
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Ticket inválido.")
         
-    # TODO: Integrar mbft-gerador
-    return {"resposta": "LLM Responderia aqui."}
+    buscador = getattr(request.app.state, "buscador", None)
+    gerador = getattr(request.app.state, "gerador", None)
+    
+    if not buscador or not gerador:
+        raise HTTPException(status_code=503, detail="Motor de Inteligência Indisponível.")
+        
+    # Fase 1: RAG Híbrido
+    contexto_bruto = await buscador.recuperar_contexto(pergunta, limit=5)
+    
+    # Formata o contexto para o prompt
+    textos_contexto = [item["metadata"].get("texto_contextualizado", "") for item in contexto_bruto]
+    contexto_formatado = "\n\n---\n\n".join(textos_contexto)
+    
+    # Fase 2: Geração Strict RAG (Zero-Hallucination)
+    try:
+        resposta_llm = await gerador.gerar_resposta(pergunta, contexto_formatado)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao consultar o Oráculo de IA: {e}")
+        
+    return {"resposta": resposta_llm}

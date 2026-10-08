@@ -25,6 +25,17 @@ async def lifespan(app: FastAPI):
         else:
             print("Aviso: embeddings_mbft.jsonl não encontrado. Busca local indisponível.")
             app.state.buscador = None
+            
+        # Tenta carregar o Gerador LLM
+        try:
+            from mbft_gerador.local_adapters import GeminiLLMClient
+            from mbft_gerador.orquestrador import OrquestradorGeracao
+            app.state.gerador = OrquestradorGeracao(GeminiLLMClient())
+            print("Gerador LLM (Gemini) engatilhado.")
+        except Exception as e:
+            print(f"Aviso: Não foi possível carregar o Gerador LLM: {e}")
+            app.state.gerador = None
+            
     except ImportError:
         print("Aviso: Adaptadores locais (PyTorch) não instalados. Pulando...")
         app.state.buscador = None
