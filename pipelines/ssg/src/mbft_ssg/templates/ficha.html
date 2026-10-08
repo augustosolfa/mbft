@@ -82,6 +82,26 @@
         </ul>
     </section>
 
+    {% if ficha.exemplos_observacoes_ait_itens %}
+    <section>
+        <h3>Exemplos e Observações (AIT)</h3>
+        <ul>
+            {% for regra in ficha.exemplos_observacoes_ait_itens %}
+                <li>{{ regra.texto }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if ficha.informacoes_complementares_html %}
+    <section>
+        <h3>Informações Complementares</h3>
+        <div style="background: var(--pico-background-color); border-left: 4px solid var(--pico-primary); padding: 1rem; overflow-x: auto;">
+            {{ ficha.informacoes_complementares_html | safe }}
+        </div>
+    </section>
+    {% endif %}
+
     {% if ficha.imagens %}
     <section>
         <h3>Ilustrações</h3>
