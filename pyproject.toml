@@ -14,6 +14,7 @@ dependencies = [
     "mbft-indexador",
     "mbft-recuperador",
     "mbft-gerador",
+    "mbft-ssg",
 ]
 
 [tool.uv.sources]
@@ -23,6 +24,7 @@ mbft-enriquecedor = { workspace = true }
 mbft-indexador = { workspace = true }
 mbft-recuperador = { workspace = true }
 mbft-gerador = { workspace = true }
+mbft-ssg = { workspace = true }
 
 [tool.uv.workspace]
 members = ["pipelines/*", "packages/*"]

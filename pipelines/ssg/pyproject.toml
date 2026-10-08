@@ -1,0 +1,23 @@
+[project]
+name = "mbft-ssg"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "jinja2>=3.1.6",
+    "mbft-core",
+]
+
+[project.scripts]
+mbft-ssg = "mbft_ssg.builder:run_build"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+mbft-core = { workspace = true }
