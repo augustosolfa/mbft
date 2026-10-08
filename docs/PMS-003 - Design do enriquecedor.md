@@ -1,6 +1,6 @@
 ---
 PMS: 003
-Título: Design do Enriquecedor e Vetorizador do MBFT
+Título: Design do Enriquecedor do MBFT
 Autor: José Augusto Solfa Campos Oliveira <augusto@solfa.net>
 Status: Rascunho
 Tipo: Trilha de Padronização (Standards Track)
@@ -9,7 +9,7 @@ Requer: PMS-001, PMS-002
 Substitui: Nenhum
 ---
 
-# PMS-003: Design do Enriquecedor e Vetorizador do MBFT
+# PMS-003: Design do Enriquecedor do MBFT
 
 ## 1. Contexto e Escopo
 
@@ -17,14 +17,13 @@ O Manual Brasileiro de Fiscalização de Trânsito (MBFT) é extraído na Etapa 
 1. `data/processed/extrator/fichas_mbft.json`: 404 fichas de fiscalização com texto semântico e estruturação inicial;
 2. `data/processed/extrator/mbft_parte_geral.md`: o texto integral das disposições gerais e normativas (páginas 1 a 31 do PDF oficial).
 
-Embora o Extrator preserve a integridade geométrica e textual do documento original, os dados resultantes ainda apresentam características de texto livre não normalizado, variações sintáticas de termos regulatórios e lacunas decorrentes de atualizações legais (como o campo de competência esvaziado nas fichas em decorrência da promulgação da Lei nº 14.599/2023). Além disso, os modelos de busca vetorial exigem segmentação (*chunking*) contextualizada e representações densas (*embeddings*) para viabilizar recuperação semântica de alta precisão.
+Embora o Extrator preserve a integridade geométrica e textual do documento original, os dados resultantes ainda apresentam características de texto livre não normalizado, variações sintáticas de termos regulatórios e lacunas decorrentes de atualizações legais (como o campo de competência esvaziado nas fichas em decorrência da promulgação da Lei nº 14.599/2023).
 
 Este documento especifica o **Enriquecedor** (Etapa 2 do PMS-001), pipeline *batch* em Python 3.14 gerenciado via `uv`, responsável por:
 1. **Normalização Categórica**: Padronizar atributos regulatórios (gravidade, penalidade, medida administrativa, infrator, constatação, pontuação e crime) sob vocabulário controlado estrito (Enums);
 2. **Resolução de Competência**: Resolver formalmente a competência das infrações afetadas pela Lei nº 14.599/2023 (Municipal, Estadual ou Concorrente) através de tabela canônica de referência normativa;
 3. **Extração de Informação Determinística (IE)**: Identificar e estruturar menções a artigos/incisos do CTB, Resoluções do CONTRAN e códigos de enquadramentos correlatos citados nos campos textuais;
-4. **Segmentação Semântica Contextualizada (Chunking)**: Fracionar as fichas por seções temáticas autônomas e a Parte Geral por blocos estruturados em Markdown, anexando metadados ricos e prefixos contextuais;
-5. **Geração de Embeddings**: Calcular vetores densos (1024 dimensões) utilizando o modelo `BAAI/bge-m3` com aceleração por hardware (PyTorch CUDA em GPU NVIDIA GeForce RTX 4070), compatibilizado nativamente com o Cloudflare Workers AI (`@cf/baai/bge-m3`) para a futura etapa de busca em tempo de execução (PMS-005).
+4. **Preparação da Parte Geral**: Manter sob sua responsabilidade a futura extração de regras globais normativas presentes na Parte Geral para alimentar o contexto de geração (LLM) do mecanismo RAG.
 
 ---
 
@@ -35,13 +34,13 @@ Este documento especifica o **Enriquecedor** (Etapa 2 do PMS-001), pipeline *bat
   * Preservar os campos originais brutos (`*_original`) ao lado dos atributos normalizados para auditoria e rastreabilidade jurídica completa.
   * Resolver a atribuição de competência das fichas com campo em branco ou marcado como `competencia_alterada_lei_14599 = True`, categorizando-as deterministicamente como `MUNICIPAL`, `ESTADUAL` ou `CONCORRENTE`, com registro explícito da fonte normativa.
   * Extrair referências estruturadas ao Código de Trânsito Brasileiro (artigo, parágrafo, inciso, alínea), resoluções do CONTRAN e códigos correlatos (`\d{3}-\d{2}`) a partir dos blocos normativos (*Quando Autuar*, *Quando Não Autuar*, *Definições e Procedimentos* e *Informações Complementares*).
-  * Gerar chunks semânticos autônomos com enriquecimento de cabeçalho (*chunk prefixing*) para as Fichas e segmentação hierárquica por cabeçalhos Markdown (512 a 800 tokens) para a Parte Geral.
-  * Computar embeddings densos de 1024 dimensões via `BAAI/bge-m3` localmente via GPU CUDA, gravando os vetores em formato compacto e de alta performance Apache Parquet.
+  * Preparar o terreno estruturado (Fichas e regras da Parte Geral) para consumo posterior pelo Indexador (PMS-004).
   * Fornecer pacote modular `pipelines/enriquecedor` integrado ao UV Workspace da raiz, com CLI própria (`mbft-enriquecedor`) e relatório automatizado de auditoria (`relatorio_enriquecimento.md`).
 
 * **Não Objetivos (Non-Goals):**
   * Não é meta processar toda a base via LLM indiscriminadamente. A prioridade absoluta e a primeira camada de extração devem ser sempre os métodos programáticos e determinísticos (regex e tabelas de de-para). O uso de modelos de linguagem (LLMs) é permitido e restrito *estritamente a uma camada de fallback* para inferir os dados apenas nos casos anômalos onde o método programático se mostrar deficiente.
-  * Não é meta realizar a persistência em banco de dados relacional SQL ou no Cloudflare Vectorize (escopo estrito da Carga / PMS-004).
+  * Não é meta realizar *chunking* ou gerar *embeddings* vetoriais (escopo do Indexador / PMS-004).
+  * Não é meta realizar a persistência em banco de dados relacional SQL ou no Cloudflare Vectorize (escopo do Indexador / PMS-004).
   * Não é meta responder perguntas ou expor endpoints HTTP em tempo real (escopo do Recuperador / PMS-005 e Gerador / PMS-006).
 
 ---
@@ -69,16 +68,10 @@ O módulo processa os artefatos da extração através de estágios modulares e 
         └── Enquadramentos Correlatos (^\d{3}-\d{2}$)
              │
              ▼
-   [ 3. Gerador de Chunks Semânticos Contextualizados ]
-        ├── Chunks Temáticos de Fichas (Ementa, Quando Autuar, Quando Não Autuar, etc.)
-        └── Chunks Hierárquicos da Parte Geral (Markdown Headers 512-800 tokens)
-             │
-             ▼
-   [ 4. Vetorizador Batch CUDA (BAAI/bge-m3) ] ──> RTX 4070 (PyTorch CUDA 13.2)
+   [ 3. Processador da Parte Geral ]
+        └── Extração de Regras Globais (Planejado para alimentar prompts RAG)
              │
              ├───> data/processed/enriquecedor/fichas_enriquecidas.json
-             ├───> data/processed/enriquecedor/chunks_parte_geral.json
-             ├───> data/processed/enriquecedor/embeddings_mbft.parquet
              └───> data/processed/enriquecedor/relatorio_enriquecimento.md
 ```
 
@@ -144,46 +137,6 @@ Para viabilizar consultas cruzadas, filtros no banco SQL e expansão de contexto
    - Extração de vocabulário de equipamentos e medidas aferidas (ex.: "etilômetro", "radar", "balança", "tacógrafo", "decalque").
 
 ---
-
-### 3.5. Granularidade de Segmentação Semântica (Chunking)
-
-Para busca vetorial em RAG jurídico, chunks monolíticos por página diluem os trechos operacionais específicos, enquanto micro-chunks por linha perdem o contexto legal. Adota-se a **Granularidade por Seção Temática Contextualizada**:
-
-#### A. Segmentação de Fichas de Enquadramento
-Cada uma das 404 fichas é subdividida em chunks estruturados, onde cada chunk recebe um cabeçalho fixo (*prefixo contextual*) para ancorar a representação vetorial:
-
-- **Prefixo de Contexto Padrão**:
-  ```text
-  [INFORMAÇÃO DA INFRAÇÃO]
-  Código: {codigo_enquadramento} | Tipificação: {tipificacao_resumida}
-  Amparo Legal: {amparo_legal} | Infrator: {infrator} | Gravidade: {gravidade} | Penalidade: {penalidade_original} | Competência: {competencias}
-  ```
-- **Tipos de Chunks por Ficha**:
-  1. `EMENTA`: Cabeçalho completo, amparo legal e enquadramento formal;
-  2. `QUANDO_AUTUAR`: Prefixo + itens normativos de lavratura do auto;
-  3. `QUANDO_NAO_AUTUAR`: Prefixo + exceções, tolerâncias e infrações subsidiárias;
-  4. `DEFINICOES_PROCEDIMENTOS`: Prefixo + rotinas operacionais, regulamentações e medições;
-  5. `EXEMPLOS_AIT`: Prefixo + textos padronizados para o campo de observações do auto de infração;
-  6. `INFORMACOES_COMPLEMENTARES`: Prefixo + texto e tabelas de notas técnicas (se presentes).
-
-#### B. Segmentação da Parte Geral (`mbft_parte_geral.md`)
-O arquivo Markdown das páginas 1 a 31 é segmentado com base na árvore de títulos (`#`, `##`, `###`):
-- Divisão semântica por seções com limite de 512 a 800 tokens;
-- Rastreamento da hierarquia de tópicos (ex.: `Disposições Gerais > Competência de Fiscalização > Delegação`);
-- Preservação da indicação de página original extraída do Extrator (ex.: `<!-- Página 12 -->`).
-
----
-
-### 3.6. Geração de Embeddings (`BAAI/bge-m3`)
-
-- **Modelo**: `BAAI/bge-m3` ([Chen et al., 2024](https://arxiv.org/abs/2402.03216)).
-- **Dimensão Vetorial**: 1024 floats de 32 bits (normalizados em norma L2 para similaridade por cosseno).
-- **Justificativa da Escolha**:
-  - Suporte de ponta à língua portuguesa e a textos técnicos e jurídicos complexos;
-  - Capacidade nativa de janelas de contexto de até 8192 tokens;
-  - Execução batch local rápida via PyTorch CUDA na GPU local (NVIDIA RTX 4070, ~12 GB VRAM);
-  - **Paridade direta com o Cloudflare Workers AI**: A Cloudflare disponibiliza o modelo `@cf/baai/bge-m3` em sua infraestrutura global na borda (*edge*), permitindo que a etapa síncrona do Recuperador (PMS-005) gere os embeddings das perguntas dos usuários sem divergência de espaço vetorial e com custo zero de API externa.
-
 ---
 
 ### 3.7. Contratos de Dados e Guardrails Compartilhados (`mbft-core`)
@@ -200,17 +153,13 @@ Em suma, o Enriquecedor materializa os seguintes contratos:
    - **Resolução de Competência**: Cruza as lacunas da Lei 14.599/23 e infere as listas de competências (ex: `[MUNICIPAL, ESTADUAL]`), definindo a `CompetenciaFonteEnum`.
    - **Mapeamento Jurídico**: Popula listas formais de `artigos_ctb` e `resolucoes_contran`.
 
-2. **`ChunkPayload` e `ChunkMetadados`**: Unidade atômica para o modelo vetorial.
-   - Associa o fragmento de texto (`texto_contextualizado`) à sua linhagem (`chunk_id`, `tipo_documento`, `origem_id`, `secao`).
-   - Garante a presença do artigo e da competência, essenciais para filtragem semântica no mecanismo RAG.
-
 ---
 
 ### 3.8. Fallback de Extração via LLM (Gemini 2.5 Flash-Lite)
 
 Para os casos anômalos onde as expressões regulares ou a tabela canônica não consigam extrair os dados com precisão, o Enriquecedor aciona uma camada de fallback via API utilizando o modelo **Gemini 2.5 Flash-Lite** (`gemini-2.5-flash-lite`).
 
-- **Custo-Benefício e Escala:** O `gemini-2.5-flash-lite` foi escolhido por sua altíssima velocidade e custo marginal próximo de zero (US$ 0,05 por 1M tokens de entrada e US$ 0,20 por 1M tokens de saída), não competindo pelos recursos da VRAM local usada para vetorização.
+- **Custo-Benefício e Escala:** O `gemini-2.5-flash-lite` foi escolhido por sua altíssima velocidade e custo marginal próximo de zero (US$ 0,05 por 1M tokens de entrada e US$ 0,20 por 1M tokens de saída).
 - **Estruturação Pydantic:** O fallback utiliza recursos de *Structured Outputs* para injetar a inferência perfeitamente nos atributos faltantes do esquema canônico.
 - **Auditoria Explícita:** A intervenção do LLM é salva no JSON final através dos atributos recém-adicionados `campos_inferidos_por_llm` e ativando o modo `revisao_manual_necessaria = True`.
 
@@ -221,15 +170,7 @@ Para os casos anômalos onde as expressões regulares ou a tabela canônica não
 Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
 1. `fichas_enriquecidas.json`: Array serializado das 404 fichas enriquecidas com o schema `FichaEnriquecida`.
-2. `chunks_parte_geral.json`: Array serializado de chunks semânticos da Parte Geral com o schema `ChunkPayload`.
-3. `embeddings_mbft.parquet`: Tabela colunar compacta contendo:
-   - `chunk_id` (`string`, chave primária);
-   - `origem_id` (`string`, chave estrangeira para a ficha ou Parte Geral);
-   - `tipo_documento` (`string`);
-   - `secao` (`string`);
-   - `texto_contextualizado` (`string`);
-   - `embedding` (`list<float32>`, dimensão fixa 1024).
-4. `relatorio_enriquecimento.md`: Relatório executivo de auditoria detalhando estatísticas de normalização, distribuição de competências resolvidas, densidade de referências ao CTB e volumetria de vetores.
+2. `relatorio_enriquecimento.md`: Relatório executivo de auditoria detalhando estatísticas de normalização, distribuição de competências resolvidas e densidade de referências ao CTB.
 
 ---
 
@@ -237,12 +178,6 @@ Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
 * **Extração de Informação Exclusivamente via LLM (Zero-shot / Few-shot):**
   * *Por que foi rejeitada:* A dependência integral de LLMs aumenta o custo de processamento, a latência e traz um risco alto de alucinação jurídica. Optou-se por uma arquitetura híbrida inteligente: o analisador léxico e expressões regulares atuam como primeira barreira (garantindo velocidade, custo zero e acurácia exata), e o LLM atua *apenas como fallback de segurança* para estruturar pontualmente as fichas anômalas que fugirem do padrão.
-* **Modelo de Embeddings `text-embedding-3-small` da OpenAI:**
-  * *Por que foi rejeitado:* Embora ofereça alta qualidade semântica, introduz acoplamento estrito a uma API comercial proprietária e incorre em custos recorrentes tanto na etapa *batch* quanto em cada requisição de consulta no *runtime*. O modelo aberto `BAAI/bge-m3` atinge desempenho de recuperação comparável ou superior em textos jurídicos em português e já possui suporte de execução gratuita na infraestrutura do Cloudflare Workers AI.
-* **Granularidade de Ficha Monolítica (1 vetor por ficha de fiscalização):**
-  * *Por que foi rejeitada:* Fichas extensas (como a Ficha 683-11, com 6 páginas de texto) diluem conceitos específicos quando representadas em um único vetor médio de 1024 dimensões. Um usuário buscando uma regra excepcional de "Quando Não Autuar" teria baixa similaridade se o vetor fosse dominado pelo texto extenso de "Definições e Procedimentos".
-* **Armazenamento de Vetores em JSON/JSONL Puro:**
-  * *Por que foi rejeitado:* Armazenar dezenas de milhares de vetores de 1024 dimensões em strings JSON gera artefatos inflados (centenas de megabytes) e lentidão de I/O na etapa de Carga. O formato colunar Apache Parquet reduz o tamanho em disco em mais de 75% e permite leitura vetorizada instantânea no Python/Polars/PyArrow.
 
 ---
 
@@ -251,7 +186,6 @@ Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 * **Auditabilidade e Segurança Jurídica:**
   * Nenhuma informação original do MBFT é descartada; os campos literais extraídos do PDF continuam acessíveis no JSON enriquecido com o sufixo `_original`.
   * As resoluções de competência decorrentes da Lei nº 14.599/2023 contêm registro explícito de auditoria (`competencia_fonte = RESOLUCAO_LEI_14599`), permitindo aos órgãos fiscalizadores distinguir entre o texto oficial do CONTRAN e a atualização legal posterior.
-* **Desempenho e Eficiência de Recursos de Hardware:**
-  * A geração de vetores utiliza PyTorch com aceleração CUDA 13.2 na GPU NVIDIA GeForce RTX 4070 em lotes de inferência controlados (*batch size* de 32 a 64 chunks), garantindo tempo total de vetorização do MBFT inferior a 2 minutos com ocupação moderada de VRAM (< 4 GB).
 * **Idempotência e Reprodutibilidade:**
-  * O pipeline de enriquecimento é estritamente puro e idempotente: dada a mesma entrada em `data/processed/extrator/`, a execução produzirá arquivos com hashes e vetores determinísticos idênticos.
+  * O pipeline de enriquecimento é estritamente puro e idempotente: dada a mesma entrada em `data/processed/extrator/`, a execução produzirá arquivos com hashes determinísticos idênticos.
+
