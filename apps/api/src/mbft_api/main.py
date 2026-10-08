@@ -50,10 +50,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configuração de CORS (Essencial para SPA no Pages consumindo a API no Workers)
+# Configuração de CORS (Bloqueia sites de terceiros de sugar nossa IA)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Substituir em prod pelo domínio do Cloudflare Pages
+    allow_origins=[
+        "http://localhost:8080", 
+        "http://127.0.0.1:8080", 
+        "http://localhost:5500", 
+        "http://127.0.0.1:5500", 
+        "https://mbft.exemplo.com" # TODO: Trocar pelo domínio oficial de produção
+    ], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

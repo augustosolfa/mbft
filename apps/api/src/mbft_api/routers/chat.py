@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Header, Request, HTTPException
+from fastapi import APIRouter, Header, Request, HTTPException, Query
 import jwt
 import datetime
 import os
@@ -6,7 +6,11 @@ import os
 router = APIRouter(prefix="/chat", tags=["Gerador LLM"])
 
 @router.post("/")
-async def fazer_pergunta(pergunta: str, request: Request, x_ticket: str = Header(...)):
+async def fazer_pergunta(
+    request: Request, 
+    pergunta: str = Query(..., min_length=5, max_length=500, description="Dúvida natural a ser respondida pela IA."),
+    x_ticket: str = Header(...)
+):
     env = request.scope.get("env", os.environ)
     JWT_SECRET = env.get("JWT_SECRET", "MUDAR_EM_PRODUCAO")
 
