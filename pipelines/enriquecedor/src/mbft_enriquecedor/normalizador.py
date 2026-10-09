@@ -1,9 +1,13 @@
 import re
+import unicodedata
 from typing import List, Tuple
 from mbft_core.models.enriquecimento import (
     GravidadeEnum, PenalidadeEnum, MedidaAdministrativaEnum,
     InfratorEnum, ConstatacaoInfracaoEnum, ReferenciaCTB
 )
+
+def _sem_acentos(t: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFKD", t) if not unicodedata.combining(c)).upper()
 
 # Regex para limpar vazamento tabular de artigos
 REGEX_ARTIGO_CTB_VAZADO = re.compile(r"((?:Art\.?\s*)?(\d{1,3}(?:\s*-[A-Za-z]+)?)\s*do\s*CTB)", re.IGNORECASE)
@@ -25,7 +29,7 @@ def sanitizar_texto(texto: str) -> str:
     return t.strip()
 
 def normalizar_gravidade(texto: str) -> GravidadeEnum:
-    t = sanitizar_texto(texto).upper().replace("Í", "I").replace("É", "E").replace("Á", "A")
+    t = _sem_acentos(sanitizar_texto(texto))
     if "GRAVISSIMA" in t: return GravidadeEnum.GRAVISSIMA
     if "GRAVE" in t: return GravidadeEnum.GRAVE
     if "MEDIA" in t: return GravidadeEnum.MEDIA
@@ -33,7 +37,7 @@ def normalizar_gravidade(texto: str) -> GravidadeEnum:
     return GravidadeEnum.NAO_APLICAVEL
 
 def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
-    t = sanitizar_texto(texto).upper().replace("Ã", "A")
+    t = _sem_acentos(sanitizar_texto(texto))
     rens = []
     if "MULTA" in t: rens.append(PenalidadeEnum.MULTA)
     if "ADVERTENCIA" in t: rens.append(PenalidadeEnum.ADVERTENCIA_POR_ESCRITO)
@@ -42,7 +46,7 @@ def normalizar_penalidades(texto: str) -> List[PenalidadeEnum]:
     return rens if rens else [PenalidadeEnum.NAO_APLICAVEL]
 
 def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaEnum]:
-    t = sanitizar_texto(texto).upper().replace("Ç", "C").replace("Ã", "A").replace("Õ", "O")
+    t = _sem_acentos(sanitizar_texto(texto))
     rens = []
     if "RETENCAO" in t: rens.append(MedidaAdministrativaEnum.RETENCAO_VEICULO)
     if "REMOCAO" in t: rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
@@ -80,7 +84,7 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
         tem_crime = True
         
     # Normalizar Infrator (removendo acentos para não perder JURÍDICA / FÍSICA)
-    t_inf = texto_infrator_limpo.upper().replace("Í", "I").replace("Á", "A").replace("Ó", "O")
+    t_inf = _sem_acentos(texto_infrator_limpo)
     infratores = []
     
     if "CONDUTOR" in t_inf and "PROPRIETARIO" in t_inf:
@@ -101,7 +105,7 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
     return infratores, tem_crime, artigos_extraidos
 
 def normalizar_constatacao(texto: str) -> List[ConstatacaoInfracaoEnum]:
-    t = sanitizar_texto(texto).upper().replace("Ç", "C").replace("Õ", "O").replace("Ã", "A")
+    t = _sem_acentos(sanitizar_texto(texto))
     res = []
     if "MEDIANTE ABORDAGEM OU NAO" in t:
         res.append(ConstatacaoInfracaoEnum.MEDIANTE_ABORDAGEM_OU_NAO)
@@ -178,13 +182,21 @@ def parse_resolucoes_contran(texto: str) -> List[str]:
     matches = regex_contran.findall(texto)
     return matches
 
-def calcular_pontuacao(texto: str, penalidades_norm: List[PenalidadeEnum]) -> Tuple[int, bool]:
+def calcular_pontuacao(texto: str, penalidades_norm: List[PenalidadeEnum]) -> Tuple[int, bool, bool]:
     t = sanitizar_texto(texto).lower()
     valor = 0
-    if "7" in t or "sete" in t: valor = 7
-    elif "5" in t or "cinco" in t: valor = 5
-    elif "4" in t or "quatro" in t: valor = 4
-    elif "3" in t or "tres" in t or "três" in t: valor = 3
+    tem_asterisco = "*" in t
     
+    m = re.match(r"\s*(\d+)", t)
+    if m:
+        valor = int(m.group(1))
+        if valor not in [0, 3, 4, 5, 7]:
+            valor = 0
+    else:
+        if "sete" in t: valor = 7
+        elif "cinco" in t: valor = 5
+        elif "quatro" in t: valor = 4
+        elif "tres" in t or "três" in t: valor = 3
+        
     suspensiva = ("suspensão" in t or "suspensao" in t) or (PenalidadeEnum.SUSPENSAO_DIREITO_DIRIGIR in penalidades_norm)
-    return valor, suspensiva
+    return valor, suspensiva, tem_asterisco

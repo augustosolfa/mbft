@@ -66,6 +66,7 @@
     "crime_transito": false,
     "pontuacao_valor": 0,
     "pontuacao_suspensiva": false,
+    "pontuacao_asterisco": false,
     "constatacao_infracao": [
       "COM_ABORDAGEM"
     ],
@@ -272,6 +273,7 @@
     "crime_transito": false,
     "pontuacao_valor": 0,
     "pontuacao_suspensiva": false,
+    "pontuacao_asterisco": false,
     "constatacao_infracao": [
       "COM_ABORDAGEM"
     ],

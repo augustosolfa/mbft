@@ -33,7 +33,7 @@ class Enriquecedor:
         )
         
         constatacao_norm = normalizar_constatacao(f_bruta.constatacao_infracao)
-        pts_valor, pts_suspensiva = calcular_pontuacao(f_bruta.pontuacao, penalidades_norm)
+        pts_valor, pts_suspensiva, pts_asterisco = calcular_pontuacao(f_bruta.pontuacao, penalidades_norm)
         
         competencia_norm, via_lei_14599 = obter_competencia_atualizada(f_bruta.codigo_enquadramento, f_bruta.competencia)
         competencia_fonte = CompetenciaFonteEnum.RESOLUCAO_LEI_14599 if via_lei_14599 else CompetenciaFonteEnum.MBFT_ORIGINAL
@@ -93,6 +93,7 @@ class Enriquecedor:
             crime_transito=tem_crime,
             pontuacao_valor=pts_valor,
             pontuacao_suspensiva=pts_suspensiva,
+            pontuacao_asterisco=pts_asterisco,
             constatacao_infracao=constatacao_norm,
             
             artigos_ctb=artigos_ctb,
