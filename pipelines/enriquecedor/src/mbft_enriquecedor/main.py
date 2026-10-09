@@ -11,8 +11,6 @@ from mbft_enriquecedor.normalizador import (
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
-from mbft_core.chunker import gerar_chunks_ficha
-from mbft_enriquecedor.vetorizador import vetorizar_e_exportar
 
 
 def processar_ficha(f_bruta: Ficha, extrator_regras: ExtratorRegrasAtomo) -> FichaEnriquecida:
@@ -141,37 +139,16 @@ def main():
         json.dump([f.model_dump(mode='json') for f in fichas_enriquecidas], f, ensure_ascii=False, indent=2)
     print(f"[Enriquecedor] Fichas enriquecidas salvas em {out_fichas_json}")
     
-    # 2. Chunking
-    print("[Enriquecedor] Gerando chunks atômicos e templates contextuais...")
-    chunks_totais = []
-    for f_enq in fichas_enriquecidas:
-        chunks = gerar_chunks_ficha(f_enq)
-        chunks_totais.extend(chunks)
-        
-    print(f"[Enriquecedor] {len(chunks_totais)} chunks gerados.")
-    
-    # 3. Vetorização
-    print("[Enriquecedor] Iniciando vetorização (BAAI/bge-m3)...")
-    out_parquet = os.path.join(out_dir, "embeddings_mbft.parquet")
-    vetorizar_e_exportar(chunks_totais, out_parquet)
-    
-    # 4. Relatório
+    # 2. Relatório
     print("[Enriquecedor] Gerando relatório...")
     out_relatorio = os.path.join(out_dir, "relatorio_enriquecimento.md")
     with open(out_relatorio, "w", encoding="utf-8") as f:
         f.write("# Relatório de Enriquecimento MBFT\n\n")
         f.write(f"- **Fichas Processadas**: {len(fichas_enriquecidas)}\n")
-        f.write(f"- **Chunks Gerados**: {len(chunks_totais)}\n")
-        f.write(f"- **Tamanho do Parquet**: {os.path.getsize(out_parquet) / (1024 * 1024):.2f} MB\n")
         
         # Estatísticas
         fichas_com_crime = sum(1 for f in fichas_enriquecidas if f.crime_transito)
         f.write(f"- **Fichas com configuração de Crime de Trânsito**: {fichas_com_crime}\n")
-        
-        chunks_excecao = sum(1 for c in chunks_totais if c.metadata.natureza_regra == "EXCECAO_DESVIO")
-        chunks_concomitancia = sum(1 for c in chunks_totais if c.metadata.natureza_regra == "CONCOMITANCIA")
-        f.write(f"- **Regras Atômicas de Exceção / Desvio**: {chunks_excecao}\n")
-        f.write(f"- **Regras Atômicas de Concomitância**: {chunks_concomitancia}\n")
     
     print("[Enriquecedor] Concluído!")
 
