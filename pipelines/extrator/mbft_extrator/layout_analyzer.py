@@ -4,16 +4,14 @@ Módulo especializado na análise de layout geométrico, limites e canais de col
 
 import re
 from typing import Dict, List, Optional, Tuple
-import pypdfium2 as pdfium
 
+from .models import PaginaExtraida, RetanguloTexto
 from .pdf_geometry import (
     Y_TOP_PRIMEIRA_PAGINA,
     MARGEM_ESQUERDA_TITULO,
     COL_BOUNDS_PCT,
     RE_IC_HEADER,
-    RE_QUANDO_AUTUAR,
     RE_COLUMN_HEADER,
-    linhas_vetoriais,
     agrupar_em_linhas,
 )
 
@@ -30,12 +28,11 @@ class LayoutAnalyzer:
     # Tolerância vertical para agrupar fragmentos na mesma linha
     Y_LINE_TOLERANCE: float = 3.2
 
-    def __init__(self, page: pdfium.PdfPage, is_first_page: bool = False):
-        self.page = page
+    def __init__(self, page_ext: PaginaExtraida, is_first_page: bool = False):
+        self.page_ext = page_ext
         self.is_first_page = is_first_page
-        self.tp = page.get_textpage()
-        self.num_rects = self.tp.count_rects()
-        self.width, self.height = page.get_size()
+        self.width = page_ext.largura
+        self.height = page_ext.altura
 
         self.y_top, self.y_bottom, self.ic_y_bound = self.detect_bounds()
         self.col_bounds = self.detect_column_bounds()
@@ -49,7 +46,7 @@ class LayoutAnalyzer:
         vlines_x: List[float] = []
 
         try:
-            paths = linhas_vetoriais(self.page)
+            paths = self.page_ext.linhas_vetoriais
             for b in paths:
                 vw = b[2] - b[0]
                 vh = b[3] - b[1]
@@ -118,35 +115,22 @@ class LayoutAnalyzer:
         ic_y_bound: Optional[float] = None
 
         # Localiza se a seção "Informações Complementares" se inicia nesta página como título
-        # Deve estar na margem esquerda (r[0] < MARGEM_ESQUERDA_TITULO) para não colidir com citações no corpo das colunas
-        for i in range(self.num_rects):
-            r = self.tp.get_rect(i)
-            txt = self.tp.get_text_bounded(*r).strip()
-            if r[0] < MARGEM_ESQUERDA_TITULO and RE_IC_HEADER.match(txt):
-                y_bottom = max(y_bottom, r[3])
-                ic_y_bound = r[3]
+        # Deve estar na margem esquerda (r_text.x0 < MARGEM_ESQUERDA_TITULO) para não colidir com citações no corpo das colunas
+        for r_text in self.page_ext.retangulos:
+            if r_text.x0 < MARGEM_ESQUERDA_TITULO and RE_IC_HEADER.match(r_text.texto):
+                y_bottom = max(y_bottom, r_text.y1)
+                ic_y_bound = r_text.y1
 
         # Na primeira página, localiza a linha dos títulos das colunas ("Quando Autuar")
         if self.is_first_page:
-            quando_ys = []
-            search_q = self.tp.search("quando", match_case=False)
-            while match := search_q.get_next():
-                quando_ys.append(self.tp.get_charbox(match[0])[1])
-
-            autuar_ys = []
-            search_a = self.tp.search("autuar", match_case=False)
-            while match := search_a.get_next():
-                autuar_ys.append(self.tp.get_charbox(match[0])[1])
-
-            valid_ys = []
-            for qy in quando_ys:
-                for ay in autuar_ys:
-                    if abs(qy - ay) < 8.0:
-                        valid_ys.append((qy + ay) / 2.0)
-
-            if valid_ys:
-                # O limite superior das colunas é o eixo Y da linha "Quando Autuar" mais alta na página
-                y_top = max(valid_ys)
+            y_tops = []
+            for r_text in self.page_ext.retangulos:
+                txt_lower = r_text.texto.lower()
+                if "quando autuar" in txt_lower or ("quando" in txt_lower and "autuar" in txt_lower):
+                    y_tops.append(r_text.y0)
+            
+            if y_tops:
+                y_top = max(y_tops)
 
         return y_top, y_bottom, ic_y_bound
 
@@ -155,7 +139,7 @@ class LayoutAnalyzer:
         Extrai e filtra todos os retângulos válidos distribuídos pelos 4 canais de colunas.
 
         Returns:
-            Dicionário canal -> lista de tuplas ((x0, y0, x1, y1), texto).
+            Dicionário canal -> lista de tuças ((x0, y0, x1, y1), texto).
         """
         page_boxes: Dict[int, List[Tuple[Tuple[float, float, float, float], str]]] = {
             0: [],
@@ -164,25 +148,22 @@ class LayoutAnalyzer:
             3: [],
         }
 
-        for i in range(self.num_rects):
-            r = self.tp.get_rect(i)  # (x0, y0, x1, y1)
-
+        for r_text in self.page_ext.retangulos:
             # Na primeira página, caixas muito altas acima de Y_TOP_PRIMEIRA_PAGINA pt são do cabeçalho
-            if self.is_first_page and r[1] > Y_TOP_PRIMEIRA_PAGINA:
+            if self.is_first_page and r_text.y0 > Y_TOP_PRIMEIRA_PAGINA:
                 continue
 
             # Apenas caixas situadas no intervalo vertical das colunas
-            if r[1] >= self.y_bottom and r[3] <= self.y_top:
-                txt = self.tp.get_text_bounded(*r).strip()
-                if not txt:
+            if r_text.y0 >= self.y_bottom and r_text.y1 <= self.y_top:
+                if not r_text.texto:
                     continue
 
                 # Ignora cabeçalhos de coluna repetitivos
-                if RE_COLUMN_HEADER.search(txt):
+                if RE_COLUMN_HEADER.search(r_text.texto):
                     continue
 
-                ch = self.get_column_channel(r[0], r[2])
-                page_boxes[ch].append((r, txt))
+                ch = self.get_column_channel(r_text.x0, r_text.x1)
+                page_boxes[ch].append(((r_text.x0, r_text.y0, r_text.x1, r_text.y1), r_text.texto))
 
         return page_boxes
 

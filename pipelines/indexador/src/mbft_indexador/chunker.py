@@ -38,12 +38,12 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[UnembeddedChunk]:
     def _criar_chunk(secao_nome: str, item_numero: int, texto_conteudo: str, natureza: str = None) -> UnembeddedChunk:
         texto_final = f"{prefixo_contexto}\n[Seção: {secao_nome}]\n{texto_conteudo}"
         
-        chunk_id = f"{ficha.codigo_enquadramento}_{secao_nome}"
+        chunk_id = f"{ficha.id}_{secao_nome}"
         if item_numero > 0:
             chunk_id += f"_ITEM_{item_numero}"
             
         metadados = ChunkMetadados(
-            origem_id=ficha.codigo_enquadramento,
+            origem_id=ficha.id,
             secao=secao_nome,
             codigo=ficha.codigo_enquadramento,
             artigo=artigo_principal,

@@ -62,7 +62,7 @@
         data-crime="{{ 'true' if ficha.crime_transito else 'false' }}"
         data-suspensiva="{{ 'true' if ficha.pontuacao_suspensiva else 'false' }}"
       >
-        <td><a href="fichas/{{ ficha.codigo_enquadramento }}.html">{{ ficha.codigo_enquadramento }}</a></td>
+        <td><a href="fichas/{{ ficha.id }}.html">{{ ficha.codigo_enquadramento }}</a></td>
         <td>{{ ficha.amparo_legal }}</td>
         <td>{{ ficha.tipificacao_resumida }}</td>
         <td>{{ ficha.gravidade.value }}</td>

@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 import pypdfium2 as pdfium
-from .docling_extractor import criar_conversor_docling
+from .docling_extractor import criar_conversor
 
 logger = logging.getLogger("MBFT-ParteGeral")
 
@@ -51,7 +51,7 @@ def extrair_parte_geral(
     logger.info(f"Iniciando extração da Parte Geral (páginas {pag_ini} a {pag_fim})...")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    converter = criar_conversor_docling()
+    converter = criar_conversor(do_ocr=False)
     res = converter.convert(str(pdf_path), page_range=(pag_ini, pag_fim))
     doc = res.document
 

@@ -1,6 +1,6 @@
 import re
 from typing import List
-from .stitching import MetadadosCabecalho
+from .models import MetadadosCabecalho
 
 def detectar_anomalia_cabecalho(meta: MetadadosCabecalho) -> List[str]:
     """Retorna uma lista de campos que parecem conter ruído ou vazamento visual."""
