@@ -14,7 +14,7 @@ from .models import Ficha, FichaMapeada, CampoNormativo, PaginaExtraida, ImagemE
 from .pdf_reader import ler_pagina, extrair_imagens_pagina
 from .cabecalho import extrair_metadados_cabecalho
 from .colunas import extrair_linhas_colunas_pagina, processar_coluna_normativa
-from .docling_extractor import processar_intervalo_docling, extrair_metadados_visuais
+from .docling_extractor import processar_intervalo_docling, extrair_metadados_visuais, criar_conversor
 from .html_builder import formatar_tabela_html, construir_html_informacoes_complementares
 from .pdf_geometry import RE_IC_HEADER, MARGEM_ESQUERDA_TITULO
 from .auditoria import CorrecaoOcr
@@ -28,11 +28,15 @@ class Conversores:
     _ocr: Optional[DocumentConverter] = None
 
     @property
-    def padrao(self) -> Optional[DocumentConverter]:
+    def padrao(self) -> DocumentConverter:
+        if self._padrao is None:
+            self._padrao = criar_conversor(do_ocr=False)
         return self._padrao
 
     @property
-    def ocr(self) -> Optional[DocumentConverter]:
+    def ocr(self) -> DocumentConverter:
+        if self._ocr is None:
+            self._ocr = criar_conversor(do_ocr=True)
         return self._ocr
 
 @dataclass
