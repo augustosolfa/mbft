@@ -1,4 +1,5 @@
 ﻿import os
+import sys
 import json
 import logging
 import argparse
@@ -50,7 +51,11 @@ def main():
 
     if args.deploy:
         from mbft_indexador.deploy import fazer_deploy_vectorize
-        fazer_deploy_vectorize(output_path)
+        try:
+            fazer_deploy_vectorize(output_path)
+        except (RuntimeError, FileNotFoundError) as e:
+            logger.error(str(e))
+            sys.exit(1)
         return
 
     if not input_path.exists():
