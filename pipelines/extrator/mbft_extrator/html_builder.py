@@ -7,17 +7,12 @@ import logging
 import re
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Any
+from typing import List, Tuple, Optional
 
-import pypdfium2 as pdfium
-from PIL import Image
-
+from .models import RetanguloTexto, ImagemExtraida, PaginaExtraida
 from .text_joiner import join_line_fragments, unificar_linhas_e_hifens
 from .pdf_geometry import (
-    FPDF_PAGEOBJ_IMAGE,
     Y_MIN_IMAGE,
-    MIN_IMG_SIZE,
-    Y_TOP_LIMIT_DEFAULT,
     MARGEM_ESQUERDA_SECAO_NUMERADA,
     X_LEFT_COL_MAX,
     X_RIGHT_COL_MIN,
@@ -28,27 +23,6 @@ from .pdf_geometry import (
 
 logger = logging.getLogger("MBFT-HtmlBuilder")
 
-
-@dataclass(frozen=True)
-class RetanguloTexto:
-    rect: Tuple[float, float, float, float]
-    yc: float
-    xc: float
-    txt: str
-    id: int
-
-@dataclass(frozen=True)
-class ImagemPagina:
-    bounds: Tuple[float, float, float, float]
-    x0: float
-    y0: float
-    x1: float
-    y1: float
-    yc: float
-    xc: float
-    rel_path: str
-    width: float
-    img_data: Any = None
 
 @dataclass(frozen=True)
 class LinhaTexto:
@@ -81,7 +55,7 @@ def agrupar_retangulos_em_linhas(rects_list: List[RetanguloTexto], y_tolerance: 
     lines = []
     for curr in linhas_agrupadas:
         curr.sort(key=lambda x: x.rect[0])
-        s = join_line_fragments([(it.rect[0], it.rect[2], it.txt) for it in curr])
+        s = join_line_fragments([(it.rect[0], it.rect[2], it.texto) for it in curr])
         if s:
             y_medio = sum(it.yc for it in curr) / len(curr)
             lines.append(LinhaTexto(
@@ -97,7 +71,7 @@ def agrupar_retangulos_em_linhas(rects_list: List[RetanguloTexto], y_tolerance: 
 
 def montar_celula_html(
     lines: List[LinhaTexto],
-    imgs: List[ImagemPagina],
+    imgs: List[ImagemExtraida],
     codigo_ficha: str,
     default_alt: str = "",
 ) -> str:
@@ -149,52 +123,19 @@ def montar_celula_html(
     return "\n".join(partes)
 
 
-def extrair_imagens_pagina(page, y_top_limit: float, codigo_ficha: str, img_idx_inicial: int) -> Tuple[List[ImagemPagina], int]:
-    page_imgs = []
-    img_idx = img_idx_inicial
-
-    for obj in page.get_objects():
-        if getattr(obj, "type", None) == FPDF_PAGEOBJ_IMAGE:
-            x0, y0, x1, y1 = obj.get_bounds()
-            if (x1 - x0) >= MIN_IMG_SIZE and (y1 - y0) >= MIN_IMG_SIZE and y0 >= Y_MIN_IMAGE and y1 <= (y_top_limit + 15.0):
-                img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
-                rel_path = f"imagens/{img_nome}"
-
-                try:
-                    bm = obj.get_bitmap()
-                    pil_img = bm.to_pil()
-                    img_idx += 1
-                    page_imgs.append(ImagemPagina(
-                        bounds=(x0, y0, x1, y1),
-                        x0=x0, y0=y0, x1=x1, y1=y1,
-                        yc=(y0 + y1) / 2.0, xc=(x0 + x1) / 2.0,
-                        rel_path=rel_path,
-                        width=x1 - x0,
-                        img_data=pil_img
-                    ))
-                except Exception:
-                    logger.exception(f"Erro ao extrair bitmap {img_nome}")
-
-    return page_imgs, img_idx
-
-def coletar_retangulos_texto(tp, y_top_limit: float) -> List[RetanguloTexto]:
+def coletar_retangulos_texto(page_ext: PaginaExtraida, y_top_limit: float) -> List[RetanguloTexto]:
     page_rects = []
-    for i in range(tp.count_rects()):
-        r = tp.get_rect(i)
-        if r[3] <= y_top_limit and r[1] >= Y_MIN_IMAGE:
-            txt = tp.get_text_bounded(*r).strip()
-            if not txt:
-                continue
-            
+    for r in page_ext.retangulos:
+        if r.y1 <= y_top_limit and r.y0 >= Y_MIN_IMAGE:
+            txt = r.texto
             if RE_IC_HEADER.match(txt):
                 continue
             if any(x in txt.upper() for x in ["CONSELHO NACIONAL", "MANUAL BRASILEIRO", "MBFT", "FICHA DE FISCALIZAÇÃO"]):
                 continue
 
-            yc = (r[1] + r[3]) / 2.0
-            xc = (r[0] + r[2]) / 2.0
-            page_rects.append(RetanguloTexto(rect=r, yc=yc, xc=xc, txt=txt, id=i))
+            page_rects.append(r)
     return page_rects
+
 
 def detectar_secoes(page_rects: List[RetanguloTexto], y_top_limit: float) -> Tuple[List[Tuple[str, float, float]], List[RetanguloTexto]]:
     global_lines = agrupar_retangulos_em_linhas(page_rects)
@@ -222,7 +163,8 @@ def detectar_secoes(page_rects: List[RetanguloTexto], y_top_limit: float) -> Tup
 
     return section_bounds, internal_rects
 
-def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[ImagemPagina], internal_rects: List[RetanguloTexto], codigo_ficha: str) -> str:
+
+def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[ImagemExtraida], internal_rects: List[RetanguloTexto], codigo_ficha: str) -> str:
     blocos = []
     sec_imgs = [img for img in page_imgs if yb <= img.yc <= yt]
     sec_rects = [r for r in internal_rects if yb <= r.yc <= yt]
@@ -231,8 +173,8 @@ def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[ImagemPag
     right_imgs = [img for img in sec_imgs if img.x0 >= X_RIGHT_COL_MIN]
     wide_imgs = [img for img in sec_imgs if img not in left_imgs and img not in right_imgs]
 
-    left_rects = [r for r in sec_rects if r.rect[2] <= X_TEXT_LEFT_MAX]
-    right_rects = [r for r in sec_rects if r.rect[0] >= X_RIGHT_COL_MIN]
+    left_rects = [r for r in sec_rects if r.x1 <= X_TEXT_LEFT_MAX]
+    right_rects = [r for r in sec_rects if r.x0 >= X_RIGHT_COL_MIN]
 
     left_lines = agrupar_retangulos_em_linhas(left_rects)
     right_lines = agrupar_retangulos_em_linhas(right_rects)
@@ -268,35 +210,27 @@ def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[ImagemPag
             
     return "\n\n".join(blocos)
 
+
 def construir_html_informacoes_complementares(
-    doc: pdfium.PdfDocument,
+    paginas_e_imagens: List[Tuple[PaginaExtraida, List[ImagemExtraida], Optional[float]]],
     codigo_ficha: str,
-    pag_ini_ic: int,
-    pag_fim: int,
-    ic_y_bound: Optional[float],
     imagens_dir: Path,
     tabelas_docling: Optional[List[str]] = None,
 ) -> Tuple[str, List[str]]:
     """
-    Processa geometricamente as seções de 'Informações Complementares' ao longo das páginas da ficha.
+    Processa geometricamente as seções de 'Informações Complementares' recebendo DTOs extraídos da página.
     Identifica ilustrações nativas, monta tabelas de 2 colunas quando cabível e parágrafos estruturados.
+    O argumento `paginas_e_imagens` contém uma lista de tuplas: (PaginaExtraida, lista_de_imagens, y_top_limit).
     """
     imagens_dir.mkdir(parents=True, exist_ok=True)
     imagens_extraidas_totais: List[str] = []
-    todas_imagens: List[ImagemPagina] = []
+    todas_imagens: List[ImagemExtraida] = []
     blocos_html: List[str] = []
-    img_idx = 1
 
-    for p_no in range(pag_ini_ic - 1, pag_fim):
-        page = doc[p_no]
-        tp = page.get_textpage()
-        _, h = page.get_size()
-        y_top_limit = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else (h - Y_TOP_LIMIT_DEFAULT)
-
-        page_imgs, img_idx = extrair_imagens_pagina(page, y_top_limit, codigo_ficha, img_idx)
+    for page_ext, page_imgs, y_top_limit in paginas_e_imagens:
         todas_imagens.extend(page_imgs)
 
-        page_rects = coletar_retangulos_texto(tp, y_top_limit)
+        page_rects = coletar_retangulos_texto(page_ext, y_top_limit)
 
         if not page_rects and not page_imgs:
             continue

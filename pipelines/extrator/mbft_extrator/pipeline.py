@@ -10,7 +10,8 @@ from dataclasses import dataclass
 import pypdfium2 as pdfium
 from docling.document_converter import DocumentConverter
 
-from .models import Ficha, FichaMapeada, CampoNormativo
+from .models import Ficha, FichaMapeada, CampoNormativo, PaginaExtraida, ImagemExtraida
+from .pdf_reader import ler_pagina, extrair_imagens_pagina
 from .stitching import (
     extrair_metadados_cabecalho,
     extrair_linhas_colunas_pagina,
@@ -19,7 +20,7 @@ from .stitching import (
 )
 from .docling_extractor import processar_intervalo_docling, extrair_metadados_visuais
 from .html_builder import formatar_tabela_html, construir_html_informacoes_complementares
-from .pdf_geometry import RE_IC_HEADER, linhas_vetoriais, MARGEM_ESQUERDA_TITULO
+from .pdf_geometry import RE_IC_HEADER, MARGEM_ESQUERDA_TITULO
 from .auditoria import CorrecaoOcr
 from .validators import detectar_anomalia_cabecalho
 
@@ -31,20 +32,14 @@ class Conversores:
     _ocr: Optional[DocumentConverter] = None
 
     @property
-    def padrao(self) -> DocumentConverter:
-        if self._padrao is None:
-            from .docling_extractor import criar_conversor_docling
-            self._padrao = criar_conversor_docling()
+    def padrao(self) -> Optional[DocumentConverter]:
         return self._padrao
 
     @property
-    def ocr(self) -> DocumentConverter:
-        if self._ocr is None:
-            from .docling_extractor import criar_conversor_docling_ocr
-            self._ocr = criar_conversor_docling_ocr()
+    def ocr(self) -> Optional[DocumentConverter]:
         return self._ocr
 
-@dataclass(frozen=True)
+@dataclass
 class ResultadoExtracao:
     ficha: Ficha
     correcoes_ocr: List[CorrecaoOcr]
@@ -53,21 +48,17 @@ class ResultadoExtracao:
 def detectar_limites_ic(
     doc: pdfium.PdfDocument,
     pag_ini: int,
-    pag_fim: int,
+    pag_fim: int
 ) -> Tuple[bool, int, Optional[float]]:
     """
-    Localiza em qual página e em qual altura Y a seção 'Informações Complementares' se inicia.
+    Localiza a partir de qual página e coordenada Y começa a seção 'Informações Complementares'.
     """
     for p_no in range(pag_ini - 1, pag_fim):
-        page = doc[p_no]
-        tp = page.get_textpage()
-        for i in range(tp.count_rects()):
-            r = tp.get_rect(i)
-            # A linha de Informações Complementares é o cabeçalho largo que inicia na margem esquerda
-            if r[0] < MARGEM_ESQUERDA_TITULO:
-                txt = tp.get_text_bounded(*r).strip()
-                if RE_IC_HEADER.match(txt):
-                    return True, p_no + 1, r[3]
+        page_ext = ler_pagina(doc[p_no])
+        for r in page_ext.retangulos:
+            if r.x0 < MARGEM_ESQUERDA_TITULO:
+                if RE_IC_HEADER.match(r.texto):
+                    return True, p_no + 1, r.y1
 
     return False, pag_ini, None
 
@@ -83,11 +74,11 @@ def tem_tabela_em_ic(
     (linhas horizontais E verticais vetoriais cruzadas).
     """
     for p_no in range(pag_ini_ic - 1, pag_fim):
-        p = doc[p_no]
+        page_ext = ler_pagina(doc[p_no])
         max_y = ic_y_bound if (p_no == pag_ini_ic - 1) else None
         linhas_h = 0
         linhas_v = 0
-        paths = linhas_vetoriais(p)
+        paths = page_ext.linhas_vetoriais
         for b in paths:
             top = b[3]
             if max_y is not None and top > max_y:
@@ -133,12 +124,22 @@ def extrair_conteudo_ic(
             logger.warning(f"Aviso na extração tabular Docling da ficha {codigo_ficha}: {e}")
 
     # 2. Constrói o HTML estruturado com tabelas de 2 colunas e posicionamento exato de imagens
+    paginas_e_imagens = []
+    img_idx = 1
+    for p_no in range(pag_ini_ic - 1, pag_fim):
+        page = doc[p_no]
+        page_ext = ler_pagina(page)
+        
+        _, h = page.get_size()
+        # Y_TOP_LIMIT_DEFAULT is around 40.0
+        y_top_limit = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else (h - 40.0)
+        
+        page_imgs, img_idx = extrair_imagens_pagina(page, y_top_limit, codigo_ficha, img_idx)
+        paginas_e_imagens.append((page_ext, page_imgs, y_top_limit))
+
     html_final, imagens = construir_html_informacoes_complementares(
-        doc=doc,
+        paginas_e_imagens=paginas_e_imagens,
         codigo_ficha=codigo_ficha,
-        pag_ini_ic=pag_ini_ic,
-        pag_fim=pag_fim,
-        ic_y_bound=ic_y_bound,
         imagens_dir=imagens_dir,
         tabelas_docling=tabelas_html,
     )
@@ -152,8 +153,8 @@ def _extrair_metadados(
     pdf_path: Path, 
     correcoes: List[CorrecaoOcr]
 ) -> MetadadosCabecalho:
-    page1 = doc[mapeada.pag_ini - 1]
-    meta = extrair_metadados_cabecalho(page1, codigo_padrao=mapeada.codigo)
+    page_ext = ler_pagina(doc[mapeada.pag_ini - 1])
+    meta = extrair_metadados_cabecalho(page_ext, codigo_padrao=mapeada.codigo)
     anomalias = detectar_anomalia_cabecalho(meta)
     
     if anomalias:
@@ -190,7 +191,8 @@ def _extrair_colunas_normativas(
     all_col_lines: Dict[int, List[str]] = {0: [], 1: [], 2: [], 3: []}
     for p in range(mapeada.pag_ini - 1, col_end_page):
         is_first = (p == mapeada.pag_ini - 1)
-        cols_p, _ = extrair_linhas_colunas_pagina(doc[p], is_first_page=is_first)
+        page_ext = ler_pagina(doc[p])
+        cols_p, _ = extrair_linhas_colunas_pagina(page_ext, is_first_page=is_first)
         for c in range(4):
             all_col_lines[c].extend(cols_p[c])
 
