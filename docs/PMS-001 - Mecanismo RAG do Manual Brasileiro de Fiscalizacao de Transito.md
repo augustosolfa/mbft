@@ -40,6 +40,96 @@ Este documento apresenta a visão geral do mecanismo proposto, com a descrição
 ### Etapas / Módulos
 O mecanismo divide-se em 5 etapas funcionais, separadas entre processamento assíncrono (*batch*) e atendimento síncrono (*runtime*):
 
+```mermaid
+flowchart TD
+    subgraph BATCH["🔄 Processamento Assíncrono (Batch / Offline)"]
+        PDF["📄 PDF MBFT Oficial\n(826 págs)"]
+
+        subgraph MOD1["1. Extrator (PMS-002)"]
+            EXT_PG["Docling Parser\n(Parte Geral pp. 1-31)"]
+            EXT_FC["pypdfium2 Vetorial\n(Fichas pp. 32-826)"]
+        end
+
+        RAW_MD["mbft_parte_geral.md"]
+        RAW_JSON["fichas_mbft.json"]
+        RAW_IMG["imagens/*.png"]
+
+        subgraph MOD2["2. Enriquecedor (PMS-003)"]
+            NORM["Normalizador de Enums"]
+            COMP["Resolução Lei 14.599/23"]
+            IE_DET["Extração IE (Regex CTB/CONTRAN)"]
+            LLM_FALLBACK["Fallback LLM Gemini 2.5"]
+        end
+
+        ENR_JSON["fichas_enriquecidas.json"]
+
+        subgraph MOD3["3. Indexador (PMS-004)"]
+            CHUNK["Chunking Semântico Contextual"]
+            EMB_GEN["BAAI/bge-m3 (GPU CUDA)"]
+        end
+
+        OUT_JSONL["embeddings_mbft.jsonl\n(1024-d Vectors + Metadata)"]
+
+        subgraph MOD7["SSG Generator (PMS-007)"]
+            JINJA["Jinja2 + Pico.css"]
+        end
+
+        SITE_HTML["Site Estático HTML\n(/fichas/518-51.html)"]
+    end
+
+    subgraph STORES["☁️ Provedores & Storage (Cloudflare)"]
+        D1[("Cloudflare D1\n(SQLite RDB)")]
+        VEC[("Cloudflare Vectorize\n(Vector Index)")]
+        PAGES["Cloudflare Pages\n(Static Host)"]
+    end
+
+    subgraph RUNTIME["⚡ Atendimento Síncrono (Runtime / Edge)"]
+        USER(["👤 Usuário / Agente"])
+
+        subgraph GATEWAY["API Gateway (PMS-008)"]
+            FASTAPI["FastAPI / Pyodide Worker"]
+            TICKET["Ticketizador & Rate Limiter"]
+        end
+
+        subgraph MOD5["4. Recuperador (PMS-005)"]
+            RRF["RRF Engine\n(Reciprocal Rank Fusion)"]
+        end
+
+        subgraph MOD6["5. Gerador (PMS-006)"]
+            PROMPT["Strict RAG System Prompt"]
+            LLM["DeepSeek Flash (Workers AI)"]
+        end
+    end
+
+    %% Flow connections
+    PDF --> EXT_PG & EXT_FC
+    EXT_PG --> RAW_MD
+    EXT_FC --> RAW_JSON & RAW_IMG
+
+    RAW_JSON --> MOD2
+    MOD2 --> ENR_JSON
+
+    ENR_JSON --> MOD3
+    ENR_JSON --> MOD7
+
+    EMB_GEN --> OUT_JSONL
+    OUT_JSONL -->|wrangler insert| VEC
+    ENR_JSON -->|SQL Import| D1
+    SITE_HTML --> PAGES
+
+    USER -->|Acessa Páginas| PAGES
+    USER -->|Requisição /busca ou /chat| FASTAPI
+    FASTAPI --> TICKET
+    TICKET --> MOD5
+
+    MOD5 -->|Busca Semântica| VEC
+    MOD5 -->|Busca Texto FTS5| D1
+    RRF --> MOD6
+    MOD6 --> LLM
+    LLM -->|Resposta Contextual| FASTAPI
+    FASTAPI -->|JSON Response| USER
+```
+
 1. **Extrator** (PMS-002): recebe o arquivo PDF oficial do MBFT e retorna o texto da parte geral e uma lista em formato JSON com os campos extraídos das fichas de enquadramento, além das imagens associadas.
 2. **Enriquecedor** (PMS-003): normaliza campos de dados categóricos (vocabulário controlado) e gera novos atributos estruturados com base em extração de informação (*Information Extraction*) a partir de campos de texto livre (como referências a artigos, flags de crime de trânsito e enquadramentos correlatos). Também realiza a extração de regras globais da Parte Geral para posterior uso em *prompts* (ex: validade de multas).
 3. **Indexador** (PMS-004): responsável pela estratégia de *chunking* semântico, geração das representações vetoriais (*embeddings*) e por persistir os dados estruturados no banco relacional SQL e os respectivos vetores de busca no banco vetorial (Cloudflare Vectorize), mantendo a chave identificadora unificada.

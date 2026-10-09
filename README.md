@@ -4,6 +4,49 @@ Monorepo para processamento, extração de dados estruturados e aplicações int
 
 ---
 
+## 📐 Arquitetura Geral do Sistema
+
+```mermaid
+flowchart TD
+    subgraph BATCH["🔄 Processamento Assíncrono (Batch Pipeline)"]
+        PDF["📄 PDF MBFT Raw\n(data/raw/mbft.pdf)"]
+
+        EXT["1. Extrator (mbft-extrator)\nDocling + pypdfium2"]
+        ENR["2. Enriquecedor (mbft-enriquecedor)\nNormalização + IE + Lei 14.599"]
+        IDX["3. Indexador (mbft-indexador)\nChunking + BAAI/bge-m3 Embeddings"]
+        SSG["4. SSG Generator (mbft-ssg)\nJinja2 + HTML Estático"]
+
+        PDF --> EXT
+        EXT -->|fichas_mbft.json| ENR
+        ENR -->|fichas_enriquecidas.json| IDX
+        ENR -->|fichas_enriquecidas.json| SSG
+    end
+
+    subgraph CLOUD["☁️ Cloud Infrastructure (Cloudflare)"]
+        D1[("Cloudflare D1\nSQL Database")]
+        VEC[("Cloudflare Vectorize\nVector Store")]
+        PAGES["Cloudflare Pages\nStatic Hosting (/fichas/*.html)"]
+    end
+
+    subgraph RUNTIME["⚡ Edge Runtime (Cloudflare Workers / Pyodide)"]
+        API["FastAPI Gateway / Ticketizador"]
+        REC["Recuperador (RAG Híbrido: Vectorize + FTS5)"]
+        GER["Gerador LLM (DeepSeek Flash / Workers AI)"]
+
+        API --> REC
+        REC --> GER
+    end
+
+    IDX -->|wrangler insert| VEC
+    ENR -->|D1 Import| D1
+    SSG --> PAGES
+
+    REC -->|Vector Search| VEC
+    REC -->|SQL/FTS5 Search| D1
+```
+
+---
+
 ## 🏗️ Estrutura do Repositório
 
 - **`data/raw/`**: Documento fonte original (`mbft.pdf`).

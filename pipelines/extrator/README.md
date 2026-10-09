@@ -8,6 +8,46 @@ Módulo responsável pela extração estruturada de alta fidelidade do **Manual 
 
 ---
 
+## 📐 Fluxo Interno da Extração
+
+```mermaid
+flowchart TD
+    CLI["💻 CLI Entrypoint (cli.py / extrair.py)\n[geral | fichas | tudo]"]
+
+    subgraph GERAL["Extração da Parte Geral (pp. 1-31)"]
+        PG_PROC["parte_geral.py"]
+        DOCLING_PG["Docling CUDA Converter\n(do_ocr=False)"]
+        MD_OUT["data/processed/extrator/\nmbft_parte_geral.md"]
+    end
+
+    subgraph FICHAS["Extração das Fichas (pp. 32-826)"]
+        FAT["fatiador.py\nDetecta Bounding Boxes & Anchors"]
+        PIPE["pipeline.py\nWorker Orchestrator (ProcessPoolExecutor)"]
+        STITCH["stitching.py\nMulti-page State Machine & Stitching"]
+        DOCLING_TAB["docling_extractor.py\nTable Layout CUDA Inference"]
+        HTML_BUILD["html_builder.py\nInformações Complementares HTML & Bitmaps PNG"]
+        PYD_VAL["models.py / mbft-core\nPydantic Validation"]
+    end
+
+    JSON_OUT["data/processed/extrator/\nfichas_mbft.json"]
+    IMG_OUT["data/processed/extrator/imagens/\nficha{cod}_{idx}.png"]
+
+    CLI -->|Comando 'geral' ou 'tudo'| PG_PROC
+    PG_PROC --> DOCLING_PG --> MD_OUT
+
+    CLI -->|Comando 'fichas' ou 'tudo'| PIPE
+    PIPE --> FAT
+    FAT --> STITCH
+    STITCH --> DOCLING_TAB
+    DOCLING_TAB --> HTML_BUILD
+    HTML_BUILD --> PYD_VAL
+
+    PYD_VAL --> JSON_OUT
+    HTML_BUILD --> IMG_OUT
+```
+
+---
+
 ## 1. Uso da Linha de Comando (CLI)
 
 O pipeline expõe uma CLI robusta para extração pontual ou em lote. Certifique-se de executar os comandos a partir da raiz do monorepo:

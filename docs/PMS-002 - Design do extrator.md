@@ -47,26 +47,38 @@ Este documento especifica o **Extrator** (Etapa 1 do PMS-001), processo *offline
 ### Pipeline de Processamento
 O extrator atua de ponta a ponta sobre o PDF em pipeline sequencial:
 
-```
-[ PDF MBFT (826 págs) ]
-         │
-         ├─── (pp. 1-31)  ──> [ Parser Documental Docling ] ──> mbft_parte_geral.md
-         │
-         └─── (pp. 32-826) ─> [ Extrator Vetorial pypdfium2 ] (fatiamento e colunas)
-                                    │
-                                    ▼
-                         [ Multi-page Stitcher ] (Costura de Estados & Âncoras)
-                                    │
-                                    ▼
-                      [ Gerador de HTML Semântico ] (Informações Complementares; Docling CUDA sob demanda p/ tabelas)
-                                    │
-                                    ▼
-                         [ Extrator de Imagens Nativas ] (bitmaps -> imagens/ficha{cod}_{idx}.png)
-                                    │
-                                    ▼
-                          [ Validador Pydantic ]
-                                    │
-                                    └──> fichas_mbft.json
+```mermaid
+flowchart TD
+    PDF["📄 PDF MBFT\n(826 páginas)"]
+
+    subgraph PARSE_PG["1. Parte Geral (pp. 1-31)"]
+        DOCLING["Parser Documental Docling\n(do_ocr=False, CUDA)"]
+        PG_MD["mbft_parte_geral.md"]
+    end
+
+    subgraph PARSE_FICHAS["2. Fichas de Fiscalização (pp. 32-826)"]
+        PDFIUM["Extrator Vetorial pypdfium2\n(Fatiamento Bounding-Box & Colunas)"]
+
+        STITCH["Multi-page Stitcher\n(Máquina de Estados & Âncoras ^\\d{3}-\\d{2}$)\n(Concatenação de Parágrafos)"]
+
+        HTML_GEN["Gerador de HTML Semântico\n(Informações Complementares)\n(Docling CUDA sob demanda p/ tabelas)"]
+
+        IMG_EXT["Extrator de Imagens Nativas\n(Extração Bitmap NDT Direct -> PNG)\nimagens/ficha{cod}_{idx}.png"]
+
+        PYDANTIC["Validador Pydantic mbft-core\n(Ficha / CampoNormativo)\n(Flag Lei 14.599/23)"]
+    end
+
+    OUT_JSON["fichas_mbft.json\n(404 Fichas Estruturadas)"]
+
+    PDF -->|Páginas 1 a 31| DOCLING
+    DOCLING --> PG_MD
+
+    PDF -->|Páginas 32 a 826| PDFIUM
+    PDFIUM --> STITCH
+    STITCH --> HTML_GEN
+    HTML_GEN --> IMG_EXT
+    IMG_EXT --> PYDANTIC
+    PYDANTIC --> OUT_JSON
 ```
 
 ### Estratégia de Parsing e Costura Multipágina

@@ -31,6 +31,41 @@ Esta PMS formaliza o uso do **FastAPI** rodando sobre o Pyodide (Python no Cloud
 ### 2.2. O "Ticketizador" e a Fila Global (Rate Limiter)
 Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fila Indiana Global**.
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 👤 Usuário / App Client
+    participant WAF as 🛡️ Cloudflare WAF
+    participant API as ⚡ API Gateway (FastAPI/Pyodide)
+    participant D1 as 🗄️ Cloudflare D1 (fila_global)
+    participant RAG as 🔍 Recuperador (PMS-005)
+    participant LLM as 🧠 Gerador LLM (PMS-006)
+
+    Note over User, D1: Passo 1: Solicitação de Ticket (Fila Global)
+    User->>WAF: POST /ticket (Rate Limit Check por IP)
+    alt Excedeu limite do WAF
+        WAF-->>User: 429 Rate Limit Exceeded
+    else Requisição Válida
+        WAF->>API: Repassa requisição
+        API->>D1: UPDATE fila_global SET next_available = max(now(), next_available) + 1m
+        D1-->>API: Novo Timestamp
+        API-->>User: Retorna Ticket JWT Assinado (contendo embarque_at)
+    end
+
+    Note over User, LLM: Passo 2: Chamada do Chat com Ticket
+    User->>API: POST /chat (payload + Header Bearer Ticket JWT)
+    API->>API: Valida Assinatura HMAC & Timestamp do JWT
+    alt Ticket Inválido ou Timestamp no Futuro
+        API-->>User: 429 Too Many Requests (Aguarde X segundos)
+    else Ticket Válido e Horário Autorizado
+        API->>RAG: Busca Contexto Híbrido (Vectorize + D1)
+        RAG-->>API: Chunks Contextuais
+        API->>LLM: Injeta Contexto + Strict System Prompt
+        LLM-->>API: Resposta Ancorada
+        API-->>User: Resposta Final JSON + Links de Fichas Estáticas
+    end
+```
+
 1. A rota `/ticket` é o ponto de entrada para quem quer perguntar à IA.
 2. Usaremos o banco **Cloudflare D1** (SQLite) com uma tabela de controle: `fila_global` (de linha única).
 3. Ao solicitar um ticket, um `UPDATE` atômico ajusta a data `next_available` para `max(now(), next_available) + 1 minuto`. O usuário recebe um token JWT assinado criptograficamente contendo a data/hora exata em que seu ticket se torna válido.

@@ -48,11 +48,35 @@ O pacote `mbft-recuperador` materializar-se-á sob a arquitetura de **Monólito 
   Desta forma, durante **Testes Locais**, injeta-se o `sqlite3` e cálculos locais com `numpy`. Em **Produção**, injetam-se classes invólucro para os Bindings da Cloudflare.
 
 * **Fluxo Coreográfico da Busca (RRF):**
-  ```text
-  Pergunta -> [ Embedder ] -> Vetor
-  Vetor    -> [ Busca Vectorize ] -> Top N (Semântico)
-  Pergunta -> [ Busca D1 / FTS5 ] -> Top N (Exato)
-  Ambos    -> [ RRF Engine ]      -> Chunk Final Consolidado
+  ```mermaid
+  flowchart TD
+      QUERY["🔍 Pergunta do Usuário"]
+
+      subgraph DENSE["1. Busca Semântica Densa"]
+          EMBED["Embedder Client\n(BAAI/bge-m3 / Cloudflare AI)"]
+          VEC_SEARCH["Cloudflare Vectorize\n(IVectorDB)"]
+          TOP_DENSE["Top N Resultados Semânticos\n(Scores de Cosseno)"]
+      end
+
+      subgraph SPARSE["2. Busca Lexical Esparsa"]
+          FTS_SEARCH["Cloudflare D1 / SQLite FTS5\n(IRelationalDB)"]
+          TOP_SPARSE["Top N Resultados Lexicais\n(Matches Exatos)"]
+      end
+
+      subgraph RRF_STAGE["3. Fusão RRF (Reciprocal Rank Fusion)"]
+          RRF_CALC["Algoritmo RRF\nScore = Σ 1 / (k + rank)"]
+          TOP_FINAL["Top Chunks Consolidados & Re-ranqueados"]
+      end
+
+      QUERY --> EMBED
+      EMBED -->|Vetor Dense 1024d| VEC_SEARCH
+      VEC_SEARCH --> TOP_DENSE
+
+      QUERY -->|Texto da Pergunta| FTS_SEARCH
+      FTS_SEARCH --> TOP_SPARSE
+
+      TOP_DENSE & TOP_SPARSE --> RRF_CALC
+      RRF_CALC --> TOP_FINAL
   ```
 
 ---

@@ -51,28 +51,49 @@ Este documento especifica o **Enriquecedor** (Etapa 2 do PMS-001), pipeline *bat
 
 O módulo processa os artefatos da extração através de estágios modulares e desacoplados:
 
-```
-[ data/processed/extrator/ ]
-   ├── fichas_mbft.json
-   └── mbft_parte_geral.md
-             │
-             ▼
-   [ 1. Normalizador de Vocabulário & Regras ]
-        ├── Sanitização de Enums (Gravidade, Penalidade, Medidas, Infrator, etc.)
-        └── Resolução de Competência (Tabela Canônica Lei nº 14.599/2023)
-             │
-             ▼
-   [ 2. Extrator de Entidades & Relações (IE Determinístico) ]
-        ├── Referências ao CTB (Art., §, Inc., Alínea)
-        ├── Resoluções do CONTRAN
-        └── Enquadramentos Correlatos (^\d{3}-\d{2}$)
-             │
-             ▼
-   [ 3. Processador da Parte Geral ]
-        └── Extração de Regras Globais (Planejado para alimentar prompts RAG)
-             │
-             ├───> data/processed/enriquecedor/fichas_enriquecidas.json
-             └───> data/processed/enriquecedor/relatorio_enriquecimento.md
+```mermaid
+flowchart TD
+    subgraph INPUTS["📥 Entradas do Extrator (PMS-002)"]
+        FICHAS_RAW["fichas_mbft.json"]
+        GERAL_RAW["mbft_parte_geral.md"]
+    end
+
+    subgraph PIPELINE["⚙️ Pipeline do Enriquecedor (mbft-enriquecedor)"]
+        subgraph STEP1["1. Normalização & Resolução"]
+            NORM["Sanitização de Vocabulário Controlado\n(Gravidade, Penalidade, Medidas, Infrator, Pontuação, Abordagem)"]
+            DESLOC["Resolução de Deslocamento Tabular\n(Crime vs. Infrator)"]
+            COMP["Resolução de Competência\n(Tabela Canônica Lei nº 14.599/2023)"]
+        end
+
+        subgraph STEP2["2. Extração de Informação (IE Determinística)"]
+            REGEX_CTB["Regex Parser CTB\n(Artigos, §, Incisos, Alíneas)"]
+            REGEX_RES["Regex Parser CONTRAN\n(Resoluções / Datas)"]
+            REGEX_CORR["Regex Enquadramentos Correlatos\n(^\\d{3}-\\d{2}$)"]
+        end
+
+        subgraph STEP3["3. Camada de Resilience & Fallback"]
+            LLM_FALLBACK["LLM Fallback (Gemini 2.5 Flash-Lite)\n(Injeção Structured Outputs p/ Casos Anômalos)"]
+        end
+
+        subgraph STEP4["4. Processador da Parte Geral"]
+            RULES_EXT["Extração de Regras Globais Normativas"]
+        end
+    end
+
+    subgraph OUTPUTS["📤 Artefatos Finais (data/processed/enriquecedor/)"]
+        FICHAS_ENR["fichas_enriquecidas.json\n(Validação Pydantic FichaEnriquecida)"]
+        RELATORIO["relatorio_enriquecimento.md\n(Estatísticas & Auditoria)"]
+    end
+
+    FICHAS_RAW --> STEP1
+    GERAL_RAW --> STEP4
+
+    NORM & DESLOC & COMP --> STEP2
+    REGEX_CTB & REGEX_RES & REGEX_CORR -->|Se houver lacunas/anomalias| LLM_FALLBACK
+
+    STEP2 --> FICHAS_ENR
+    LLM_FALLBACK --> FICHAS_ENR
+    STEP1 & STEP2 --> RELATORIO
 ```
 
 ---
