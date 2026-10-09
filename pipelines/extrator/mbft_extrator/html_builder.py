@@ -11,7 +11,7 @@ from typing import List, Tuple, Optional, Dict, Any
 import pypdfium2 as pdfium
 from PIL import Image
 
-from .stitching import _join_line_fragments, unificar_linhas_e_hifens
+from .text_joiner import join_line_fragments, unificar_linhas_e_hifens
 from .pdf_geometry import (
     FPDF_PAGEOBJ_IMAGE,
     Y_MIN_IMAGE,
@@ -50,7 +50,7 @@ def agrupar_retangulos_em_linhas(rects_list: List[Dict[str, Any]], y_tolerance: 
     lines = []
     for curr in linhas_agrupadas:
         curr.sort(key=lambda x: x["rect"][0])
-        s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
+        s = join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
         if s:
             y_medio = sum(it["yc"] for it in curr) / len(curr)
             lines.append({"y": y_medio, "text": s, "rects": curr, "x0": curr[0]["rect"][0], "x1": curr[-1]["rect"][2]})

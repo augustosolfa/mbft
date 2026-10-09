@@ -9,7 +9,7 @@ from typing import List, Dict, Tuple, Optional, Any
 import pypdfium2 as pdfium
 from .models import CampoNormativo
 from .layout_analyzer import LayoutAnalyzer
-from .text_joiner import TextJoiner, _join_line_fragments, unificar_linhas_e_hifens
+from .text_joiner import TextJoiner
 
 logger = logging.getLogger("MBFT-Stitching")
 

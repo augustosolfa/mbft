@@ -73,6 +73,6 @@ class TextJoiner:
         return texto
 
 
-# Funções de compatibilidade
-_join_line_fragments = TextJoiner.join_horizontal_fragments
+# Funções públicas para compatibilidade e uso em outros módulos
+join_line_fragments = TextJoiner.join_horizontal_fragments
 unificar_linhas_e_hifens = TextJoiner.unificar_linhas_e_hifens

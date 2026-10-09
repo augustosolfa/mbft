@@ -2,29 +2,53 @@
 Pipeline principal de orquestração da extração de fichas e persistência de checkpoints.
 """
 
-import json
 import logging
-import re
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Any
+from dataclasses import dataclass
 
 import pypdfium2 as pdfium
 from docling.document_converter import DocumentConverter
 
 from .models import Ficha, FichaMapeada, CampoNormativo
-from .fatiador import mapear_fichas_no_pdf
 from .stitching import (
     extrair_metadados_cabecalho,
     extrair_linhas_colunas_pagina,
     processar_coluna_normativa,
+    MetadadosCabecalho,
 )
-from .docling_extractor import criar_conversor_docling, processar_intervalo_docling
+from .docling_extractor import processar_intervalo_docling, extrair_metadados_visuais
 from .html_builder import formatar_tabela_html, construir_html_informacoes_complementares
+from .pdf_geometry import RE_IC_HEADER, linhas_vetoriais, MARGEM_ESQUERDA_TITULO
+from .auditoria import CorrecaoOcr
+from .validators import detectar_anomalia_cabecalho
 
 logger = logging.getLogger("MBFT-Pipeline")
 
+@dataclass
+class Conversores:
+    _padrao: Any = None
+    _ocr: Any = None
 
-from .pdf_geometry import RE_IC_HEADER, linhas_vetoriais, MARGEM_ESQUERDA_TITULO
+    @property
+    def padrao(self) -> Any:
+        if self._padrao is None:
+            from .docling_extractor import criar_conversor_docling
+            self._padrao = criar_conversor_docling()
+        return self._padrao
+
+    @property
+    def ocr(self) -> Any:
+        if self._ocr is None:
+            from .docling_extractor import criar_conversor_docling_ocr
+            self._ocr = criar_conversor_docling_ocr()
+        return self._ocr
+
+@dataclass(frozen=True)
+class ResultadoExtracao:
+    ficha: Ficha
+    correcoes_ocr: List[CorrecaoOcr]
+
 
 def detectar_limites_ic(
     doc: pdfium.PdfDocument,
@@ -119,37 +143,6 @@ def extrair_conteudo_ic(
         tabelas_docling=tabelas_html,
     )
     return html_final, imagens
-
-
-from dataclasses import dataclass
-from .auditoria import CorrecaoOcr
-from .validators import detectar_anomalia_cabecalho
-from .docling_extractor import extrair_metadados_visuais
-from .stitching import MetadadosCabecalho
-
-@dataclass
-class Conversores:
-    _padrao: Any = None
-    _ocr: Any = None
-
-    @property
-    def padrao(self) -> Any:
-        if self._padrao is None:
-            from .docling_extractor import criar_conversor_docling
-            self._padrao = criar_conversor_docling()
-        return self._padrao
-
-    @property
-    def ocr(self) -> Any:
-        if self._ocr is None:
-            from .docling_extractor import criar_conversor_docling_ocr
-            self._ocr = criar_conversor_docling_ocr()
-        return self._ocr
-
-@dataclass(frozen=True)
-class ResultadoExtracao:
-    ficha: Ficha
-    correcoes_ocr: List[CorrecaoOcr]
 
 
 def _extrair_metadados(
