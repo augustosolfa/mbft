@@ -153,18 +153,6 @@ def fatiar_texto_em_campos(header_txt: str) -> MetadadosCabecalho:
         
     return MetadadosCabecalho(**kwargs)
 
-def aplicar_regra_competencia_vazia(meta: MetadadosCabecalho) -> None:
-    """
-    Regra de Negócio: Se a competência estiver vazia no cabeçalho (normalmente em branco ou substituída por '-'),
-    assume-se que a competência foi alterada/assumida pela Lei 14.599/23 (e por omissão não listada expressamente).
-    """
-    comp = (meta.competencia or "").strip()
-    if not comp or comp == "-":
-        meta.competencia = None
-        meta.competencia_alterada_lei_14599 = True
-    else:
-        meta.competencia = comp
-
 def aplicar_correcoes_metadados(meta: MetadadosCabecalho, codigo_padrao: str = "") -> MetadadosCabecalho:
     infrator = meta.infrator or ""
     crime = meta.pode_configurar_crime_transito or ""
@@ -189,8 +177,6 @@ def aplicar_correcoes_metadados(meta: MetadadosCabecalho, codigo_padrao: str = "
     const_inf = meta.constatacao_infracao or ""
     const_inf = re.split(r'(?i)constata[cç][aã]o da infra[cç][aã]o', const_inf)[0].strip()
     meta.constatacao_infracao = const_inf
-
-    aplicar_regra_competencia_vazia(meta)
 
     return meta
 

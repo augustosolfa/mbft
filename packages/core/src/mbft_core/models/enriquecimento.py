@@ -59,6 +59,7 @@ class CompetenciaEnum(str, Enum):
 class CompetenciaFonteEnum(str, Enum):
     MBFT_ORIGINAL = "MBFT_ORIGINAL"
     RESOLUCAO_LEI_14599 = "RESOLUCAO_LEI_14599"
+    NAO_RESOLVIDA = "NAO_RESOLVIDA"
 
 class NaturezaRegraEnum(str, Enum):
     HIPOTESE_AUTUACAO = "HIPOTESE_AUTUACAO"

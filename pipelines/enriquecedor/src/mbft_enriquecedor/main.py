@@ -33,8 +33,8 @@ class Enriquecedor:
         constatacao_norm = normalizar_constatacao(f_bruta.constatacao_infracao)
         pts_valor, pts_suspensiva, pts_asterisco = calcular_pontuacao(f_bruta.pontuacao, penalidades_norm)
         
-        competencia_norm, via_lei_14599 = obter_competencia_atualizada(f_bruta.codigo_enquadramento, f_bruta.competencia)
-        competencia_fonte = CompetenciaFonteEnum.RESOLUCAO_LEI_14599 if via_lei_14599 else CompetenciaFonteEnum.MBFT_ORIGINAL
+        competencia_norm, competencia_fonte = obter_competencia_atualizada(f_bruta.codigo_enquadramento, f_bruta.competencia)
+        revisao_manual = (competencia_fonte == CompetenciaFonteEnum.NAO_RESOLVIDA)
         
         # Extração de itens atômicos
         quando_autuar_itens = self.extrator_regras.extrair_itens(f_bruta.quando_autuar, SecaoFichaEnum.QUANDO_AUTUAR, f_bruta.codigo_enquadramento)
@@ -106,7 +106,8 @@ class Enriquecedor:
             
             informacoes_complementares_html=f_bruta.informacoes_complementares,
             paginas=f_bruta.paginas,
-            imagens=f_bruta.imagens
+            imagens=f_bruta.imagens,
+            revisao_manual_necessaria=revisao_manual
         )
 
 
