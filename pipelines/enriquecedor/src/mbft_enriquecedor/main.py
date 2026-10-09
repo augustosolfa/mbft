@@ -11,7 +11,7 @@ from mbft_enriquecedor.normalizador import (
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
-from mbft_enriquecedor.chunker import gerar_chunks_ficha
+from mbft_core.chunker import gerar_chunks_ficha
 from mbft_enriquecedor.vetorizador import vetorizar_e_exportar
 
 
@@ -168,8 +168,8 @@ def main():
         fichas_com_crime = sum(1 for f in fichas_enriquecidas if f.crime_transito)
         f.write(f"- **Fichas com configuração de Crime de Trânsito**: {fichas_com_crime}\n")
         
-        chunks_excecao = sum(1 for c in chunks_totais if c.metadados.natureza_regra == "EXCECAO_DESVIO")
-        chunks_concomitancia = sum(1 for c in chunks_totais if c.metadados.natureza_regra == "CONCOMITANCIA")
+        chunks_excecao = sum(1 for c in chunks_totais if c.metadata.natureza_regra == "EXCECAO_DESVIO")
+        chunks_concomitancia = sum(1 for c in chunks_totais if c.metadata.natureza_regra == "CONCOMITANCIA")
         f.write(f"- **Regras Atômicas de Exceção / Desvio**: {chunks_excecao}\n")
         f.write(f"- **Regras Atômicas de Concomitância**: {chunks_concomitancia}\n")
     
