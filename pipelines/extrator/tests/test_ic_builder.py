@@ -1,7 +1,7 @@
 import pypdfium2 as pdfium
 import re
 from pathlib import Path
-from mbft_extrator.stitching import _join_line_fragments
+from mbft_extrator.text_joiner import join_line_fragments
 
 def agrupar_retangulos_em_linhas(rects_list, y_tolerance=3.5):
     rects_list = sorted(rects_list, key=lambda item: -item["yc"])
@@ -15,14 +15,14 @@ def agrupar_retangulos_em_linhas(rects_list, y_tolerance=3.5):
             curr_y = yc if len(curr) == 1 else (curr_y + yc) / 2
         else:
             curr.sort(key=lambda x: x[0])
-            s = _join_line_fragments(curr)
+            s = join_line_fragments(curr)
             if s:
                 lines.append({"y": curr_y, "text": s, "x0": curr[0][0], "x1": curr[-1][1]})
             curr = [(r[0], r[2], txt)]
             curr_y = yc
     if curr:
         curr.sort(key=lambda x: x[0])
-        s = _join_line_fragments(curr)
+        s = join_line_fragments(curr)
         if s:
             lines.append({"y": curr_y, "text": s, "x0": curr[0][0], "x1": curr[-1][1]})
     return lines
@@ -79,14 +79,14 @@ for item in all_rects_sorted:
         curr_y = yc if len(curr) == 1 else (curr_y + yc) / 2
     else:
         curr.sort(key=lambda x: x["rect"][0])
-        s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
+        s = join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
         if s:
             global_lines_with_rects.append({"y": curr_y, "text": s, "rects": curr, "x0": curr[0]["rect"][0]})
         curr = [item]
         curr_y = yc
 if curr:
     curr.sort(key=lambda x: x["rect"][0])
-    s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
+    s = join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
     if s:
         global_lines_with_rects.append({"y": curr_y, "text": s, "rects": curr, "x0": curr[0]["rect"][0]})
 
@@ -229,14 +229,14 @@ def processar_pagina_ic(p, y_top_limit=780.0, codigo_ficha=""):
             curr_y = yc if len(curr) == 1 else (curr_y + yc) / 2
         else:
             curr.sort(key=lambda x: x["rect"][0])
-            s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
+            s = join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
             if s:
                 global_lines_with_rects.append({"y": curr_y, "text": s, "rects": curr, "x0": curr[0]["rect"][0]})
             curr = [item]
             curr_y = yc
     if curr:
         curr.sort(key=lambda x: x["rect"][0])
-        s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
+        s = join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
         if s:
             global_lines_with_rects.append({"y": curr_y, "text": s, "rects": curr, "x0": curr[0]["rect"][0]})
 

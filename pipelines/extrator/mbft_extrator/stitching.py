@@ -9,7 +9,7 @@ from typing import List, Dict, Tuple, Optional, Any
 import pypdfium2 as pdfium
 from .models import CampoNormativo
 from .layout_analyzer import LayoutAnalyzer
-from .text_joiner import TextJoiner
+from .text_joiner import join_line_fragments
 
 logger = logging.getLogger("MBFT-Stitching")
 
@@ -194,7 +194,7 @@ def extrair_linhas_colunas_pagina(
 ) -> Tuple[Dict[int, List[str]], Optional[float]]:
     """
     Extrai as linhas de texto distribuídas nos 4 canais de colunas do MBFT.
-    Utiliza LayoutAnalyzer para análise geométrica e TextJoiner para unificação espacial.
+    Utiliza LayoutAnalyzer para análise geométrica e join_line_fragments para unificação espacial.
     Retorna também o Y do início de Informações Complementares, se presente na página.
     """
     analyzer = LayoutAnalyzer(page=page, is_first_page=is_first_page)
@@ -204,7 +204,7 @@ def extrair_linhas_colunas_pagina(
     for ch, line_clusters in clustered.items():
         lines = []
         for line_frags in line_clusters:
-            line_str = TextJoiner.join_horizontal_fragments(line_frags)
+            line_str = join_line_fragments(line_frags)
             if line_str:
                 lines.append(line_str)
         cols_lines[ch] = lines
