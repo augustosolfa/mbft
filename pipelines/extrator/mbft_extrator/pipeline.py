@@ -122,19 +122,28 @@ def extrair_conteudo_ic(
     return html_final, imagens
 
 
+from dataclasses import dataclass
+from .auditoria import CorrecaoOcr
+
+@dataclass(frozen=True)
+class ResultadoExtracao:
+    ficha: Ficha
+    correcoes_ocr: List[CorrecaoOcr]
+
 def extrair_ficha_completa(
     doc: pdfium.PdfDocument,
     converter: Any,
     pdf_path: Path,
     mapeada: FichaMapeada,
     imagens_dir: Path,
-) -> Ficha:
+) -> ResultadoExtracao:
     """
     Processa e extrai todos os campos estruturados de uma ficha de fiscalização.
     """
     codigo = mapeada.codigo
     pag_ini = mapeada.pag_ini
     pag_fim = mapeada.pag_fim
+    correcoes = []
 
     # 1. Metadados do cabeçalho na primeira página
     page1 = doc[pag_ini - 1]
@@ -143,7 +152,6 @@ def extrair_ficha_completa(
     # 1.1 Auditoria Intermediária e OCR Fallback
     from .validators import detectar_anomalia_cabecalho
     from .docling_extractor import extrair_metadados_visuais
-    from .auditoria import AuditoriaGeral
     
     anomalias = detectar_anomalia_cabecalho(meta)
     
@@ -163,7 +171,7 @@ def extrair_ficha_completa(
             valor_novo = meta_visual.get(campo)
             if valor_novo:
                 meta[campo] = valor_novo
-                AuditoriaGeral.registrar_correcao_ocr(codigo, campo, valor_antigo, valor_novo)
+                correcoes.append(CorrecaoOcr(ficha=codigo, campo=campo, antigo=valor_antigo, novo=valor_novo))
 
     # 2. Localiza limites de Informações Complementares
     has_ic, ic_start_page, ic_y_bound = detectar_limites_ic(doc, pag_ini, pag_fim)
@@ -198,7 +206,7 @@ def extrair_ficha_completa(
             imagens_dir=imagens_dir,
         )
 
-    return Ficha(
+    ficha = Ficha(
         id=codigo,
         tipificacao_resumida=meta.get("tipificacao_resumida"),
         codigo_enquadramento=codigo,
@@ -221,3 +229,4 @@ def extrair_ficha_completa(
         paginas=list(range(pag_ini, pag_fim + 1)),
         imagens=imagens,
     )
+    return ResultadoExtracao(ficha=ficha, correcoes_ocr=correcoes)
