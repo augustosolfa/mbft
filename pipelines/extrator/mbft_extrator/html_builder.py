@@ -12,6 +12,18 @@ import pypdfium2 as pdfium
 from PIL import Image
 
 from .stitching import _join_line_fragments, unificar_linhas_e_hifens
+from .pdf_geometry import (
+    FPDF_PAGEOBJ_IMAGE,
+    Y_MIN_IMAGE,
+    MIN_IMG_SIZE,
+    Y_TOP_LIMIT_DEFAULT,
+    MARGEM_ESQUERDA_SECAO_NUMERADA,
+    X_LEFT_COL_MAX,
+    X_RIGHT_COL_MIN,
+    X_TEXT_LEFT_MAX,
+    RE_IC_HEADER,
+    agrupar_em_linhas,
+)
 
 logger = logging.getLogger("MBFT-HtmlBuilder")
 
@@ -32,27 +44,17 @@ def agrupar_retangulos_em_linhas(rects_list: List[Dict[str, Any]], y_tolerance: 
     """
     if not rects_list:
         return []
-    rects_sorted = sorted(rects_list, key=lambda item: -item["yc"])
+
+    linhas_agrupadas = agrupar_em_linhas(rects_list, lambda x: x["yc"], y_tolerance)
+
     lines = []
-    curr = []
-    curr_y = None
-    for item in rects_sorted:
-        yc = item["yc"]
-        if curr_y is None or abs(yc - curr_y) <= y_tolerance:
-            curr.append(item)
-            curr_y = yc if len(curr) == 1 else (curr_y + yc) / 2
-        else:
-            curr.sort(key=lambda x: x["rect"][0])
-            s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
-            if s:
-                lines.append({"y": curr_y, "text": s, "rects": curr, "x0": curr[0]["rect"][0], "x1": curr[-1]["rect"][2]})
-            curr = [item]
-            curr_y = yc
-    if curr:
+    for curr in linhas_agrupadas:
         curr.sort(key=lambda x: x["rect"][0])
         s = _join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
         if s:
-            lines.append({"y": curr_y, "text": s, "rects": curr, "x0": curr[0]["rect"][0], "x1": curr[-1]["rect"][2]})
+            y_medio = sum(it["yc"] for it in curr) / len(curr)
+            lines.append({"y": y_medio, "text": s, "rects": curr, "x0": curr[0]["rect"][0], "x1": curr[-1]["rect"][2]})
+
     return lines
 
 
@@ -116,9 +118,9 @@ def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_f
     img_idx = img_idx_inicial
 
     for obj in page.get_objects():
-        if obj.type == pdfium.raw.FPDF_PAGEOBJ_IMAGE:
+        if getattr(obj, "type", None) == FPDF_PAGEOBJ_IMAGE:
             x0, y0, x1, y1 = obj.get_bounds()
-            if (x1 - x0) >= 25.0 and (y1 - y0) >= 25.0 and y0 >= 30.0 and y1 <= (y_top_limit + 15.0):
+            if (x1 - x0) >= MIN_IMG_SIZE and (y1 - y0) >= MIN_IMG_SIZE and y0 >= Y_MIN_IMAGE and y1 <= (y_top_limit + 15.0):
                 img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
                 img_path = imagens_dir / img_nome
                 rel_path = f"imagens/{img_nome}"
@@ -146,12 +148,12 @@ def coletar_retangulos_texto(tp, y_top_limit: float) -> List[Dict[str, Any]]:
     page_rects = []
     for i in range(tp.count_rects()):
         r = tp.get_rect(i)
-        if r[3] <= y_top_limit and r[1] >= 30.0:
+        if r[3] <= y_top_limit and r[1] >= Y_MIN_IMAGE:
             txt = tp.get_text_bounded(*r).strip()
             if not txt:
                 continue
-            # Remove ruídos e cabeçalhos de controle
-            if re.match(r"^informa[cç][oõ]es\s+complementares:?$", txt, re.IGNORECASE):
+            
+            if RE_IC_HEADER.match(txt):
                 continue
             if any(x in txt.upper() for x in ["CONSELHO NACIONAL", "MANUAL BRASILEIRO", "MBFT", "FICHA DE FISCALIZAÇÃO"]):
                 continue
@@ -166,7 +168,7 @@ def detectar_secoes(page_rects: List[Dict[str, Any]], y_top_limit: float) -> Tup
     sections = []
     section_rect_ids = set()
     for gl in global_lines:
-        if gl["x0"] < 80.0 and re.match(r"^\d+\.", gl["text"]):
+        if gl["x0"] < MARGEM_ESQUERDA_SECAO_NUMERADA and re.match(r"^\d+\.", gl["text"]):
             sections.append(gl)
             for r_item in gl["rects"]:
                 section_rect_ids.add(r_item["id"])
@@ -182,7 +184,7 @@ def detectar_secoes(page_rects: List[Dict[str, Any]], y_top_limit: float) -> Tup
 
     for idx, s in enumerate(sections):
         yt = s["y"]
-        yb = sections[idx + 1]["y"] if idx + 1 < len(sections) else 30.0
+        yb = sections[idx + 1]["y"] if idx + 1 < len(sections) else Y_MIN_IMAGE
         section_bounds.append((s["text"], yt, yb))
 
     return section_bounds, internal_rects
@@ -192,12 +194,12 @@ def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[Dict[str,
     sec_imgs = [img for img in page_imgs if yb <= img["yc"] <= yt]
     sec_rects = [r for r in internal_rects if yb <= r["yc"] <= yt]
 
-    left_imgs = [img for img in sec_imgs if img["x1"] <= 290.0]
-    right_imgs = [img for img in sec_imgs if img["x0"] >= 280.0]
+    left_imgs = [img for img in sec_imgs if img["x1"] <= X_LEFT_COL_MAX]
+    right_imgs = [img for img in sec_imgs if img["x0"] >= X_RIGHT_COL_MIN]
     wide_imgs = [img for img in sec_imgs if img not in left_imgs and img not in right_imgs]
 
-    left_rects = [r for r in sec_rects if r["rect"][2] <= 300.0]
-    right_rects = [r for r in sec_rects if r["rect"][0] >= 280.0]
+    left_rects = [r for r in sec_rects if r["rect"][2] <= X_TEXT_LEFT_MAX]
+    right_rects = [r for r in sec_rects if r["rect"][0] >= X_RIGHT_COL_MIN]
 
     left_lines = agrupar_retangulos_em_linhas(left_rects)
     right_lines = agrupar_retangulos_em_linhas(right_rects)
@@ -255,7 +257,7 @@ def construir_html_informacoes_complementares(
         page = doc[p_no]
         tp = page.get_textpage()
         w, h = page.get_size()
-        y_top_limit = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else (h - 40.0)
+        y_top_limit = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else (h - Y_TOP_LIMIT_DEFAULT)
 
         page_imgs, novas_imagens, img_idx = extrair_imagens_pagina(page, y_top_limit, imagens_dir, codigo_ficha, img_idx)
         imagens_extraidas_totais.extend(novas_imagens)

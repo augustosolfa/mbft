@@ -29,24 +29,25 @@ METADATA_FIELDS = [
 ]
 
 
+from .pdf_geometry import RE_QUANDO_AUTUAR, RE_COLUMN_HEADER, Y_LIMIT_HEADER, linhas_vetoriais
+
 def identificar_linhas_grade_cabecalho(page: pdfium.PdfPage) -> Tuple[float, List[Tuple], List[Tuple]]:
     tp = page.get_textpage()
-    y_limit = 350.0
+    y_limit = Y_LIMIT_HEADER
     for i in range(tp.count_rects()):
         r = tp.get_rect(i)
         t = tp.get_text_bounded(*r).strip()
-        if re.search(r"quando\s+autuar", t, re.IGNORECASE):
+        if RE_QUANDO_AUTUAR.search(t):
             y_limit = r[1] - 5.0
             break
 
     v_lines, h_lines = [], []
-    for obj in page.get_objects():
-        if getattr(obj, "type", None) == 2:  # Path
-            b = obj.get_bounds()
-            w, h = b[2] - b[0], b[3] - b[1]
-            if b[3] > y_limit: # Região dinâmica do cabeçalho
-                if w > 20 and h < 5: h_lines.append(b)
-                elif h > 10 and w < 5: v_lines.append(b)
+    paths = linhas_vetoriais(page)
+    for b in paths:
+        w, h = b[2] - b[0], b[3] - b[1]
+        if b[3] > y_limit: # Região dinâmica do cabeçalho
+            if w > 20 and h < 5: h_lines.append(b)
+            elif h > 10 and w < 5: v_lines.append(b)
                 
     return y_limit, h_lines, v_lines
 
@@ -61,8 +62,6 @@ def extrair_celulas_cabecalho(page: pdfium.PdfPage, h_lines: List[Tuple], v_line
     hl = dedup(h_lines, 1)[::-1]
     tp = page.get_textpage()
     cells = []
-    
-    re_ignore = re.compile(r'^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es.*|exemplos.*):?$', re.IGNORECASE)
     
     for i in range(len(hl)-1):
         top, bottom = hl[i], hl[i+1]
@@ -80,7 +79,7 @@ def extrair_celulas_cabecalho(page: pdfium.PdfPage, h_lines: List[Tuple], v_line
             if txt:
                 txt = re.sub(r'[\r\n]+', ' ', txt)
                 txt = re.sub(r'\s+', ' ', txt)
-                if not re_ignore.match(txt):
+                if not RE_COLUMN_HEADER.match(txt):
                     cells.append({'text': txt, 'left': vl[j], 'top': top})
                     
     return cells

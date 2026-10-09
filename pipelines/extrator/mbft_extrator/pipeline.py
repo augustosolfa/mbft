@@ -24,6 +24,8 @@ from .html_builder import formatar_tabela_html, construir_html_informacoes_compl
 logger = logging.getLogger("MBFT-Pipeline")
 
 
+from .pdf_geometry import RE_IC_HEADER, linhas_vetoriais, MARGEM_ESQUERDA_TITULO
+
 def detectar_limites_ic(
     doc: pdfium.PdfDocument,
     pag_ini: int,
@@ -38,9 +40,9 @@ def detectar_limites_ic(
         for i in range(tp.count_rects()):
             r = tp.get_rect(i)
             # A linha de Informações Complementares é o cabeçalho largo que inicia na margem esquerda
-            if r[0] < 60.0:
+            if r[0] < MARGEM_ESQUERDA_TITULO:
                 txt = tp.get_text_bounded(*r).strip()
-                if re.match(r"^informa[cç][oõ]es\s+complementares:?$", txt, re.IGNORECASE):
+                if RE_IC_HEADER.match(txt):
                     return True, p_no + 1, r[3]
 
     return False, pag_ini, None
@@ -61,18 +63,17 @@ def tem_tabela_em_ic(
         max_y = ic_y_bound if (p_no == pag_ini_ic - 1) else None
         linhas_h = 0
         linhas_v = 0
-        for obj in p.get_objects():
-            if obj.type == 2:  # FPDF_PAGEOBJ_PATH
-                b = obj.get_bounds()
-                top = b[3]
-                if max_y is not None and top > max_y:
-                    continue
-                w = b[2] - b[0]
-                h = b[3] - b[1]
-                if w > 80 and h < 4:
-                    linhas_h += 1
-                elif h > 20 and w < 4:
-                    linhas_v += 1
+        paths = linhas_vetoriais(p)
+        for b in paths:
+            top = b[3]
+            if max_y is not None and top > max_y:
+                continue
+            w = b[2] - b[0]
+            h = b[3] - b[1]
+            if w > 80 and h < 4:
+                linhas_h += 1
+            elif h > 20 and w < 4:
+                linhas_v += 1
         if linhas_h >= 3 and linhas_v >= 2:
             return True
     return False
