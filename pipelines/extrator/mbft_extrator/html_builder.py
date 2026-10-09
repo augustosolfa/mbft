@@ -6,7 +6,8 @@ e exportação de imagens nativas e de alta resolução.
 import logging
 import re
 from pathlib import Path
-from typing import List, Tuple, Optional, Dict, Any
+from dataclasses import dataclass
+from typing import List, Tuple, Optional, Any
 
 import pypdfium2 as pdfium
 from PIL import Image
@@ -28,6 +29,35 @@ from .pdf_geometry import (
 logger = logging.getLogger("MBFT-HtmlBuilder")
 
 
+@dataclass(frozen=True)
+class RetanguloTexto:
+    rect: Tuple[float, float, float, float]
+    yc: float
+    xc: float
+    txt: str
+    id: int
+
+@dataclass(frozen=True)
+class ImagemPagina:
+    bounds: Tuple[float, float, float, float]
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+    yc: float
+    xc: float
+    rel_path: str
+    width: float
+
+@dataclass(frozen=True)
+class LinhaTexto:
+    y: float
+    text: str
+    rects: List[RetanguloTexto]
+    x0: float
+    x1: float
+
+
 def formatar_tabela_html(html_bruto: str) -> str:
     """
     Limpa e padroniza tabela HTML gerada pelo Docling para garantir semântica pura.
@@ -38,29 +68,35 @@ def formatar_tabela_html(html_bruto: str) -> str:
     return limpo.strip()
 
 
-def agrupar_retangulos_em_linhas(rects_list: List[Dict[str, Any]], y_tolerance: float = 3.5) -> List[Dict[str, Any]]:
+def agrupar_retangulos_em_linhas(rects_list: List[RetanguloTexto], y_tolerance: float = 3.5) -> List[LinhaTexto]:
     """
     Agrupa retângulos de texto horizontalmente adjacentes em linhas contínuas.
     """
     if not rects_list:
         return []
 
-    linhas_agrupadas = agrupar_em_linhas(rects_list, lambda x: x["yc"], y_tolerance)
+    linhas_agrupadas = agrupar_em_linhas(rects_list, lambda x: x.yc, y_tolerance)
 
     lines = []
     for curr in linhas_agrupadas:
-        curr.sort(key=lambda x: x["rect"][0])
-        s = join_line_fragments([(it["rect"][0], it["rect"][2], it["txt"]) for it in curr])
+        curr.sort(key=lambda x: x.rect[0])
+        s = join_line_fragments([(it.rect[0], it.rect[2], it.txt) for it in curr])
         if s:
-            y_medio = sum(it["yc"] for it in curr) / len(curr)
-            lines.append({"y": y_medio, "text": s, "rects": curr, "x0": curr[0]["rect"][0], "x1": curr[-1]["rect"][2]})
+            y_medio = sum(it.yc for it in curr) / len(curr)
+            lines.append(LinhaTexto(
+                y=y_medio,
+                text=s,
+                rects=curr,
+                x0=curr[0].rect[0],
+                x1=curr[-1].rect[2]
+            ))
 
     return lines
 
 
 def montar_celula_html(
-    lines: List[Dict[str, Any]],
-    imgs: List[Dict[str, Any]],
+    lines: List[LinhaTexto],
+    imgs: List[ImagemPagina],
     codigo_ficha: str,
     default_alt: str = "",
 ) -> str:
@@ -72,47 +108,47 @@ def montar_celula_html(
 
     if imgs:
         img = imgs[0]
-        y_img = img["yc"]
-        top_lines = [l for l in lines if l["y"] > y_img]
-        bottom_lines = [l for l in lines if l["y"] <= y_img]
+        y_img = img.yc
+        top_lines = [l for l in lines if l.y > y_img]
+        bottom_lines = [l for l in lines if l.y <= y_img]
 
         # 1. Linhas do topo (subtítulo)
         if top_lines:
-            texto_top = unificar_linhas_e_hifens([l["text"] for l in top_lines])
+            texto_top = unificar_linhas_e_hifens([l.text for l in top_lines])
             partes.append(f"<p><strong>{texto_top}</strong></p>")
 
         # 2. Imagem com atributo alt descritivo
         alt = default_alt or f"Ilustração da Ficha {codigo_ficha}"
         if top_lines:
-            alt = top_lines[0]["text"]
+            alt = top_lines[0].text
         elif bottom_lines:
-            alt = " - ".join(l["text"] for l in bottom_lines[:2])
+            alt = " - ".join(l.text for l in bottom_lines[:2])
 
-        rel_path = img.get("rel_path", "")
+        rel_path = img.rel_path
         partes.append(f'<img src="{rel_path}" alt="{alt}" />')
 
         # 3. Linhas abaixo da imagem (legenda / parágrafo explicativo)
         if bottom_lines:
-            if len(bottom_lines) > 2 and any(len(l["text"]) > 40 for l in bottom_lines):
-                texto_bot = unificar_linhas_e_hifens([l["text"] for l in bottom_lines])
+            if len(bottom_lines) > 2 and any(len(l.text) > 40 for l in bottom_lines):
+                texto_bot = unificar_linhas_e_hifens([l.text for l in bottom_lines])
                 partes.append(f"<p>{texto_bot}</p>")
             else:
                 for l in bottom_lines:
-                    partes.append(f"<p>{l['text']}</p>")
+                    partes.append(f"<p>{l.text}</p>")
     else:
         # Sem imagem na célula
         if lines:
-            if len(lines) > 2 and any(len(l["text"]) > 40 for l in lines):
-                texto = unificar_linhas_e_hifens([l["text"] for l in lines])
+            if len(lines) > 2 and any(len(l.text) > 40 for l in lines):
+                texto = unificar_linhas_e_hifens([l.text for l in lines])
                 partes.append(f"<p>{texto}</p>")
             else:
                 for l in lines:
-                    partes.append(f"<p>{l['text']}</p>")
+                    partes.append(f"<p>{l.text}</p>")
 
     return "\n".join(partes)
 
 
-def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_ficha: str, img_idx_inicial: int) -> Tuple[List[Dict[str, Any]], List[str], int]:
+def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_ficha: str, img_idx_inicial: int) -> Tuple[List[ImagemPagina], List[str], int]:
     page_imgs = []
     imagens_extraidas = []
     img_idx = img_idx_inicial
@@ -132,19 +168,19 @@ def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_f
                     logger.info(f"Imagem extraída: {img_path} ({pil_img.width}x{pil_img.height} px)")
                     imagens_extraidas.append(rel_path)
                     img_idx += 1
-                    page_imgs.append({
-                        "bounds": (x0, y0, x1, y1),
-                        "x0": x0, "y0": y0, "x1": x1, "y1": y1,
-                        "yc": (y0 + y1) / 2.0, "xc": (x0 + x1) / 2.0,
-                        "rel_path": rel_path,
-                        "width": x1 - x0,
-                    })
+                    page_imgs.append(ImagemPagina(
+                        bounds=(x0, y0, x1, y1),
+                        x0=x0, y0=y0, x1=x1, y1=y1,
+                        yc=(y0 + y1) / 2.0, xc=(x0 + x1) / 2.0,
+                        rel_path=rel_path,
+                        width=x1 - x0,
+                    ))
                 except Exception as e:
                     logger.warning(f"Erro ao salvar bitmap {img_nome}: {e}")
 
     return page_imgs, imagens_extraidas, img_idx
 
-def coletar_retangulos_texto(tp, y_top_limit: float) -> List[Dict[str, Any]]:
+def coletar_retangulos_texto(tp, y_top_limit: float) -> List[RetanguloTexto]:
     page_rects = []
     for i in range(tp.count_rects()):
         r = tp.get_rect(i)
@@ -160,46 +196,46 @@ def coletar_retangulos_texto(tp, y_top_limit: float) -> List[Dict[str, Any]]:
 
             yc = (r[1] + r[3]) / 2.0
             xc = (r[0] + r[2]) / 2.0
-            page_rects.append({"rect": r, "yc": yc, "xc": xc, "txt": txt, "id": i})
+            page_rects.append(RetanguloTexto(rect=r, yc=yc, xc=xc, txt=txt, id=i))
     return page_rects
 
-def detectar_secoes(page_rects: List[Dict[str, Any]], y_top_limit: float) -> Tuple[List[Tuple[str, float, float]], List[Dict[str, Any]]]:
+def detectar_secoes(page_rects: List[RetanguloTexto], y_top_limit: float) -> Tuple[List[Tuple[str, float, float]], List[RetanguloTexto]]:
     global_lines = agrupar_retangulos_em_linhas(page_rects)
     sections = []
     section_rect_ids = set()
     for gl in global_lines:
-        if gl["x0"] < MARGEM_ESQUERDA_SECAO_NUMERADA and re.match(r"^\d+\.", gl["text"]):
+        if gl.x0 < MARGEM_ESQUERDA_SECAO_NUMERADA and re.match(r"^\d+\.", gl.text):
             sections.append(gl)
-            for r_item in gl["rects"]:
-                section_rect_ids.add(r_item["id"])
+            for r_item in gl.rects:
+                section_rect_ids.add(r_item.id)
 
-    if not sections:
-        sections = [{"y": y_top_limit, "text": "", "rects": [], "x0": 0.0}]
-
-    internal_rects = [r for r in page_rects if r["id"] not in section_rect_ids]
+    internal_rects = [r for r in page_rects if r.id not in section_rect_ids]
 
     section_bounds = []
-    if sections and sections[0]["text"] and (y_top_limit - sections[0]["y"] > 25.0):
-        section_bounds.append(("", y_top_limit, sections[0]["y"]))
+    if not sections:
+        section_bounds.append(("", y_top_limit, Y_MIN_IMAGE))
+    else:
+        if sections[0].text and (y_top_limit - sections[0].y > 25.0):
+            section_bounds.append(("", y_top_limit, sections[0].y))
 
-    for idx, s in enumerate(sections):
-        yt = s["y"]
-        yb = sections[idx + 1]["y"] if idx + 1 < len(sections) else Y_MIN_IMAGE
-        section_bounds.append((s["text"], yt, yb))
+        for idx, s in enumerate(sections):
+            yt = s.y
+            yb = sections[idx + 1].y if idx + 1 < len(sections) else Y_MIN_IMAGE
+            section_bounds.append((s.text, yt, yb))
 
     return section_bounds, internal_rects
 
-def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[Dict[str, Any]], internal_rects: List[Dict[str, Any]], codigo_ficha: str) -> str:
+def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[ImagemPagina], internal_rects: List[RetanguloTexto], codigo_ficha: str) -> str:
     blocos = []
-    sec_imgs = [img for img in page_imgs if yb <= img["yc"] <= yt]
-    sec_rects = [r for r in internal_rects if yb <= r["yc"] <= yt]
+    sec_imgs = [img for img in page_imgs if yb <= img.yc <= yt]
+    sec_rects = [r for r in internal_rects if yb <= r.yc <= yt]
 
-    left_imgs = [img for img in sec_imgs if img["x1"] <= X_LEFT_COL_MAX]
-    right_imgs = [img for img in sec_imgs if img["x0"] >= X_RIGHT_COL_MIN]
+    left_imgs = [img for img in sec_imgs if img.x1 <= X_LEFT_COL_MAX]
+    right_imgs = [img for img in sec_imgs if img.x0 >= X_RIGHT_COL_MIN]
     wide_imgs = [img for img in sec_imgs if img not in left_imgs and img not in right_imgs]
 
-    left_rects = [r for r in sec_rects if r["rect"][2] <= X_TEXT_LEFT_MAX]
-    right_rects = [r for r in sec_rects if r["rect"][0] >= X_RIGHT_COL_MIN]
+    left_rects = [r for r in sec_rects if r.rect[2] <= X_TEXT_LEFT_MAX]
+    right_rects = [r for r in sec_rects if r.rect[0] >= X_RIGHT_COL_MIN]
 
     left_lines = agrupar_retangulos_em_linhas(left_rects)
     right_lines = agrupar_retangulos_em_linhas(right_rects)

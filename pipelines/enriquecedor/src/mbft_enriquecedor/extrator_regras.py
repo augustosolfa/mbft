@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 import os
 
-from mbft_core.models.extracao import CampoNormativo
+from mbft_core.models.extracao import CampoNormativo, SecaoFichaEnum
 from mbft_core.models.enriquecimento import ItemRegra, NaturezaRegraEnum
 from mbft_enriquecedor.normalizador import sanitizar_texto
 
@@ -46,7 +46,7 @@ class ExtratorRegrasAtomo:
         else:
             self.client = None
 
-    def extrair_itens(self, campo: CampoNormativo, secao_origem: str, codigo_enquadramento: str) -> List[ItemRegra]:
+    def extrair_itens(self, campo: CampoNormativo, secao_origem: SecaoFichaEnum, codigo_enquadramento: str) -> List[ItemRegra]:
         """
         Converte as strings do CampoNormativo em ItemRegra estruturado usando heurísticas,
         com fallback para Gemini caso a estrutura seja complexa.
@@ -88,7 +88,7 @@ class ExtratorRegrasAtomo:
             regra = self._inferir_via_heuristica(texto_final, secao_origem, codigo_enquadramento)
             
             # 2. Se a heurística não conseguir determinar a natureza_regra, usa fallback (Gemini)
-            if regra.natureza_regra == NaturezaRegraEnum.PROCEDIMENTO_GERAL and "QUANDO_NAO_AUTUAR" in secao_origem.upper():
+            if regra.natureza_regra == NaturezaRegraEnum.PROCEDIMENTO_GERAL and secao_origem == SecaoFichaEnum.QUANDO_NAO_AUTUAR:
                 # É suspeito que um item de 'Quando Não Autuar' caia no fallback default de procedimento geral
                 if self.client:
                     regra_llm = self._inferir_via_llm(texto_final, secao_origem, codigo_enquadramento)
@@ -99,17 +99,15 @@ class ExtratorRegrasAtomo:
             
         return itens_regras
 
-    def _inferir_via_heuristica(self, texto: str, secao: str, codigo_enquadramento: str) -> ItemRegra:
+    def _inferir_via_heuristica(self, texto: str, secao: SecaoFichaEnum, codigo_enquadramento: str) -> ItemRegra:
         t_upper = texto.upper()
         natureza = NaturezaRegraEnum.PROCEDIMENTO_GERAL
         
-        # Heurística de Seção
-        secao_upper = secao.upper()
-        if "EXEMPLOS" in secao_upper:
+        if secao == SecaoFichaEnum.EXEMPLOS_AIT:
             natureza = NaturezaRegraEnum.EXEMPLO_OBSERVACAO
-        elif "QUANDO_AUTUAR" in secao_upper:
+        elif secao == SecaoFichaEnum.QUANDO_AUTUAR:
             natureza = NaturezaRegraEnum.HIPOTESE_AUTUACAO
-        elif "QUANDO_NAO_AUTUAR" in secao_upper:
+        elif secao == SecaoFichaEnum.QUANDO_NAO_AUTUAR:
             natureza = NaturezaRegraEnum.EXCECAO_DESVIO
             
         # Heurística de Palavras-Chave
@@ -135,13 +133,13 @@ class ExtratorRegrasAtomo:
             codigos_redirecionamento=redirecionamentos
         )
 
-    def _inferir_via_llm(self, texto: str, secao: str, codigo_enquadramento: str) -> Optional[ItemRegra]:
+    def _inferir_via_llm(self, texto: str, secao: SecaoFichaEnum, codigo_enquadramento: str) -> Optional[ItemRegra]:
         """
         Fallback utilizando o Gemini 2.5 Flash-Lite com Structured Outputs.
         """
         try:
             prompt = f"""
-            Analise a seguinte regra extraída da seção '{secao}' do Manual Brasileiro de Fiscalização de Trânsito:
+            Analise a seguinte regra extraída da seção '{secao.value}' do Manual Brasileiro de Fiscalização de Trânsito:
             Regra: "{texto}"
             
             Classifique a natureza da regra e extraia códigos de enquadramento (formato NNN-NN).

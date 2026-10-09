@@ -36,15 +36,17 @@ def get_conversores() -> Conversores:
 @dataclass(frozen=True)
 class TarefaFicha:
     pdf_path: str
-    ficha_mapeada: dict
+    ficha_mapeada: FichaMapeada
     imagens_dir: str
     cache_fichas_dir: str
     pasta_individuais: Optional[str]
     force: bool
 
-def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> dict:
+from .pipeline import ResultadoExtracao
+
+def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> ResultadoExtracao:
     """Função executada em cada processo worker para processar uma ficha individual."""
-    m = FichaMapeada(**tarefa.ficha_mapeada)
+    m = tarefa.ficha_mapeada
     pdf_path = Path(tarefa.pdf_path)
     imagens_dir = Path(tarefa.imagens_dir)
     cache_fichas_dir = Path(tarefa.cache_fichas_dir)
@@ -55,9 +57,15 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> dict:
         with open(f_cache, "r", encoding="utf-8") as f:
             c_data = json.load(f)
             if "dados" in c_data and "correcoes" in c_data:
-                return c_data
+                return ResultadoExtracao(
+                    ficha=Ficha.model_validate(c_data["dados"]),
+                    correcoes_ocr=[CorrecaoOcr(**c) for c in c_data["correcoes"]]
+                )
             else:
-                return {"dados": c_data, "correcoes": []}
+                return ResultadoExtracao(
+                    ficha=Ficha.model_validate(c_data),
+                    correcoes_ocr=[]
+                )
 
     doc = pdfium.PdfDocument(str(pdf_path))
     conversores = get_conversores()
@@ -70,7 +78,7 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> dict:
         imagens_dir=imagens_dir,
     )
     dados = resultado.ficha.model_dump()
-    correcoes = [{"ficha": c.ficha, "campo": c.campo, "antigo": c.antigo, "novo": c.novo} for c in resultado.correcoes_ocr]
+    correcoes = [c.__dict__ for c in resultado.correcoes_ocr]
 
     doc.close()
 
@@ -85,7 +93,7 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> dict:
         with open(pasta_indiv / f"ficha_{m.codigo}.json", "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
 
-    return {"dados": dados, "correcoes": correcoes}
+    return resultado
 
 def cmd_geral(args):
     """Executa a extração da Parte Geral (Páginas 1 a 31) para Markdown."""
@@ -116,7 +124,7 @@ def construir_tarefas(mapeadas, pdf_path, imagens_dir, cache_fichas_dir, pasta_i
     return [
         TarefaFicha(
             pdf_path=str(pdf_path),
-            ficha_mapeada=m.model_dump(),
+            ficha_mapeada=m,
             imagens_dir=str(imagens_dir),
             cache_fichas_dir=str(cache_fichas_dir),
             pasta_individuais=str(pasta_individuais) if pasta_individuais else None,
@@ -133,19 +141,17 @@ def executar_tarefas(tasks, workers, total_fichas):
     if workers <= 1:
         for t in tasks:
             result = _processar_uma_ficha_worker(t)
-            dados = result["dados"]
-            correcoes_totais.extend([CorrecaoOcr(**c) for c in result["correcoes"]])
+            correcoes_totais.extend(result.correcoes_ocr)
             concluidas += 1
-            logger.info(f"[{concluidas}/{total_fichas}] Ficha {dados['id']} processada.")
-            fichas_extraidas.append(Ficha(**dados))
+            logger.info(f"[{concluidas}/{total_fichas}] Ficha {result.ficha.id} processada.")
+            fichas_extraidas.append(result.ficha)
     else:
         with ProcessPoolExecutor(max_workers=workers) as executor:
             for result in executor.map(_processar_uma_ficha_worker, tasks):
-                dados = result["dados"]
-                correcoes_totais.extend([CorrecaoOcr(**c) for c in result["correcoes"]])
+                correcoes_totais.extend(result.correcoes_ocr)
                 concluidas += 1
-                logger.info(f"[{concluidas}/{total_fichas}] Ficha {dados['id']} processada.")
-                fichas_extraidas.append(Ficha(**dados))
+                logger.info(f"[{concluidas}/{total_fichas}] Ficha {result.ficha.id} processada.")
+                fichas_extraidas.append(result.ficha)
                 
     return fichas_extraidas, correcoes_totais
 

@@ -3,7 +3,7 @@ import logging
 from typing import List
 
 from mbft_core.paths import PROCESSED_DIR
-from mbft_core.models.extracao import Ficha
+from mbft_core.models.extracao import Ficha, SecaoFichaEnum
 from mbft_core.models.enriquecimento import FichaEnriquecida, CompetenciaFonteEnum
 from mbft_enriquecedor.normalizador import (
     normalizar_gravidade, normalizar_penalidades, normalizar_medidas_administrativas,
@@ -37,10 +37,10 @@ class Enriquecedor:
         competencia_fonte = CompetenciaFonteEnum.RESOLUCAO_LEI_14599 if via_lei_14599 else CompetenciaFonteEnum.MBFT_ORIGINAL
         
         # Extração de itens atômicos
-        quando_autuar_itens = self.extrator_regras.extrair_itens(f_bruta.quando_autuar, "QUANDO_AUTUAR", f_bruta.codigo_enquadramento)
-        quando_nao_autuar_itens = self.extrator_regras.extrair_itens(f_bruta.quando_nao_autuar, "QUANDO_NAO_AUTUAR", f_bruta.codigo_enquadramento)
-        definicoes_procedimentos_itens = self.extrator_regras.extrair_itens(f_bruta.definicoes_procedimentos, "DEFINICOES_PROCEDIMENTOS", f_bruta.codigo_enquadramento)
-        exemplos_observacoes_ait_itens = self.extrator_regras.extrair_itens(f_bruta.exemplos_observacoes_ait, "EXEMPLOS_AIT", f_bruta.codigo_enquadramento)
+        quando_autuar_itens = self.extrator_regras.extrair_itens(f_bruta.quando_autuar, SecaoFichaEnum.QUANDO_AUTUAR, f_bruta.codigo_enquadramento)
+        quando_nao_autuar_itens = self.extrator_regras.extrair_itens(f_bruta.quando_nao_autuar, SecaoFichaEnum.QUANDO_NAO_AUTUAR, f_bruta.codigo_enquadramento)
+        definicoes_procedimentos_itens = self.extrator_regras.extrair_itens(f_bruta.definicoes_procedimentos, SecaoFichaEnum.DEFINICOES_PROCEDIMENTOS, f_bruta.codigo_enquadramento)
+        exemplos_observacoes_ait_itens = self.extrator_regras.extrair_itens(f_bruta.exemplos_observacoes_ait, SecaoFichaEnum.EXEMPLOS_AIT, f_bruta.codigo_enquadramento)
 
         # Computação de amparo legal e artigos associados
         artigos_ctb = parse_amparo_legal(f_bruta.amparo_legal) + artigos_ctb_crime

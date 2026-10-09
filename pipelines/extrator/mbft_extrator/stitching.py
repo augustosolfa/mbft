@@ -143,16 +143,15 @@ def fatiar_texto_em_campos(header_txt: str) -> MetadadosCabecalho:
 
     positions.sort(key=lambda x: x[0])
 
-    meta = MetadadosCabecalho()
-    meta.competencia_alterada_lei_14599 = competencia_alterada_lei
+    kwargs = {"competencia_alterada_lei_14599": competencia_alterada_lei}
     for i, (start, end, label) in enumerate(positions):
         next_start = positions[i + 1][0] if i + 1 < len(positions) else len(header_txt)
         val = header_txt[end:next_start]
         val = re.sub(r"[\r\n]+", " ", val)
         val = re.sub(r"\s+", " ", val).strip()
-        setattr(meta, label, val)
+        kwargs[label] = val
         
-    return meta
+    return MetadadosCabecalho(**kwargs)
 
 def aplicar_correcoes_metadados(meta: MetadadosCabecalho, codigo_padrao: str = "") -> MetadadosCabecalho:
     infrator = meta.infrator or ""

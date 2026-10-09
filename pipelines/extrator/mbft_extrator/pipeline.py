@@ -27,18 +27,18 @@ logger = logging.getLogger("MBFT-Pipeline")
 
 @dataclass
 class Conversores:
-    _padrao: Any = None
-    _ocr: Any = None
+    _padrao: Optional[DocumentConverter] = None
+    _ocr: Optional[DocumentConverter] = None
 
     @property
-    def padrao(self) -> Any:
+    def padrao(self) -> DocumentConverter:
         if self._padrao is None:
             from .docling_extractor import criar_conversor_docling
             self._padrao = criar_conversor_docling()
         return self._padrao
 
     @property
-    def ocr(self) -> Any:
+    def ocr(self) -> DocumentConverter:
         if self._ocr is None:
             from .docling_extractor import criar_conversor_docling_ocr
             self._ocr = criar_conversor_docling_ocr()
@@ -161,19 +161,32 @@ def _extrair_metadados(
         meta_visual = extrair_metadados_visuais(conversores.ocr, pdf_path, mapeada.pag_ini)
         
         for campo in anomalias:
-            valor_antigo = getattr(meta, campo, "")
             valor_novo = meta_visual.get(campo)
             if valor_novo:
-                setattr(meta, campo, valor_novo)
-                correcoes.append(CorrecaoOcr(ficha=mapeada.codigo, campo=campo, antigo=str(valor_antigo), novo=valor_novo))
+                if campo == "infrator":
+                    valor_antigo = meta.infrator
+                    meta.infrator = valor_novo
+                elif campo == "constatacao_infracao":
+                    valor_antigo = meta.constatacao_infracao
+                    meta.constatacao_infracao = valor_novo
+                else:
+                    continue
+                correcoes.append(CorrecaoOcr(ficha=mapeada.codigo, campo=campo, antigo=str(valor_antigo or ""), novo=valor_novo))
     
     return meta
+
+@dataclass(frozen=True)
+class ColunasNormativas:
+    quando_autuar: CampoNormativo
+    quando_nao_autuar: CampoNormativo
+    definicoes_procedimentos: CampoNormativo
+    exemplos_observacoes_ait: CampoNormativo
 
 def _extrair_colunas_normativas(
     doc: pdfium.PdfDocument,
     mapeada: FichaMapeada,
     col_end_page: int
-) -> Tuple[CampoNormativo, CampoNormativo, CampoNormativo, CampoNormativo]:
+) -> ColunasNormativas:
     all_col_lines: Dict[int, List[str]] = {0: [], 1: [], 2: [], 3: []}
     for p in range(mapeada.pag_ini - 1, col_end_page):
         is_first = (p == mapeada.pag_ini - 1)
@@ -186,17 +199,20 @@ def _extrair_colunas_normativas(
     definicoes_procedimentos = processar_coluna_normativa(all_col_lines[2])
     exemplos_observacoes_ait = processar_coluna_normativa(all_col_lines[3])
     
-    return quando_autuar, quando_nao_autuar, definicoes_procedimentos, exemplos_observacoes_ait
+    return ColunasNormativas(
+        quando_autuar=quando_autuar,
+        quando_nao_autuar=quando_nao_autuar,
+        definicoes_procedimentos=definicoes_procedimentos,
+        exemplos_observacoes_ait=exemplos_observacoes_ait,
+    )
 
 def _montar_ficha(
     meta: MetadadosCabecalho,
-    colunas: Tuple[CampoNormativo, CampoNormativo, CampoNormativo, CampoNormativo],
+    colunas: ColunasNormativas,
     ic_html: str,
     imagens: List[str],
     mapeada: FichaMapeada
 ) -> Ficha:
-    quando_autuar, quando_nao_autuar, definicoes_procedimentos, exemplos_observacoes_ait = colunas
-    
     return Ficha(
         id=mapeada.codigo,
         tipificacao_resumida=meta.tipificacao_resumida or "",
@@ -212,10 +228,10 @@ def _montar_ficha(
         competencia_alterada_lei_14599=meta.competencia_alterada_lei_14599,
         pontuacao=meta.pontuacao or "",
         constatacao_infracao=meta.constatacao_infracao or "",
-        quando_autuar=quando_autuar,
-        quando_nao_autuar=quando_nao_autuar,
-        definicoes_procedimentos=definicoes_procedimentos,
-        exemplos_observacoes_ait=exemplos_observacoes_ait,
+        quando_autuar=colunas.quando_autuar,
+        quando_nao_autuar=colunas.quando_nao_autuar,
+        definicoes_procedimentos=colunas.definicoes_procedimentos,
+        exemplos_observacoes_ait=colunas.exemplos_observacoes_ait,
         informacoes_complementares=ic_html,
         paginas=list(range(mapeada.pag_ini, mapeada.pag_fim + 1)),
         imagens=imagens,
