@@ -99,7 +99,27 @@ def get_header_text_by_column(page: pdfium.PdfPage) -> str:
     return header_text
 
 
-def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -> Dict[str, Any]:
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class MetadadosCabecalho:
+    tipificacao_resumida: Optional[str] = None
+    codigo_enquadramento: str = ""
+    amparo_legal: Optional[str] = None
+    tipificacao_enquadramento: Optional[str] = None
+    gravidade: Optional[str] = None
+    penalidade: Optional[str] = None
+    medida_administrativa: Optional[str] = None
+    pode_configurar_crime_transito: Optional[str] = None
+    infrator: Optional[str] = None
+    competencia: Optional[str] = None
+    competencia_alterada_lei_14599: bool = False
+    pontuacao: Optional[str] = None
+    constatacao_infracao: Optional[str] = None
+
+
+def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -> MetadadosCabecalho:
     """
     Extrai do cabeçalho da primeira página os metadados jurídicos da infração.
     """
@@ -124,18 +144,18 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
 
     positions.sort(key=lambda x: x[0])
 
-    meta: Dict[str, Any] = {label: "" for label, _ in METADATA_FIELDS}
-    meta["competencia_alterada_lei_14599"] = competencia_alterada_lei
+    meta = MetadadosCabecalho()
+    meta.competencia_alterada_lei_14599 = competencia_alterada_lei
     for i, (start, end, label) in enumerate(positions):
         next_start = positions[i + 1][0] if i + 1 < len(positions) else len(header_txt)
         val = header_txt[end:next_start]
         val = re.sub(r"[\r\n]+", " ", val)
         val = re.sub(r"\s+", " ", val).strip()
-        meta[label] = val
+        setattr(meta, label, val)
 
     # Normalizações determinísticas (heurísticas consagradas do extrair_mbft_old.py):
-    infrator = meta.get("infrator", "")
-    crime = meta.get("pode_configurar_crime_transito", "")
+    infrator = meta.infrator or ""
+    crime = meta.pode_configurar_crime_transito or ""
     
     # Corrige vazamento de "SIM" ou "NÃO" para dentro do infrator devido a falha da grade
     m_sim_nao = re.match(r"^(N[ÃA]O|SIM)\b\s*(.*)$", infrator, re.IGNORECASE)
@@ -146,27 +166,27 @@ def extrair_metadados_cabecalho(page: pdfium.PdfPage, codigo_padrao: str = "") -
         if not crime or len(crime) > 25 or "Cêi" in crime or "14599" in crime:
             crime = crime_ext
 
-    cod = meta.get("codigo_enquadramento", "")
+    cod = meta.codigo_enquadramento or ""
     m_cod = re.search(r"([0-9]{3}\s*-\s*[0-9]{1,2})", cod)
     if m_cod:
-        meta["codigo_enquadramento"] = re.sub(r"\s+", "", m_cod.group(1))
+        meta.codigo_enquadramento = re.sub(r"\s+", "", m_cod.group(1))
     elif codigo_padrao:
-        meta["codigo_enquadramento"] = codigo_padrao
+        meta.codigo_enquadramento = codigo_padrao
 
-    meta["infrator"] = infrator
-    meta["pode_configurar_crime_transito"] = crime.strip() if crime and crime.strip() else None
+    meta.infrator = infrator
+    meta.pode_configurar_crime_transito = crime.strip() if crime and crime.strip() else None
 
     # Limpeza de duplicação por sobreposição de bounding box na última linha do cabeçalho
-    const_inf = meta.get("constatacao_infracao", "")
+    const_inf = meta.constatacao_infracao or ""
     const_inf = re.split(r'(?i)constata[cç][aã]o da infra[cç][aã]o', const_inf)[0].strip()
-    meta["constatacao_infracao"] = const_inf
+    meta.constatacao_infracao = const_inf
 
-    comp = meta.get("competencia", "").strip()
+    comp = (meta.competencia or "").strip()
     if not comp:
-        meta["competencia"] = None
-        meta["competencia_alterada_lei_14599"] = True
+        meta.competencia = None
+        meta.competencia_alterada_lei_14599 = True
     else:
-        meta["competencia"] = comp
+        meta.competencia = comp
 
     return meta
 

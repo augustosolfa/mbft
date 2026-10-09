@@ -32,15 +32,17 @@ from dataclasses import dataclass
 # Contexto global apenas para uso seguro via ProcessPoolExecutor.initializer
 class WorkerContext:
     doc: Optional[pdfium.PdfDocument] = None
-    converter: Optional[Any] = None
+    conversores: Optional[Any] = None
 
     @classmethod
     def inicializar(cls, pdf_path: str):
         cls.doc = pdfium.PdfDocument(pdf_path)
-        from .docling_extractor import criar_conversor_docling, criar_conversor_docling_ocr
-        conv_padrao = criar_conversor_docling()
-        conv_ocr = criar_conversor_docling_ocr()
-        cls.converter = (conv_padrao, conv_ocr)
+        from .pipeline import Conversores
+        c = Conversores()
+        # Warmup na inicialização do worker
+        _ = c.padrao
+        _ = c.ocr
+        cls.conversores = c
 
 
 def _obter_raiz_repo() -> Path:
@@ -98,7 +100,7 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> dict:
 
     resultado = extrair_ficha_completa(
         doc=WorkerContext.doc,
-        converter=WorkerContext.converter,
+        conversores=WorkerContext.conversores,
         pdf_path=pdf_path,
         mapeada=m,
         imagens_dir=imagens_dir,

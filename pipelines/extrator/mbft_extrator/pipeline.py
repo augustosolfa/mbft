@@ -80,7 +80,7 @@ def tem_tabela_em_ic(
 
 def extrair_conteudo_ic(
     doc: pdfium.PdfDocument,
-    converter: Any,
+    converter: Optional[DocumentConverter],
     pdf_path: Path,
     codigo_ficha: str,
     pag_ini_ic: int,
@@ -97,9 +97,7 @@ def extrair_conteudo_ic(
 
     if possui_tabela and converter and (pag_fim >= pag_ini_ic):
         try:
-            instancia_converter = converter() if callable(converter) else converter
-            conv_padrao = instancia_converter[0] if isinstance(instancia_converter, tuple) else instancia_converter
-            docling_doc = processar_intervalo_docling(conv_padrao, pdf_path, pag_ini_ic, pag_fim)
+            docling_doc = processar_intervalo_docling(converter, pdf_path, pag_ini_ic, pag_fim)
             for item, lvl in docling_doc.iterate_items():
                 if type(item).__name__ == "TableItem":
                     t_md = item.export_to_markdown(docling_doc)
@@ -124,63 +122,67 @@ def extrair_conteudo_ic(
 
 from dataclasses import dataclass
 from .auditoria import CorrecaoOcr
+from .validators import detectar_anomalia_cabecalho
+from .docling_extractor import extrair_metadados_visuais
+from .stitching import MetadadosCabecalho
+
+@dataclass
+class Conversores:
+    _padrao: Any = None
+    _ocr: Any = None
+
+    @property
+    def padrao(self) -> Any:
+        if self._padrao is None:
+            from .docling_extractor import criar_conversor_docling
+            self._padrao = criar_conversor_docling()
+        return self._padrao
+
+    @property
+    def ocr(self) -> Any:
+        if self._ocr is None:
+            from .docling_extractor import criar_conversor_docling_ocr
+            self._ocr = criar_conversor_docling_ocr()
+        return self._ocr
 
 @dataclass(frozen=True)
 class ResultadoExtracao:
     ficha: Ficha
     correcoes_ocr: List[CorrecaoOcr]
 
-def extrair_ficha_completa(
-    doc: pdfium.PdfDocument,
-    converter: Any,
-    pdf_path: Path,
-    mapeada: FichaMapeada,
-    imagens_dir: Path,
-) -> ResultadoExtracao:
-    """
-    Processa e extrai todos os campos estruturados de uma ficha de fiscalização.
-    """
-    codigo = mapeada.codigo
-    pag_ini = mapeada.pag_ini
-    pag_fim = mapeada.pag_fim
-    correcoes = []
 
-    # 1. Metadados do cabeçalho na primeira página
-    page1 = doc[pag_ini - 1]
-    meta = extrair_metadados_cabecalho(page1, codigo_padrao=codigo)
-
-    # 1.1 Auditoria Intermediária e OCR Fallback
-    from .validators import detectar_anomalia_cabecalho
-    from .docling_extractor import extrair_metadados_visuais
-    
+def _extrair_metadados(
+    doc: pdfium.PdfDocument, 
+    mapeada: FichaMapeada, 
+    conversores: Conversores, 
+    pdf_path: Path, 
+    correcoes: List[CorrecaoOcr]
+) -> MetadadosCabecalho:
+    page1 = doc[mapeada.pag_ini - 1]
+    meta = extrair_metadados_cabecalho(page1, codigo_padrao=mapeada.codigo)
     anomalias = detectar_anomalia_cabecalho(meta)
     
-    # Resolve o callable (lazy loader) primeiro
-    instancia_converter = converter() if callable(converter) else converter
-    
-    # Extrai o padrao e o ocr
-    conv_padrao = instancia_converter[0] if isinstance(instancia_converter, tuple) else instancia_converter
-    conv_ocr = instancia_converter[1] if isinstance(instancia_converter, tuple) and len(instancia_converter) > 1 else None
-
-    if anomalias and conv_ocr is not None:
-        logger.warning(f"Ficha {codigo} apresentou anomalias {anomalias}. Acionando OCR...")
-        meta_visual = extrair_metadados_visuais(conv_ocr, pdf_path, pag_ini)
+    if anomalias:
+        logger.warning(f"Ficha {mapeada.codigo} apresentou anomalias {anomalias}. Acionando OCR...")
+        meta_visual = extrair_metadados_visuais(conversores.ocr, pdf_path, mapeada.pag_ini)
         
         for campo in anomalias:
-            valor_antigo = meta.get(campo, "")
+            valor_antigo = getattr(meta, campo, "")
             valor_novo = meta_visual.get(campo)
             if valor_novo:
-                meta[campo] = valor_novo
-                correcoes.append(CorrecaoOcr(ficha=codigo, campo=campo, antigo=valor_antigo, novo=valor_novo))
+                setattr(meta, campo, valor_novo)
+                correcoes.append(CorrecaoOcr(ficha=mapeada.codigo, campo=campo, antigo=str(valor_antigo), novo=valor_novo))
+    
+    return meta
 
-    # 2. Localiza limites de Informações Complementares
-    has_ic, ic_start_page, ic_y_bound = detectar_limites_ic(doc, pag_ini, pag_fim)
-    col_end_page = ic_start_page if has_ic else pag_fim
-
-    # 3. Costura geométrica das 4 colunas normativas
+def _extrair_colunas_normativas(
+    doc: pdfium.PdfDocument,
+    mapeada: FichaMapeada,
+    col_end_page: int
+) -> Tuple[CampoNormativo, CampoNormativo, CampoNormativo, CampoNormativo]:
     all_col_lines: Dict[int, List[str]] = {0: [], 1: [], 2: [], 3: []}
-    for p in range(pag_ini - 1, col_end_page):
-        is_first = (p == pag_ini - 1)
+    for p in range(mapeada.pag_ini - 1, col_end_page):
+        is_first = (p == mapeada.pag_ini - 1)
         cols_p, _ = extrair_linhas_colunas_pagina(doc[p], is_first_page=is_first)
         for c in range(4):
             all_col_lines[c].extend(cols_p[c])
@@ -189,6 +191,63 @@ def extrair_ficha_completa(
     quando_nao_autuar = processar_coluna_normativa(all_col_lines[1])
     definicoes_procedimentos = processar_coluna_normativa(all_col_lines[2])
     exemplos_observacoes_ait = processar_coluna_normativa(all_col_lines[3])
+    
+    return quando_autuar, quando_nao_autuar, definicoes_procedimentos, exemplos_observacoes_ait
+
+def _montar_ficha(
+    meta: MetadadosCabecalho,
+    colunas: Tuple[CampoNormativo, CampoNormativo, CampoNormativo, CampoNormativo],
+    ic_html: str,
+    imagens: List[str],
+    mapeada: FichaMapeada
+) -> Ficha:
+    quando_autuar, quando_nao_autuar, definicoes_procedimentos, exemplos_observacoes_ait = colunas
+    
+    return Ficha(
+        id=mapeada.codigo,
+        tipificacao_resumida=meta.tipificacao_resumida or "",
+        codigo_enquadramento=meta.codigo_enquadramento,
+        amparo_legal=meta.amparo_legal or "",
+        tipificacao_enquadramento=meta.tipificacao_enquadramento or "",
+        gravidade=meta.gravidade or "",
+        penalidade=meta.penalidade or "",
+        medida_administrativa=meta.medida_administrativa or "",
+        pode_configurar_crime_transito=meta.pode_configurar_crime_transito,
+        infrator=meta.infrator or "",
+        competencia=meta.competencia,
+        competencia_alterada_lei_14599=meta.competencia_alterada_lei_14599,
+        pontuacao=meta.pontuacao or "",
+        constatacao_infracao=meta.constatacao_infracao or "",
+        quando_autuar=quando_autuar,
+        quando_nao_autuar=quando_nao_autuar,
+        definicoes_procedimentos=definicoes_procedimentos,
+        exemplos_observacoes_ait=exemplos_observacoes_ait,
+        informacoes_complementares=ic_html,
+        paginas=list(range(mapeada.pag_ini, mapeada.pag_fim + 1)),
+        imagens=imagens,
+    )
+
+def extrair_ficha_completa(
+    doc: pdfium.PdfDocument,
+    conversores: Conversores,
+    pdf_path: Path,
+    mapeada: FichaMapeada,
+    imagens_dir: Path,
+) -> ResultadoExtracao:
+    """
+    Processa e extrai todos os campos estruturados de uma ficha de fiscalização.
+    """
+    correcoes = []
+
+    # 1. Metadados do cabeçalho na primeira página
+    meta = _extrair_metadados(doc, mapeada, conversores, pdf_path, correcoes)
+
+    # 2. Localiza limites de Informações Complementares
+    has_ic, ic_start_page, ic_y_bound = detectar_limites_ic(doc, mapeada.pag_ini, mapeada.pag_fim)
+    col_end_page = ic_start_page if has_ic else mapeada.pag_fim
+
+    # 3. Costura geométrica das 4 colunas normativas
+    colunas = _extrair_colunas_normativas(doc, mapeada, col_end_page)
 
     # 4. Informações Complementares e Imagens
     if not has_ic:
@@ -197,36 +256,14 @@ def extrair_ficha_completa(
     else:
         ic_html, imagens = extrair_conteudo_ic(
             doc=doc,
-            converter=converter,
+            converter=conversores.padrao,
             pdf_path=pdf_path,
-            codigo_ficha=codigo,
+            codigo_ficha=mapeada.codigo,
             pag_ini_ic=ic_start_page,
-            pag_fim=pag_fim,
+            pag_fim=mapeada.pag_fim,
             ic_y_bound=ic_y_bound,
             imagens_dir=imagens_dir,
         )
 
-    ficha = Ficha(
-        id=codigo,
-        tipificacao_resumida=meta.get("tipificacao_resumida"),
-        codigo_enquadramento=codigo,
-        amparo_legal=meta.get("amparo_legal"),
-        tipificacao_enquadramento=meta.get("tipificacao_enquadramento"),
-        gravidade=meta.get("gravidade"),
-        penalidade=meta.get("penalidade"),
-        medida_administrativa=meta.get("medida_administrativa"),
-        pode_configurar_crime_transito=meta.get("pode_configurar_crime_transito"),
-        infrator=meta.get("infrator"),
-        competencia=meta.get("competencia") or None,
-        competencia_alterada_lei_14599=meta.get("competencia_alterada_lei_14599", False),
-        pontuacao=meta.get("pontuacao"),
-        constatacao_infracao=meta.get("constatacao_infracao"),
-        quando_autuar=quando_autuar,
-        quando_nao_autuar=quando_nao_autuar,
-        definicoes_procedimentos=definicoes_procedimentos,
-        exemplos_observacoes_ait=exemplos_observacoes_ait,
-        informacoes_complementares=ic_html,
-        paginas=list(range(pag_ini, pag_fim + 1)),
-        imagens=imagens,
-    )
+    ficha = _montar_ficha(meta, colunas, ic_html, imagens, mapeada)
     return ResultadoExtracao(ficha=ficha, correcoes_ocr=correcoes)
