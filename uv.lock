@@ -1111,7 +1111,6 @@ name = "mbft-enriquecedor"
 version = "0.1.0"
 source = { editable = "pipelines/enriquecedor" }
 dependencies = [
-    { name = "google-genai" },
     { name = "mbft-core" },
     { name = "polars" },
     { name = "sentence-transformers" },
@@ -1120,7 +1119,6 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "google-genai" },
     { name = "mbft-core", editable = "packages/core" },
     { name = "polars" },
     { name = "sentence-transformers" },

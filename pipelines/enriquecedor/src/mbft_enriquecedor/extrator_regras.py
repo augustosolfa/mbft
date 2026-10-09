@@ -1,9 +1,6 @@
 import re
 from typing import List, Optional
 from pydantic import BaseModel
-from google import genai
-from google.genai import types
-import os
 
 from mbft_core.models.extracao import CampoNormativo, SecaoFichaEnum
 from mbft_core.models.enriquecimento import ItemRegra, NaturezaRegraEnum
@@ -43,13 +40,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ExtratorRegrasAtomo:
-    def __init__(self, llm_client=None):
-        self.client = llm_client
+    def __init__(self):
+        pass
 
     def extrair_itens(self, campo: CampoNormativo, secao_origem: SecaoFichaEnum, codigo_enquadramento: str) -> List[ItemRegra]:
         """
-        Converte as strings do CampoNormativo em ItemRegra estruturado usando heurísticas,
-        com fallback para Gemini caso a estrutura seja complexa.
+        Converte as strings do CampoNormativo em ItemRegra estruturado usando heurísticas determinísticas.
         """
         itens_regras = []
         
@@ -82,17 +78,8 @@ class ExtratorRegrasAtomo:
             if match_pai and not match_sub and texto_item.strip().endswith(":"):
                 continue
                 
-            # 1. Aplicar Heurística Lexical (Expressões Regulares)
+            # Aplicar Heurística Lexical (Expressões Regulares)
             regra = self._inferir_via_heuristica(texto_final, secao_origem, codigo_enquadramento)
-            
-            # 2. Se a heurística não conseguir determinar a natureza_regra, usa fallback (Gemini)
-            if regra.natureza_regra == NaturezaRegraEnum.PROCEDIMENTO_GERAL and secao_origem == SecaoFichaEnum.QUANDO_NAO_AUTUAR:
-                # É suspeito que um item de 'Quando Não Autuar' caia no fallback default de procedimento geral
-                if self.client:
-                    regra_llm = self._inferir_via_llm(texto_final, secao_origem, codigo_enquadramento)
-                    if regra_llm:
-                        regra = regra_llm
-            
             itens_regras.append(regra)
             
         return itens_regras
@@ -130,35 +117,3 @@ class ExtratorRegrasAtomo:
             codigos_concomitantes=concomitantes,
             codigos_redirecionamento=redirecionamentos
         )
-
-    def _inferir_via_llm(self, texto: str, secao: SecaoFichaEnum, codigo_enquadramento: str) -> Optional[ItemRegra]:
-        """
-        Fallback utilizando o Gemini 2.5 Flash-Lite com Structured Outputs.
-        """
-        try:
-            prompt = f"""
-            Analise a seguinte regra extraída da seção '{secao.value}' do Manual Brasileiro de Fiscalização de Trânsito:
-            Regra: "{texto}"
-            
-            Classifique a natureza da regra e extraia códigos de enquadramento (formato NNN-NN).
-            - HIPOTESE_AUTUACAO: Quando descreve uma situação em que o agente DEVE autuar.
-            - EXCECAO_DESVIO: Quando descreve uma situação que NÃO é infração, ou que deve autuar em OUTRO artigo (redirecionamento).
-            - CONCOMITANCIA: Quando manda autuar concorrentemente com outro código.
-            - PROCEDIMENTO_GERAL: Notas, definições ou regras de medição.
-            - EXEMPLO_OBSERVACAO: Sugestão do que escrever no bloco de observações do Auto de Infração.
-            """
-            
-            response = self.client.models.generate_content(
-                model='gemini-2.5-flash-lite',
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=ItemRegra,
-                    temperature=0.0
-                ),
-            )
-            if response.parsed:
-                return response.parsed
-        except Exception:
-            logger.exception("Erro no fallback LLM para a regra: %s", texto)
-        return None

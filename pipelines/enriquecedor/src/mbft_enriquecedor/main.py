@@ -12,15 +12,13 @@ from mbft_enriquecedor.normalizador import (
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
-import os
-from google import genai
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
 class Enriquecedor:
-    def __init__(self, llm_client=None):
-        self.extrator_regras = ExtratorRegrasAtomo(llm_client=llm_client)
+    def __init__(self):
+        self.extrator_regras = ExtratorRegrasAtomo()
 
     def processar_ficha(self, f_bruta: Ficha) -> FichaEnriquecida:
         # Normalização de atributos básicos
@@ -152,10 +150,7 @@ def main():
     if not fichas_brutas:
         return
         
-    api_key = os.environ.get("GEMINI_API_KEY")
-    llm_client = genai.Client(api_key=api_key) if api_key else None
-        
-    enriquecedor = Enriquecedor(llm_client=llm_client)
+    enriquecedor = Enriquecedor()
     fichas_enriquecidas = []
     
     logger.info("Iniciando normalização e extração atômica das regras...")
