@@ -38,13 +38,13 @@ def expandir_codigos(texto: str) -> List[str]:
         
     return sorted(list(codigos_expandidos))
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class ExtratorRegrasAtomo:
-    def __init__(self):
-        self.api_key = os.environ.get("GEMINI_API_KEY")
-        if self.api_key:
-            self.client = genai.Client(api_key=self.api_key)
-        else:
-            self.client = None
+    def __init__(self, llm_client=None):
+        self.client = llm_client
 
     def extrair_itens(self, campo: CampoNormativo, secao_origem: SecaoFichaEnum, codigo_enquadramento: str) -> List[ItemRegra]:
         """
@@ -77,8 +77,6 @@ class ExtratorRegrasAtomo:
                 if ":" in texto_pai_limpo:
                     texto_pai_limpo = texto_pai_limpo.split(":")[0] + ":"
                 ultimo_pai_texto = texto_pai_limpo
-            else:
-                pass
                 
             # Descartar o Chunk Fantasma (pai oco que termina em :)
             if match_pai and not match_sub and texto_item.strip().endswith(":"):
@@ -161,7 +159,6 @@ class ExtratorRegrasAtomo:
             )
             if response.parsed:
                 return response.parsed
-        except Exception as e:
-            print(f"Erro no fallback LLM: {e}")
-            pass
+        except Exception:
+            logger.exception("Erro no fallback LLM para a regra: %s", texto)
         return None

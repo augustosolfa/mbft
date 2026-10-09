@@ -57,7 +57,8 @@ class LayoutAnalyzer:
                 if vw < 5.0 and vh > 20.0:
                     vlines_x.append((b[0] + b[2]) / 2.0)
         except Exception:
-            pass
+            import logging
+            logging.getLogger("MBFT-LayoutAnalyzer").exception("Falha ao detectar as linhas vetoriais divisoras de coluna")
 
         clusters: List[List[float]] = []
         for x in sorted(vlines_x):

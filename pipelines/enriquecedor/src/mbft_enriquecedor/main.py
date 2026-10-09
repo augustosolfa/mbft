@@ -12,13 +12,15 @@ from mbft_enriquecedor.normalizador import (
 )
 from mbft_enriquecedor.tabelas_competencia import obter_competencia_atualizada
 from mbft_enriquecedor.extrator_regras import ExtratorRegrasAtomo
+import os
+from google import genai
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
 class Enriquecedor:
-    def __init__(self):
-        self.extrator_regras = ExtratorRegrasAtomo()
+    def __init__(self, llm_client=None):
+        self.extrator_regras = ExtratorRegrasAtomo(llm_client=llm_client)
 
     def processar_ficha(self, f_bruta: Ficha) -> FichaEnriquecida:
         # Normalização de atributos básicos
@@ -115,9 +117,9 @@ def carregar_fichas_brutas() -> List[Ficha]:
     try:
         with open(input_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-    except Exception as e:
-        logger.error(f"Erro ao ler JSON: {e}")
-        return []
+    except Exception:
+        logger.exception("Erro fatal ao ler JSON de fichas brutas.")
+        raise
         
     fichas = [Ficha(**item) for item in data]
     logger.info(f"{len(fichas)} fichas carregadas do Extrator.")
@@ -149,7 +151,10 @@ def main():
     if not fichas_brutas:
         return
         
-    enriquecedor = Enriquecedor()
+    api_key = os.environ.get("GEMINI_API_KEY")
+    llm_client = genai.Client(api_key=api_key) if api_key else None
+        
+    enriquecedor = Enriquecedor(llm_client=llm_client)
     fichas_enriquecidas = []
     
     logger.info("Iniciando normalização e extração atômica das regras...")

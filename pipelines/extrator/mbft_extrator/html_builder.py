@@ -48,6 +48,7 @@ class ImagemPagina:
     xc: float
     rel_path: str
     width: float
+    img_data: Any = None
 
 @dataclass(frozen=True)
 class LinhaTexto:
@@ -148,9 +149,8 @@ def montar_celula_html(
     return "\n".join(partes)
 
 
-def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_ficha: str, img_idx_inicial: int) -> Tuple[List[ImagemPagina], List[str], int]:
+def extrair_imagens_pagina(page, y_top_limit: float, codigo_ficha: str, img_idx_inicial: int) -> Tuple[List[ImagemPagina], int]:
     page_imgs = []
-    imagens_extraidas = []
     img_idx = img_idx_inicial
 
     for obj in page.get_objects():
@@ -158,15 +158,11 @@ def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_f
             x0, y0, x1, y1 = obj.get_bounds()
             if (x1 - x0) >= MIN_IMG_SIZE and (y1 - y0) >= MIN_IMG_SIZE and y0 >= Y_MIN_IMAGE and y1 <= (y_top_limit + 15.0):
                 img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
-                img_path = imagens_dir / img_nome
                 rel_path = f"imagens/{img_nome}"
 
                 try:
                     bm = obj.get_bitmap()
                     pil_img = bm.to_pil()
-                    pil_img.save(img_path, "PNG")
-                    logger.info(f"Imagem extraída: {img_path} ({pil_img.width}x{pil_img.height} px)")
-                    imagens_extraidas.append(rel_path)
                     img_idx += 1
                     page_imgs.append(ImagemPagina(
                         bounds=(x0, y0, x1, y1),
@@ -174,11 +170,12 @@ def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_f
                         yc=(y0 + y1) / 2.0, xc=(x0 + x1) / 2.0,
                         rel_path=rel_path,
                         width=x1 - x0,
+                        img_data=pil_img
                     ))
-                except Exception as e:
-                    logger.warning(f"Erro ao salvar bitmap {img_nome}: {e}")
+                except Exception:
+                    logger.exception(f"Erro ao extrair bitmap {img_nome}")
 
-    return page_imgs, imagens_extraidas, img_idx
+    return page_imgs, img_idx
 
 def coletar_retangulos_texto(tp, y_top_limit: float) -> List[RetanguloTexto]:
     page_rects = []
@@ -286,17 +283,18 @@ def construir_html_informacoes_complementares(
     """
     imagens_dir.mkdir(parents=True, exist_ok=True)
     imagens_extraidas_totais: List[str] = []
+    todas_imagens: List[ImagemPagina] = []
     blocos_html: List[str] = []
     img_idx = 1
 
     for p_no in range(pag_ini_ic - 1, pag_fim):
         page = doc[p_no]
         tp = page.get_textpage()
-        w, h = page.get_size()
+        _, h = page.get_size()
         y_top_limit = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else (h - Y_TOP_LIMIT_DEFAULT)
 
-        page_imgs, novas_imagens, img_idx = extrair_imagens_pagina(page, y_top_limit, imagens_dir, codigo_ficha, img_idx)
-        imagens_extraidas_totais.extend(novas_imagens)
+        page_imgs, img_idx = extrair_imagens_pagina(page, y_top_limit, codigo_ficha, img_idx)
+        todas_imagens.extend(page_imgs)
 
         page_rects = coletar_retangulos_texto(tp, y_top_limit)
 
@@ -309,6 +307,15 @@ def construir_html_informacoes_complementares(
             bloco_secao = renderizar_secao(title, yt, yb, page_imgs, internal_rects, codigo_ficha)
             if bloco_secao:
                 blocos_html.append(bloco_secao)
+
+    for img in todas_imagens:
+        img_path = imagens_dir / Path(img.rel_path).name
+        try:
+            img.img_data.save(img_path, "PNG")
+            logger.info(f"Imagem gravada: {img_path} ({img.img_data.width}x{img.img_data.height} px)")
+            imagens_extraidas_totais.append(img.rel_path)
+        except Exception:
+            logger.exception(f"Erro ao salvar bitmap em disco: {img_path}")
 
     if tabelas_docling:
         for tab in tabelas_docling:
