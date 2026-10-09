@@ -1,23 +1,34 @@
-import json
+﻿import json
 import os
 import shutil
+import logging
 from pathlib import Path
+from typing import Optional
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-# Importa a tipagem do mbft-core
 from mbft_core.models.enriquecimento import FichaEnriquecida
+from mbft_core.paths import PROCESSED_DIR
 
-def run_build():
-    print("Iniciando build do Site Estático (SSG)...")
+logger = logging.getLogger(__name__)
+
+def run_build(
+    fichas_json: Optional[Path] = None,
+    templates_dir: Optional[Path] = None,
+    output_dir: Optional[Path] = None,
+    imagens_src: Optional[Path] = None
+):
+    if fichas_json is None:
+        fichas_json = PROCESSED_DIR / "enriquecedor" / "fichas_enriquecidas.json"
+    if templates_dir is None:
+        templates_dir = Path(__file__).resolve().parent / "templates"
+    if output_dir is None:
+        output_dir = PROCESSED_DIR / "site"
+    if imagens_src is None:
+        imagens_src = PROCESSED_DIR / "extrator" / "imagens"
+
+    logger.info("Iniciando build do Site Estático (SSG)...")
     
-    # Caminhos
-    project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
-    templates_dir = Path(__file__).resolve().parent / "templates"
-    output_dir = project_root / "data" / "processed" / "site"
     fichas_out_dir = output_dir / "fichas"
-    
-    json_path = project_root / "data" / "processed" / "enriquecedor" / "fichas_enriquecidas.json"
-    imagens_src = project_root / "data" / "processed" / "extrator" / "imagens"
     imagens_dst = output_dir / "imagens"
     
     # Prepara diretório de saída
@@ -36,8 +47,8 @@ def run_build():
     template_ficha = env.get_template("ficha.html")
     
     # Carrega e converte os dados
-    print(f"Lendo dados de: {json_path}")
-    with open(json_path, "r", encoding="utf-8") as f:
+    logger.info(f"Lendo dados de: {fichas_json}")
+    with open(fichas_json, "r", encoding="utf-8") as f:
         dados_brutos = json.load(f)
         
     fichas = []
@@ -69,7 +80,8 @@ def run_build():
     out_chat = output_dir / "chat.html"
     out_chat.write_text(html_chat, encoding="utf-8")
 
-    print(f"Build concluído com sucesso! {len(fichas)} fichas geradas em: {output_dir}")
+    logger.info(f"Build concluído com sucesso! {len(fichas)} fichas geradas em: {output_dir}")
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     run_build()
