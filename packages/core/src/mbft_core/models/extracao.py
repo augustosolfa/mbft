@@ -70,14 +70,6 @@ class Ficha(BaseModel):
     paginas: List[int] = Field(default_factory=list, description="Páginas do PDF (1-indexadas) de onde a ficha foi extraída")
     imagens: List[str] = Field(default_factory=list, description="Caminhos relativos das imagens extraídas para esta ficha")
 
-    @field_validator("codigo_enquadramento")
-    @classmethod
-    def validar_consistencia_id(cls, v: str, info) -> str:
-        id_val = info.data.get("id") if info.data else None
-        if id_val and v != id_val:
-            raise ValueError(f"codigo_enquadramento ('{v}') deve ser idêntico ao id ('{id_val}')")
-        return v
-
     @field_validator("competencia")
     @classmethod
     def validar_competencia(cls, v: Optional[str]) -> Optional[str]:

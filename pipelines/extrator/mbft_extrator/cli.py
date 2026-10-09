@@ -50,7 +50,7 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> ResultadoExtracao:
     pdf_path = Path(tarefa.pdf_path)
     imagens_dir = Path(tarefa.imagens_dir)
     cache_fichas_dir = Path(tarefa.cache_fichas_dir)
-    f_cache = cache_fichas_dir / f"ficha_{m.codigo}.json"
+    f_cache = cache_fichas_dir / f"ficha_{m.identificador}.json"
 
     # Checkpoint
     if f_cache.exists() and not tarefa.force:
@@ -90,7 +90,7 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> ResultadoExtracao:
     if tarefa.pasta_individuais:
         pasta_indiv = Path(tarefa.pasta_individuais)
         pasta_indiv.mkdir(parents=True, exist_ok=True)
-        with open(pasta_indiv / f"ficha_{m.codigo}.json", "w", encoding="utf-8") as f:
+        with open(pasta_indiv / f"ficha_{m.identificador}.json", "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
 
     return resultado

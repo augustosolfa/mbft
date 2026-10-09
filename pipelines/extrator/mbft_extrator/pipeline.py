@@ -216,7 +216,7 @@ def _montar_ficha(
     mapeada: FichaMapeada
 ) -> Ficha:
     return Ficha(
-        id=mapeada.codigo,
+        id=mapeada.identificador,
         tipificacao_resumida=meta.tipificacao_resumida or "",
         codigo_enquadramento=meta.codigo_enquadramento,
         amparo_legal=meta.amparo_legal or "",

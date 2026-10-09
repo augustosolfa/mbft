@@ -52,14 +52,19 @@ def run_build(
         dados_brutos = json.load(f)
         
     fichas = []
+    seen_ids = set()
     for item in dados_brutos:
         # Validação estrita via Pydantic
         ficha = FichaEnriquecida(**item)
         fichas.append(ficha)
         
+        if ficha.id in seen_ids:
+            raise ValueError(f"Colisão de ID detectada: o arquivo {ficha.id}.html seria sobrescrito.")
+        seen_ids.add(ficha.id)
+        
         # Gera HTML da Ficha
         html_ficha = template_ficha.render(ficha=ficha)
-        out_ficha = fichas_out_dir / f"{ficha.codigo_enquadramento}.html"
+        out_ficha = fichas_out_dir / f"{ficha.id}.html"
         out_ficha.write_text(html_ficha, encoding="utf-8")
         
     # Gera HTML da Lista Completa
