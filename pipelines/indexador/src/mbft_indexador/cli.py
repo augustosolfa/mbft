@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from mbft_core.models import FichaEnriquecida
 from mbft_core.models.indexacao import ChunkPayload
-from mbft_core.chunker import gerar_chunks_ficha
+from mbft_indexador.chunker import gerar_chunks_ficha
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
