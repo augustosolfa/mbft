@@ -15,6 +15,7 @@ class ChunkMetadados(BaseModel):
     infratores: List[str] = Field(default_factory=list, description="Lista de infratores aplicáveis")
     competencias: List[str] = Field(default_factory=list, description="Lista de esferas de competência")
     texto_contextualizado: str = Field(..., description="Texto do fragmento original com prefixo (usado para RAG)")
+    natureza_regra: Optional[str] = Field(default=None, description="Classificação semântica da regra atômica (ex: EXCECAO_DESVIO)")
 
 
 class ChunkPayload(BaseModel):

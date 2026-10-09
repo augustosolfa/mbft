@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from mbft_core.models import FichaEnriquecida
 from mbft_core.models.indexacao import ChunkPayload
-from mbft_indexador.chunker import processar_ficha
+from mbft_indexador.chunker import gerar_chunks_ficha
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ def main():
     logger.info("Iniciando processo de chunking...")
     todos_chunks = []
     for ficha in tqdm(fichas, desc="Fazendo chunking"):
-        chunks = processar_ficha(ficha)
+        chunks = gerar_chunks_ficha(ficha)
         todos_chunks.extend(chunks)
         
     logger.info(f"Total de {len(todos_chunks)} chunks gerados.")
@@ -56,24 +56,24 @@ def main():
         payloads = []
         for c in todos_chunks:
             payloads.append(ChunkPayload(
-                id=c["id"],
+                id=c.id,
                 values=[0.0] * 1024,
-                metadata=c["metadata"]
+                metadata=c.metadata
             ))
     else:
         logger.info("Carregando modelo de embeddings...")
         from mbft_indexador.embedder import GeradorEmbeddings
         embedder = GeradorEmbeddings()
         
-        textos_para_vetorizar = [c["texto_para_embedding"] for c in todos_chunks]
+        textos_para_vetorizar = [c.texto_para_embedding for c in todos_chunks]
         vetores = embedder.gerar_embeddings_lote(textos_para_vetorizar, batch_size=args.batch_size)
         
         payloads = []
         for i, c in enumerate(todos_chunks):
             payloads.append(ChunkPayload(
-                id=c["id"],
+                id=c.id,
                 values=vetores[i],
-                metadata=c["metadata"]
+                metadata=c.metadata
             ))
             
     logger.info(f"Salvando artefato JSONL (NDJSON) em {output_path}...")

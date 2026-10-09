@@ -6,31 +6,33 @@ Gera o relatório 'relatorio_extracao.md'.
 import logging
 from pathlib import Path
 from typing import List, Dict, Any
+from dataclasses import dataclass
 
 from .models import Ficha
 
 logger = logging.getLogger("MBFT-Auditoria")
 
-class AuditoriaGeral:
-    correcoes_ocr = []
 
-    @classmethod
-    def registrar_correcao_ocr(cls, ficha_id: str, campo: str, valor_antigo: str, valor_novo: str):
-        cls.correcoes_ocr.append({
-            "ficha": ficha_id,
-            "campo": campo,
-            "antigo": valor_antigo,
-            "novo": valor_novo
-        })
+@dataclass(frozen=True)
+class CorrecaoOcr:
+    ficha: str
+    campo: str
+    antigo: str
+    novo: str
+
 
 def gerar_relatorio_auditoria(
     fichas: List[Ficha],
     total_paginas_pdf: int,
     output_path: Path,
+    correcoes_ocr: List[CorrecaoOcr] = None,
 ) -> Path:
     """
     Gera relatório em Markdown detalhando a integridade dos dados extraídos.
     """
+    if correcoes_ocr is None:
+        correcoes_ocr = []
+
     logger.info("Gerando relatório de auditoria e controle de qualidade...")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -94,10 +96,10 @@ def gerar_relatorio_auditoria(
         "",
         "## 4. Intervenções do OCR (Visual Fallback)",
     ])
-    if AuditoriaGeral.correcoes_ocr:
-        linhas.append(f"O motor de OCR visual interveio em {len(AuditoriaGeral.correcoes_ocr)} campos sujos:")
-        for cor in AuditoriaGeral.correcoes_ocr:
-            linhas.append(f"- **Ficha {cor['ficha']}** (`{cor['campo']}`): substituído de `{cor['antigo']}` para `{cor['novo']}`")
+    if correcoes_ocr:
+        linhas.append(f"O motor de OCR visual interveio em {len(correcoes_ocr)} campos sujos:")
+        for cor in correcoes_ocr:
+            linhas.append(f"- **Ficha {cor.ficha}** (`{cor.campo}`): substituído de `{cor.antigo}` para `{cor.novo}`")
     else:
         linhas.append("- ✅ Nenhuma anomalia detectada que exigisse OCR.")
 

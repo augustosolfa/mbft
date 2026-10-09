@@ -59,6 +59,7 @@ class CompetenciaEnum(str, Enum):
 class CompetenciaFonteEnum(str, Enum):
     MBFT_ORIGINAL = "MBFT_ORIGINAL"
     RESOLUCAO_LEI_14599 = "RESOLUCAO_LEI_14599"
+    NAO_RESOLVIDA = "NAO_RESOLVIDA"
 
 class NaturezaRegraEnum(str, Enum):
     HIPOTESE_AUTUACAO = "HIPOTESE_AUTUACAO"
@@ -113,6 +114,7 @@ class FichaEnriquecida(BaseModel):
     crime_transito: bool
     pontuacao_valor: int = Field(default=0, description="0, 3, 4, 5 ou 7 pontos")
     pontuacao_suspensiva: bool = Field(default=False, description="True se gera suspensão direta da CNH")
+    pontuacao_asterisco: bool = Field(default=False, description="True se a pontuação possui asterisco (ex: vide item...)")
     constatacao_infracao: List[ConstatacaoInfracaoEnum]
     
     # Informações Extraídas (IE)

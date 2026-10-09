@@ -1,7 +1,7 @@
 import sqlite3
 import os
 from fastapi import Request, Depends
-from typing import Any
+from typing import Any, Protocol
 
 # Durante o dev local, usaremos um arquivo SQLite.
 # Em produção (Cloudflare), usaremos request.scope["env"]["DB"] (binding D1)
@@ -22,34 +22,15 @@ def init_local_db():
         conn.commit()
         conn.close()
 
-def get_db(request: Request) -> Any:
-    """
-    Dependência FastAPI que retorna a conexão com o banco.
-    Injeta o D1 no Cloudflare ou o SQLite em ambiente local.
-    """
-    env = request.scope.get("env", {})
-    if "DB" in env:
-        # Retorna o binding D1 nativo do Cloudflare
-        yield env["DB"]
-    else:
-        # Ambiente Local (Uvicorn)
-        init_local_db()
-        conn = sqlite3.connect(LOCAL_DB_PATH, check_same_thread=False)
-        try:
-            yield conn
-        finally:
-            conn.close()
+class FilaRepository(Protocol):
+    async def avancar_fila_global(self, segundos: int = 60) -> str:
+        ...
 
-class FilaRepository:
-    def __init__(self, db: Any):
+class SqliteFilaRepository:
+    def __init__(self, db: sqlite3.Connection):
         self.db = db
-        # Se db possuir o atributo 'cursor', é o SQLite local. Caso contrário, é o D1.
-        self.is_local = hasattr(self.db, "cursor")
 
     async def avancar_fila_global(self, segundos: int = 60) -> str:
-        """
-        Avança a fila global de forma atômica e retorna o novo horário ISO.
-        """
         query = '''
             UPDATE fila_global 
             SET next_available = datetime(
@@ -62,17 +43,46 @@ class FilaRepository:
             WHERE id = 1 
             RETURNING next_available;
         '''
-        
-        if self.is_local:
-            cursor = self.db.cursor()
-            cursor.execute(query, (segundos,))
-            row = cursor.fetchone()
-            self.db.commit()
-            return row[0] if row else ""
-        else:
-            # Bindings do Cloudflare D1 em Python
-            # A API pyodide do Cloudflare mapeia prepare().bind().first()
-            stmt = self.db.prepare(query).bind(segundos)
-            result = await stmt.first()
-            return result["next_available"] if result else ""
+        cursor = self.db.cursor()
+        cursor.execute(query, (segundos,))
+        row = cursor.fetchone()
+        self.db.commit()
+        return row[0] if row else ""
+
+class D1FilaRepository:
+    def __init__(self, db: Any):
+        self.db = db
+
+    async def avancar_fila_global(self, segundos: int = 60) -> str:
+        query = '''
+            UPDATE fila_global 
+            SET next_available = datetime(
+                max(
+                    CAST(strftime('%s', next_available) AS INTEGER), 
+                    CAST(strftime('%s', 'now') AS INTEGER)
+                ) + ?, 
+                'unixepoch'
+            ) 
+            WHERE id = 1 
+            RETURNING next_available;
+        '''
+        stmt = self.db.prepare(query).bind(segundos)
+        result = await stmt.first()
+        return result["next_available"] if result else ""
+
+def get_db(request: Request) -> FilaRepository:
+    """
+    Dependência FastAPI que retorna a conexão com o banco como FilaRepository.
+    Injeta o D1 no Cloudflare ou o SQLite em ambiente local.
+    """
+    env = request.scope.get("env", {})
+    if "DB" in env:
+        yield D1FilaRepository(env["DB"])
+    else:
+        init_local_db()
+        conn = sqlite3.connect(LOCAL_DB_PATH, check_same_thread=False)
+        try:
+            yield SqliteFilaRepository(conn)
+        finally:
+            conn.close()
 

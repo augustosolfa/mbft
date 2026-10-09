@@ -3,9 +3,16 @@ Modelos de dados para a etapa de extração do MBFT.
 Serve como guardrail de saída do Extrator e guardrail de entrada do Enriquecedor.
 """
 
+from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+
+class SecaoFichaEnum(str, Enum):
+    QUANDO_AUTUAR = "QUANDO_AUTUAR"
+    QUANDO_NAO_AUTUAR = "QUANDO_NAO_AUTUAR"
+    DEFINICOES_PROCEDIMENTOS = "DEFINICOES_PROCEDIMENTOS"
+    EXEMPLOS_AIT = "EXEMPLOS_AIT"
 
 class CampoNormativo(BaseModel):
     """

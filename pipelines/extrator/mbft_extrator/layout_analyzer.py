@@ -6,6 +6,17 @@ import re
 from typing import Dict, List, Optional, Tuple
 import pypdfium2 as pdfium
 
+from .pdf_geometry import (
+    Y_TOP_PRIMEIRA_PAGINA,
+    MARGEM_ESQUERDA_TITULO,
+    COL_BOUNDS_PCT,
+    RE_IC_HEADER,
+    RE_QUANDO_AUTUAR,
+    RE_COLUMN_HEADER,
+    linhas_vetoriais,
+    agrupar_em_linhas,
+)
+
 
 class LayoutAnalyzer:
     """
@@ -18,18 +29,6 @@ class LayoutAnalyzer:
 
     # Tolerância vertical para agrupar fragmentos na mesma linha
     Y_LINE_TOLERANCE: float = 3.2
-
-    # Regex para ignorar cabeçalhos repetitivos impressos no topo de colunas
-    RE_COLUMN_HEADER = re.compile(
-        r"^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es\s+e\s+procedimentos|exemplos\s+do\s+campo.*):?$",
-        re.IGNORECASE,
-    )
-
-    # Regex para detecção de início da seção de Informações Complementares
-    RE_IC_HEADER = re.compile(r"^informa[cç][oõ]es\s+complementares:?$", re.IGNORECASE)
-
-    # Regex para identificação da linha de início das colunas
-    RE_QUANDO_AUTUAR = re.compile(r"quando\s+autuar", re.IGNORECASE)
 
     def __init__(self, page: pdfium.PdfPage, is_first_page: bool = False):
         self.page = page
@@ -50,16 +49,16 @@ class LayoutAnalyzer:
         vlines_x: List[float] = []
 
         try:
-            for obj in self.page.get_objects():
-                if getattr(obj, "type", None) == 2:  # FPDF_PAGEOBJ_PATH
-                    b = obj.get_bounds()
-                    vw = b[2] - b[0]
-                    vh = b[3] - b[1]
-                    # Traço vertical fino e com altura mínima representativa
-                    if vw < 5.0 and vh > 20.0:
-                        vlines_x.append((b[0] + b[2]) / 2.0)
+            paths = linhas_vetoriais(self.page)
+            for b in paths:
+                vw = b[2] - b[0]
+                vh = b[3] - b[1]
+                # Traço vertical fino e com altura mínima representativa
+                if vw < 5.0 and vh > 20.0:
+                    vlines_x.append((b[0] + b[2]) / 2.0)
         except Exception:
-            pass
+            import logging
+            logging.getLogger("MBFT-LayoutAnalyzer").exception("Falha ao detectar as linhas vetoriais divisoras de coluna")
 
         clusters: List[List[float]] = []
         for x in sorted(vlines_x):
@@ -72,10 +71,8 @@ class LayoutAnalyzer:
 
         means = [sum(c) / len(c) for c in clusters]
 
-        # Proporções esperadas das 3 divisórias internas: ~28%, ~50% e ~73%
-        expected_pct = [0.28, 0.50, 0.73]
         bounds: List[float] = []
-        for exp in expected_pct:
+        for exp in COL_BOUNDS_PCT:
             target = w * exp
             if means:
                 best = min(means, key=lambda x: abs(x - target))
@@ -121,11 +118,11 @@ class LayoutAnalyzer:
         ic_y_bound: Optional[float] = None
 
         # Localiza se a seção "Informações Complementares" se inicia nesta página como título
-        # Deve estar na margem esquerda (r[0] < 60) para não colidir com citações no corpo das colunas
+        # Deve estar na margem esquerda (r[0] < MARGEM_ESQUERDA_TITULO) para não colidir com citações no corpo das colunas
         for i in range(self.num_rects):
             r = self.tp.get_rect(i)
             txt = self.tp.get_text_bounded(*r).strip()
-            if r[0] < 60 and self.RE_IC_HEADER.match(txt):
+            if r[0] < MARGEM_ESQUERDA_TITULO and RE_IC_HEADER.match(txt):
                 y_bottom = max(y_bottom, r[3])
                 ic_y_bound = r[3]
 
@@ -170,8 +167,8 @@ class LayoutAnalyzer:
         for i in range(self.num_rects):
             r = self.tp.get_rect(i)  # (x0, y0, x1, y1)
 
-            # Na primeira página, caixas muito altas acima de 715 pt são do cabeçalho
-            if self.is_first_page and r[1] > 715:
+            # Na primeira página, caixas muito altas acima de Y_TOP_PRIMEIRA_PAGINA pt são do cabeçalho
+            if self.is_first_page and r[1] > Y_TOP_PRIMEIRA_PAGINA:
                 continue
 
             # Apenas caixas situadas no intervalo vertical das colunas
@@ -181,7 +178,7 @@ class LayoutAnalyzer:
                     continue
 
                 # Ignora cabeçalhos de coluna repetitivos
-                if self.RE_COLUMN_HEADER.search(txt):
+                if RE_COLUMN_HEADER.search(txt):
                     continue
 
                 ch = self.get_column_channel(r[0], r[2])
@@ -210,27 +207,15 @@ class LayoutAnalyzer:
             if not boxes:
                 continue
 
-            # Calcula centro vertical (yc) de cada caixa e ordena de cima para baixo
-            b_yc = [(b[0], (b[0][1] + b[0][3]) / 2.0, b[1]) for b in boxes]
-            b_yc.sort(key=lambda item: -item[1])
-
-            channel_lines: List[List[Tuple[float, float, str]]] = []
-            curr_line: List[Tuple[float, float, str]] = []
-            curr_y: Optional[float] = None
-
-            for r, yc, txt in b_yc:
-                if curr_y is None or abs(yc - curr_y) <= self.Y_LINE_TOLERANCE:
-                    curr_line.append((r[0], r[2], txt))
-                    curr_y = yc if len(curr_line) == 1 else (curr_y + yc) / 2.0
-                else:
-                    curr_line.sort(key=lambda x: x[0])
-                    channel_lines.append(curr_line)
-                    curr_line = [(r[0], r[2], txt)]
-                    curr_y = yc
-
-            if curr_line:
-                curr_line.sort(key=lambda x: x[0])
-                channel_lines.append(curr_line)
+            # item format: (r, yc, txt)
+            b_items = [(b[0], (b[0][1] + b[0][3]) / 2.0, b[1]) for b in boxes]
+            
+            linhas_agrupadas = agrupar_em_linhas(b_items, lambda x: x[1], self.Y_LINE_TOLERANCE)
+            
+            channel_lines = []
+            for curr_line in linhas_agrupadas:
+                curr_line.sort(key=lambda x: x[0][0]) # sort by x0
+                channel_lines.append([(it[0][0], it[0][2], it[2]) for it in curr_line])
 
             cols_clusters[ch] = channel_lines
 
