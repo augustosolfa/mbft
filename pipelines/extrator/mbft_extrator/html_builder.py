@@ -110,6 +110,129 @@ def montar_celula_html(
     return "\n".join(partes)
 
 
+def extrair_imagens_pagina(page, y_top_limit: float, imagens_dir: Path, codigo_ficha: str, img_idx_inicial: int) -> Tuple[List[Dict[str, Any]], List[str], int]:
+    page_imgs = []
+    imagens_extraidas = []
+    img_idx = img_idx_inicial
+
+    for obj in page.get_objects():
+        if obj.type == pdfium.raw.FPDF_PAGEOBJ_IMAGE:
+            x0, y0, x1, y1 = obj.get_bounds()
+            if (x1 - x0) >= 25.0 and (y1 - y0) >= 25.0 and y0 >= 30.0 and y1 <= (y_top_limit + 15.0):
+                img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
+                img_path = imagens_dir / img_nome
+                rel_path = f"imagens/{img_nome}"
+
+                try:
+                    bm = obj.get_bitmap()
+                    pil_img = bm.to_pil()
+                    pil_img.save(img_path, "PNG")
+                    logger.info(f"Imagem extraída: {img_path} ({pil_img.width}x{pil_img.height} px)")
+                    imagens_extraidas.append(rel_path)
+                    img_idx += 1
+                    page_imgs.append({
+                        "bounds": (x0, y0, x1, y1),
+                        "x0": x0, "y0": y0, "x1": x1, "y1": y1,
+                        "yc": (y0 + y1) / 2.0, "xc": (x0 + x1) / 2.0,
+                        "rel_path": rel_path,
+                        "width": x1 - x0,
+                    })
+                except Exception as e:
+                    logger.warning(f"Erro ao salvar bitmap {img_nome}: {e}")
+
+    return page_imgs, imagens_extraidas, img_idx
+
+def coletar_retangulos_texto(tp, y_top_limit: float) -> List[Dict[str, Any]]:
+    page_rects = []
+    for i in range(tp.count_rects()):
+        r = tp.get_rect(i)
+        if r[3] <= y_top_limit and r[1] >= 30.0:
+            txt = tp.get_text_bounded(*r).strip()
+            if not txt:
+                continue
+            # Remove ruídos e cabeçalhos de controle
+            if re.match(r"^informa[cç][oõ]es\s+complementares:?$", txt, re.IGNORECASE):
+                continue
+            if any(x in txt.upper() for x in ["CONSELHO NACIONAL", "MANUAL BRASILEIRO", "MBFT", "FICHA DE FISCALIZAÇÃO"]):
+                continue
+
+            yc = (r[1] + r[3]) / 2.0
+            xc = (r[0] + r[2]) / 2.0
+            page_rects.append({"rect": r, "yc": yc, "xc": xc, "txt": txt, "id": i})
+    return page_rects
+
+def detectar_secoes(page_rects: List[Dict[str, Any]], y_top_limit: float) -> Tuple[List[Tuple[str, float, float]], List[Dict[str, Any]]]:
+    global_lines = agrupar_retangulos_em_linhas(page_rects)
+    sections = []
+    section_rect_ids = set()
+    for gl in global_lines:
+        if gl["x0"] < 80.0 and re.match(r"^\d+\.", gl["text"]):
+            sections.append(gl)
+            for r_item in gl["rects"]:
+                section_rect_ids.add(r_item["id"])
+
+    if not sections:
+        sections = [{"y": y_top_limit, "text": "", "rects": [], "x0": 0.0}]
+
+    internal_rects = [r for r in page_rects if r["id"] not in section_rect_ids]
+
+    section_bounds = []
+    if sections and sections[0]["text"] and (y_top_limit - sections[0]["y"] > 25.0):
+        section_bounds.append(("", y_top_limit, sections[0]["y"]))
+
+    for idx, s in enumerate(sections):
+        yt = s["y"]
+        yb = sections[idx + 1]["y"] if idx + 1 < len(sections) else 30.0
+        section_bounds.append((s["text"], yt, yb))
+
+    return section_bounds, internal_rects
+
+def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[Dict[str, Any]], internal_rects: List[Dict[str, Any]], codigo_ficha: str) -> str:
+    blocos = []
+    sec_imgs = [img for img in page_imgs if yb <= img["yc"] <= yt]
+    sec_rects = [r for r in internal_rects if yb <= r["yc"] <= yt]
+
+    left_imgs = [img for img in sec_imgs if img["x1"] <= 290.0]
+    right_imgs = [img for img in sec_imgs if img["x0"] >= 280.0]
+    wide_imgs = [img for img in sec_imgs if img not in left_imgs and img not in right_imgs]
+
+    left_rects = [r for r in sec_rects if r["rect"][2] <= 300.0]
+    right_rects = [r for r in sec_rects if r["rect"][0] >= 280.0]
+
+    left_lines = agrupar_retangulos_em_linhas(left_rects)
+    right_lines = agrupar_retangulos_em_linhas(right_rects)
+
+    if title:
+        blocos.append(f"<p><strong>{title}</strong></p>")
+
+    # Condição para 2 colunas:
+    is_2col = (len(left_imgs) > 0 and len(right_imgs) > 0 and len(wide_imgs) == 0) or (
+        len(left_imgs) == 0 and len(right_imgs) == 0 and len(wide_imgs) == 0
+        and len(left_lines) > 0 and len(right_lines) > 0
+        and abs(len(left_lines) - len(right_lines)) <= 4
+    )
+
+    if is_2col:
+        td_left = montar_celula_html(left_lines, left_imgs, codigo_ficha=codigo_ficha)
+        td_right = montar_celula_html(right_lines, right_imgs, codigo_ficha=codigo_ficha)
+        tabela = (
+            "<table>\n"
+            "  <tr>\n"
+            f"    <td>\n{td_left}\n    </td>\n"
+            f"    <td>\n{td_right}\n    </td>\n"
+            "  </tr>\n"
+            "</table>"
+        )
+        blocos.append(tabela)
+    else:
+        # 1 coluna linear
+        all_lines = agrupar_retangulos_em_linhas(sec_rects)
+        conteudo = montar_celula_html(all_lines, sec_imgs, codigo_ficha=codigo_ficha)
+        if conteudo:
+            blocos.append(conteudo)
+            
+    return "\n\n".join(blocos)
+
 def construir_html_informacoes_complementares(
     doc: pdfium.PdfDocument,
     codigo_ficha: str,
@@ -124,7 +247,7 @@ def construir_html_informacoes_complementares(
     Identifica ilustrações nativas, monta tabelas de 2 colunas quando cabível e parágrafos estruturados.
     """
     imagens_dir.mkdir(parents=True, exist_ok=True)
-    imagens_extraidas: List[str] = []
+    imagens_extraidas_totais: List[str] = []
     blocos_html: List[str] = []
     img_idx = 1
 
@@ -134,128 +257,24 @@ def construir_html_informacoes_complementares(
         w, h = page.get_size()
         y_top_limit = ic_y_bound if (p_no == pag_ini_ic - 1 and ic_y_bound is not None) else (h - 40.0)
 
-        # 1. Coleta objetos de imagem nativos
-        page_imgs: List[Dict[str, Any]] = []
-        for obj in page.get_objects():
-            if obj.type == pdfium.raw.FPDF_PAGEOBJ_IMAGE:
-                x0, y0, x1, y1 = obj.get_bounds()
-                if (x1 - x0) >= 25.0 and (y1 - y0) >= 25.0 and y0 >= 30.0 and y1 <= (y_top_limit + 15.0):
-                    img_nome = f"ficha{codigo_ficha}_{img_idx}.png"
-                    img_path = imagens_dir / img_nome
-                    rel_path = f"imagens/{img_nome}"
+        page_imgs, novas_imagens, img_idx = extrair_imagens_pagina(page, y_top_limit, imagens_dir, codigo_ficha, img_idx)
+        imagens_extraidas_totais.extend(novas_imagens)
 
-                    try:
-                        bm = obj.get_bitmap()
-                        pil_img = bm.to_pil()
-                        pil_img.save(img_path, "PNG")
-                        logger.info(f"Imagem extraída: {img_path} ({pil_img.width}x{pil_img.height} px)")
-                        imagens_extraidas.append(rel_path)
-                        img_idx += 1
-                        page_imgs.append({
-                            "bounds": (x0, y0, x1, y1),
-                            "x0": x0, "y0": y0, "x1": x1, "y1": y1,
-                            "yc": (y0 + y1) / 2.0, "xc": (x0 + x1) / 2.0,
-                            "rel_path": rel_path,
-                            "width": x1 - x0,
-                        })
-                    except Exception as e:
-                        logger.warning(f"Erro ao salvar bitmap {img_nome}: {e}")
-
-        # 2. Coleta retângulos de texto da região de Informações Complementares
-        page_rects: List[Dict[str, Any]] = []
-        for i in range(tp.count_rects()):
-            r = tp.get_rect(i)
-            if r[3] <= y_top_limit and r[1] >= 30.0:
-                txt = tp.get_text_bounded(*r).strip()
-                if not txt:
-                    continue
-                # Remove ruídos e cabeçalhos de controle
-                if re.match(r"^informa[cç][oõ]es\s+complementares:?$", txt, re.IGNORECASE):
-                    continue
-                if any(x in txt.upper() for x in ["CONSELHO NACIONAL", "MANUAL BRASILEIRO", "MBFT", "FICHA DE FISCALIZAÇÃO"]):
-                    continue
-
-                yc = (r[1] + r[3]) / 2.0
-                xc = (r[0] + r[2]) / 2.0
-                page_rects.append({"rect": r, "yc": yc, "xc": xc, "txt": txt, "id": i})
+        page_rects = coletar_retangulos_texto(tp, y_top_limit)
 
         if not page_rects and not page_imgs:
             continue
 
-        # 3. Detecta seções numeradas (ex: '1.', '2.')
-        global_lines = agrupar_retangulos_em_linhas(page_rects)
-        sections: List[Dict[str, Any]] = []
-        section_rect_ids = set()
-        for gl in global_lines:
-            if gl["x0"] < 80.0 and re.match(r"^\d+\.", gl["text"]):
-                sections.append(gl)
-                for r_item in gl["rects"]:
-                    section_rect_ids.add(r_item["id"])
+        section_bounds, internal_rects = detectar_secoes(page_rects, y_top_limit)
 
-        if not sections:
-            sections = [{"y": y_top_limit, "text": "", "rects": [], "x0": 0.0}]
-
-        internal_rects = [r for r in page_rects if r["id"] not in section_rect_ids]
-
-        section_bounds: List[Tuple[str, float, float]] = []
-        if sections and sections[0]["text"] and (y_top_limit - sections[0]["y"] > 25.0):
-            section_bounds.append(("", y_top_limit, sections[0]["y"]))
-
-        for idx, s in enumerate(sections):
-            yt = s["y"]
-            yb = sections[idx + 1]["y"] if idx + 1 < len(sections) else 30.0
-            section_bounds.append((s["text"], yt, yb))
-
-        # 4. Constrói o HTML de cada fatia vertical
         for title, yt, yb in section_bounds:
-            sec_imgs = [img for img in page_imgs if yb <= img["yc"] <= yt]
-            sec_rects = [r for r in internal_rects if yb <= r["yc"] <= yt]
+            bloco_secao = renderizar_secao(title, yt, yb, page_imgs, internal_rects, codigo_ficha)
+            if bloco_secao:
+                blocos_html.append(bloco_secao)
 
-            left_imgs = [img for img in sec_imgs if img["x1"] <= 290.0]
-            right_imgs = [img for img in sec_imgs if img["x0"] >= 280.0]
-            wide_imgs = [img for img in sec_imgs if img not in left_imgs and img not in right_imgs]
-
-            left_rects = [r for r in sec_rects if r["rect"][2] <= 300.0]
-            right_rects = [r for r in sec_rects if r["rect"][0] >= 280.0]
-
-            left_lines = agrupar_retangulos_em_linhas(left_rects)
-            right_lines = agrupar_retangulos_em_linhas(right_rects)
-
-            if title:
-                blocos_html.append(f"<p><strong>{title}</strong></p>")
-
-            # Condição para 2 colunas:
-            # Há duas imagens paralelas (esquerda e direita) e nenhuma imagem larga
-            # OU colunas de texto paralelas sem imagem central de largura total
-            is_2col = (len(left_imgs) > 0 and len(right_imgs) > 0 and len(wide_imgs) == 0) or (
-                len(left_imgs) == 0 and len(right_imgs) == 0 and len(wide_imgs) == 0
-                and len(left_lines) > 0 and len(right_lines) > 0
-                and abs(len(left_lines) - len(right_lines)) <= 4
-            )
-
-            if is_2col:
-                td_left = montar_celula_html(left_lines, left_imgs, codigo_ficha=codigo_ficha)
-                td_right = montar_celula_html(right_lines, right_imgs, codigo_ficha=codigo_ficha)
-                tabela = (
-                    "<table>\n"
-                    "  <tr>\n"
-                    f"    <td>\n{td_left}\n    </td>\n"
-                    f"    <td>\n{td_right}\n    </td>\n"
-                    "  </tr>\n"
-                    "</table>"
-                )
-                blocos_html.append(tabela)
-            else:
-                # 1 coluna linear
-                all_lines = agrupar_retangulos_em_linhas(sec_rects)
-                conteudo = montar_celula_html(all_lines, sec_imgs, codigo_ficha=codigo_ficha)
-                if conteudo:
-                    blocos_html.append(conteudo)
-
-    # 5. Tabelas Docling (se houver tabelas textuais nativas não cobertas por imagens)
     if tabelas_docling:
         for tab in tabelas_docling:
             blocos_html.append(tab)
 
     html_final = "\n\n".join(blocos_html).strip() if blocos_html else "<p>Não há.</p>"
-    return html_final, imagens_extraidas
+    return html_final, imagens_extraidas_totais

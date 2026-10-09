@@ -132,6 +132,67 @@ def cmd_geral(args):
     logger.info("Extração da Parte Geral concluída com sucesso.")
 
 
+def filtrar_por_faixa(mapeadas, range_str: str):
+    if not range_str:
+        return mapeadas
+    partes = range_str.split("-")
+    if len(partes) == 2 and partes[0].isdigit() and partes[1].isdigit():
+        v_ini, v_fim = int(partes[0]), int(partes[1])
+        if v_ini >= 32:
+            filtradas = [m for m in mapeadas if (m.pag_ini <= v_fim and m.pag_fim >= v_ini)]
+            logger.info(f"Filtro por faixa de páginas {v_ini}-{v_fim}: {len(filtradas)} fichas selecionadas.")
+            return filtradas
+        else:
+            filtradas = mapeadas[v_ini - 1 : v_fim]
+            logger.info(f"Filtro por índice de fichas {v_ini}-{v_fim}: {len(filtradas)} fichas selecionadas.")
+            return filtradas
+    return mapeadas
+
+def construir_tarefas(mapeadas, pdf_path, imagens_dir, cache_fichas_dir, salvar_individuais, force):
+    return [
+        TarefaFicha(
+            pdf_path=str(pdf_path),
+            ficha_mapeada=m.model_dump(),
+            imagens_dir=str(imagens_dir),
+            cache_fichas_dir=str(cache_fichas_dir),
+            salvar_individuais=salvar_individuais,
+            force=force,
+        )
+        for m in mapeadas
+    ]
+
+def executar_tarefas(tasks, pdf_path, workers, total_fichas):
+    fichas_extraidas = []
+    correcoes_totais = []
+    concluidas = 0
+
+    from mbft_extrator.auditoria import CorrecaoOcr
+
+    if workers <= 1:
+        for t in tasks:
+            result = _processar_uma_ficha_worker(t)
+            dados = result["dados"]
+            correcoes_totais.extend([CorrecaoOcr(**c) for c in result["correcoes"]])
+            concluidas += 1
+            logger.info(f"[{concluidas}/{total_fichas}] Ficha {dados['id']} processada.")
+            fichas_extraidas.append(Ficha(**dados))
+    else:
+        with ProcessPoolExecutor(max_workers=workers, initializer=WorkerContext.inicializar, initargs=(str(pdf_path),)) as executor:
+            for result in executor.map(_processar_uma_ficha_worker, tasks):
+                dados = result["dados"]
+                correcoes_totais.extend([CorrecaoOcr(**c) for c in result["correcoes"]])
+                concluidas += 1
+                logger.info(f"[{concluidas}/{total_fichas}] Ficha {dados['id']} processada.")
+                fichas_extraidas.append(Ficha(**dados))
+                
+    return fichas_extraidas, correcoes_totais
+
+def salvar_consolidado(fichas_extraidas, saida_json, elapsed):
+    saida_json.parent.mkdir(parents=True, exist_ok=True)
+    with open(saida_json, "w", encoding="utf-8") as f:
+        json.dump([f.model_dump() for f in fichas_extraidas], f, ensure_ascii=False, indent=2)
+    logger.info(f"Consolidado salvo em: {saida_json} ({len(fichas_extraidas)} fichas, tempo: {elapsed:.1f}s)")
+
 def cmd_fichas(args):
     """Executa a extração das Fichas de Fiscalização Estruturadas."""
     pdf_path = Path(args.pdf)
@@ -147,67 +208,19 @@ def cmd_fichas(args):
     logger.info(f"=== Iniciando Extração de Fichas de {pdf_path} ===")
     mapeadas = mapear_fichas_no_pdf(pdf_path, cache_path=mapa_cache, force=args.force)
 
-    # Filtro por --range se especificado (ex: 32-37 para páginas, ou 1-5 para índice de fichas)
-    if args.range:
-        partes = args.range.split("-")
-        if len(partes) == 2 and partes[0].isdigit() and partes[1].isdigit():
-            v_ini, v_fim = int(partes[0]), int(partes[1])
-            # Se valores forem >= 32, trata como número de página
-            if v_ini >= 32:
-                mapeadas = [m for m in mapeadas if (m.pag_ini <= v_fim and m.pag_fim >= v_ini)]
-                logger.info(f"Filtro por faixa de páginas {v_ini}-{v_fim}: {len(mapeadas)} fichas selecionadas.")
-            else:
-                # Trata como índice de fichas (1-based)
-                mapeadas = mapeadas[v_ini - 1 : v_fim]
-                logger.info(f"Filtro por índice de fichas {v_ini}-{v_fim}: {len(mapeadas)} fichas selecionadas.")
+    mapeadas = filtrar_por_faixa(mapeadas, args.range)
 
     total = len(mapeadas)
     workers = max(1, getattr(args, "workers", 4))
     logger.info(f"Processando {total} fichas com {workers} worker(s) paralelos...")
 
-    tasks = [
-        TarefaFicha(
-            pdf_path=str(pdf_path),
-            ficha_mapeada=m.model_dump(),
-            imagens_dir=str(imagens_dir),
-            cache_fichas_dir=str(cache_fichas_dir),
-            salvar_individuais=args.salvar_individuais,
-            force=args.force,
-        )
-        for m in mapeadas
-    ]
+    tasks = construir_tarefas(mapeadas, pdf_path, imagens_dir, cache_fichas_dir, args.salvar_individuais, args.force)
 
-    fichas_extraidas: List[Ficha] = []
-    from mbft_extrator.auditoria import CorrecaoOcr
-    correcoes_totais: List[CorrecaoOcr] = []
-    concluidas = 0
     t0 = time.time()
-
-    if workers <= 1:
-        for t in tasks:
-            result = _processar_uma_ficha_worker(t)
-            dados = result["dados"]
-            correcoes_totais.extend([CorrecaoOcr(**c) for c in result["correcoes"]])
-            concluidas += 1
-            logger.info(f"[{concluidas}/{total}] Ficha {dados['id']} processada.")
-            fichas_extraidas.append(Ficha(**dados))
-    else:
-        with ProcessPoolExecutor(max_workers=workers, initializer=WorkerContext.inicializar, initargs=(str(pdf_path),)) as executor:
-            for result in executor.map(_processar_uma_ficha_worker, tasks):
-                dados = result["dados"]
-                correcoes_totais.extend([CorrecaoOcr(**c) for c in result["correcoes"]])
-                concluidas += 1
-                logger.info(f"[{concluidas}/{total}] Ficha {dados['id']} processada.")
-                fichas_extraidas.append(Ficha(**dados))
-
+    fichas_extraidas, correcoes_totais = executar_tarefas(tasks, pdf_path, workers, total)
     elapsed = time.time() - t0
 
-    # Gravação do JSON consolidado principal
-    saida_json.parent.mkdir(parents=True, exist_ok=True)
-    with open(saida_json, "w", encoding="utf-8") as f:
-        json.dump([f.model_dump() for f in fichas_extraidas], f, ensure_ascii=False, indent=2)
-
-    logger.info(f"Consolidado salvo em: {saida_json} ({len(fichas_extraidas)} fichas, tempo: {elapsed:.1f}s)")
+    salvar_consolidado(fichas_extraidas, saida_json, elapsed)
 
     # Gera relatório de auditoria
     relatorio_path = DEFAULT_RELATORIO
