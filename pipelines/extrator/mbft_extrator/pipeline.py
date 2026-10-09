@@ -10,14 +10,10 @@ from dataclasses import dataclass
 import pypdfium2 as pdfium
 from docling.document_converter import DocumentConverter
 
-from .models import Ficha, FichaMapeada, CampoNormativo, PaginaExtraida, ImagemExtraida
+from .models import Ficha, FichaMapeada, CampoNormativo, PaginaExtraida, ImagemExtraida, MetadadosCabecalho
 from .pdf_reader import ler_pagina, extrair_imagens_pagina
-from .stitching import (
-    extrair_metadados_cabecalho,
-    extrair_linhas_colunas_pagina,
-    processar_coluna_normativa,
-    MetadadosCabecalho,
-)
+from .cabecalho import extrair_metadados_cabecalho
+from .colunas import extrair_linhas_colunas_pagina, processar_coluna_normativa
 from .docling_extractor import processar_intervalo_docling, extrair_metadados_visuais
 from .html_builder import formatar_tabela_html, construir_html_informacoes_complementares
 from .pdf_geometry import RE_IC_HEADER, MARGEM_ESQUERDA_TITULO

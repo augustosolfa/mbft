@@ -3,9 +3,25 @@ Re-exportação de modelos canônicos a partir do pacote neutro mbft-core,
 e definição de modelos intermediários da pipeline de extração (DTOs geométricos).
 """
 from dataclasses import dataclass
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Optional
 
 from mbft_core.models import CampoNormativo, Ficha, FichaMapeada
+
+@dataclass
+class MetadadosCabecalho:
+    tipificacao_resumida: Optional[str] = None
+    codigo_enquadramento: str = ""
+    amparo_legal: Optional[str] = None
+    tipificacao_enquadramento: Optional[str] = None
+    gravidade: Optional[str] = None
+    penalidade: Optional[str] = None
+    medida_administrativa: Optional[str] = None
+    pode_configurar_crime_transito: Optional[str] = None
+    infrator: Optional[str] = None
+    competencia: Optional[str] = None
+    competencia_alterada_lei_14599: bool = False
+    pontuacao: Optional[str] = None
+    constatacao_infracao: Optional[str] = None
 
 @dataclass
 class RetanguloTexto:
@@ -48,4 +64,4 @@ class ImagemExtraida:
     width: float
     img_data: Any = None
 
-__all__ = ["CampoNormativo", "Ficha", "FichaMapeada", "RetanguloTexto", "PaginaExtraida", "ImagemExtraida"]
+__all__ = ["MetadadosCabecalho", "CampoNormativo", "Ficha", "FichaMapeada", "RetanguloTexto", "PaginaExtraida", "ImagemExtraida"]
