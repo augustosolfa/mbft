@@ -24,7 +24,7 @@ torch = { index = "pytorch-cu132" }
 mbft-core = { workspace = true }
 
 [project.scripts]
-mbft-enriquecedor = "mbft_enriquecedor:main"
+mbft-enriquecedor = "mbft_enriquecedor.main:main"
 
 [build-system]
 requires = ["hatchling"]
