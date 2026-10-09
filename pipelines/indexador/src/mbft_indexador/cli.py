@@ -1,16 +1,39 @@
-import os
+﻿import os
 import json
 import logging
 import argparse
 from pathlib import Path
 from tqdm import tqdm
+from typing import List
 
 from mbft_core.models import FichaEnriquecida
 from mbft_core.models.indexacao import ChunkPayload
 from mbft_indexador.chunker import gerar_chunks_ficha
+from mbft_indexador.embedder import Embedder
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
+
+def processar_indexacao(fichas: List[FichaEnriquecida], embedder: Embedder, batch_size: int = 32) -> List[ChunkPayload]:
+    logger.info("Iniciando processo de chunking...")
+    todos_chunks = []
+    for ficha in tqdm(fichas, desc="Fazendo chunking"):
+        chunks = gerar_chunks_ficha(ficha)
+        todos_chunks.extend(chunks)
+        
+    logger.info(f"Total de {len(todos_chunks)} chunks gerados.")
+    
+    textos_para_vetorizar = [c.texto_para_embedding for c in todos_chunks]
+    vetores = embedder.gerar_embeddings_lote(textos_para_vetorizar, batch_size=batch_size)
+    
+    payloads = []
+    for i, c in enumerate(todos_chunks):
+        payloads.append(ChunkPayload(
+            id=c.id,
+            values=vetores[i],
+            metadata=c.metadata
+        ))
+    return payloads
 
 def main():
     parser = argparse.ArgumentParser(description="MBFT Indexador - Gera chunks e embeddings BAAI/bge-m3 para o Cloudflare Vectorize.")
@@ -43,43 +66,20 @@ def main():
     fichas = [FichaEnriquecida.model_validate(f) for f in fichas_data]
     logger.info(f"{len(fichas)} fichas validadas com sucesso.")
     
-    logger.info("Iniciando processo de chunking...")
-    todos_chunks = []
-    for ficha in tqdm(fichas, desc="Fazendo chunking"):
-        chunks = gerar_chunks_ficha(ficha)
-        todos_chunks.extend(chunks)
-        
-    logger.info(f"Total de {len(todos_chunks)} chunks gerados.")
-    
     if args.skip_embeddings:
-        logger.info("Pulando geração de embeddings (modo skip). Vetor preenchido com zeros.")
-        payloads = []
-        for c in todos_chunks:
-            payloads.append(ChunkPayload(
-                id=c.id,
-                values=[0.0] * 1024,
-                metadata=c.metadata
-            ))
+        logger.info("Pulando geração de embeddings (modo skip). Usando FakeEmbedder.")
+        from mbft_indexador.embedder import FakeEmbedder
+        embedder = FakeEmbedder()
     else:
         logger.info("Carregando modelo de embeddings...")
         from mbft_indexador.embedder import GeradorEmbeddings
         embedder = GeradorEmbeddings()
-        
-        textos_para_vetorizar = [c.texto_para_embedding for c in todos_chunks]
-        vetores = embedder.gerar_embeddings_lote(textos_para_vetorizar, batch_size=args.batch_size)
-        
-        payloads = []
-        for i, c in enumerate(todos_chunks):
-            payloads.append(ChunkPayload(
-                id=c.id,
-                values=vetores[i],
-                metadata=c.metadata
-            ))
+
+    payloads = processar_indexacao(fichas, embedder, args.batch_size)
             
     logger.info(f"Salvando artefato JSONL (NDJSON) em {output_path}...")
     with open(output_path, "w", encoding="utf-8") as out_f:
         for payload in payloads:
-            # model_dump_json serializa adequadamente os metadados
             out_f.write(payload.model_dump_json() + "\n")
             
     logger.info(f"Concluído! {len(payloads)} registros exportados.")

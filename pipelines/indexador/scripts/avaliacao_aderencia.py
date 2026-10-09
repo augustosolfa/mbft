@@ -1,4 +1,4 @@
-import os
+﻿import os
 import json
 import yaml
 import logging
@@ -6,11 +6,11 @@ import argparse
 from pathlib import Path
 import numpy as np
 
-try:
-    from sentence_transformers import SentenceTransformer
-    import torch
-except ImportError:
-    SentenceTransformer = None
+# We'll import GeradorEmbeddings instead of sentence_transformers directly
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+
+from mbft_indexador.embedder import GeradorEmbeddings
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -34,9 +34,8 @@ def main():
         logger.error(f"Arquivo de casos não encontrado: {casos_path}")
         return
 
-    logger.info("Carregando modelo...")
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = SentenceTransformer("BAAI/bge-m3", device=device)
+    logger.info("Carregando modelo via GeradorEmbeddings...")
+    embedder = GeradorEmbeddings()
 
     logger.info(f"Carregando embeddings de {jsonl_path}...")
     chunks = []
@@ -62,7 +61,9 @@ def main():
         query = caso["query"]
         expected_codes = set(caso["expected"])
         
-        query_emb = model.encode(query, normalize_embeddings=True)
+        # GeradorEmbeddings returns List[List[float]], we just extract the first one and make it a numpy array
+        query_emb_list = embedder.gerar_embeddings_lote([query], batch_size=1)[0]
+        query_emb = np.array(query_emb_list, dtype=np.float32)
         
         results = []
         for c in chunks:
@@ -79,7 +80,6 @@ def main():
                     codes.append(code)
             return codes
             
-        # Pega códigos únicos. Queremos o Recall baseado nas fichas de infração retornadas.
         unique_codes = get_unique_codes(results)
         top1_codes = unique_codes[:1]
         top3_codes = unique_codes[:3]
