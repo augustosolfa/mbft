@@ -1,6 +1,6 @@
 import pytest
 from typing import List, Dict, Any
-from mbft_recuperador.buscador import BuscadorHibrido
+from mbft_api.recuperador.buscador import BuscadorHibrido
 
 class MockEmbedder:
     async def embed_query(self, query: str) -> List[float]:
@@ -105,7 +105,7 @@ async def test_diversificacao_por_ficha_evita_monopolio_e_faz_backfill():
     assert [r["id"] for r in top5] == ["752-81_1", "752-82_1", "751-01_1", "752-81_2", "752-81_3"]
 
 def test_formatar_token_fts_preserva_exatos_curtos_numericos_e_romanos():
-    from mbft_recuperador.local_adapters import LocalSqliteDB
+    from mbft_api.recuperador.local_adapters import LocalSqliteDB
 
     assert LocalSqliteDB._formatar_token_fts("") == ""
     assert LocalSqliteDB._formatar_token_fts("Art") == "Art"
@@ -125,7 +125,7 @@ def test_formatar_token_fts_preserva_exatos_curtos_numericos_e_romanos():
 @pytest.mark.asyncio
 async def test_local_sqlite_db_normaliza_grau_para_ordinal_e_ignora_underscores(tmp_path):
     import json
-    from mbft_recuperador.local_adapters import LocalSqliteDB
+    from mbft_api.recuperador.local_adapters import LocalSqliteDB
 
     jsonl = tmp_path / "test_emb.jsonl"
     chunk = {
@@ -146,4 +146,3 @@ async def test_local_sqlite_db_normaliza_grau_para_ordinal_e_ignora_underscores(
 
     res_underscore = await db.buscar_fts("____ Art_244", limit=5)
     assert [r["id"] for r in res_underscore] == ["712-92_EMENTA"]
-

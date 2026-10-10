@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 # Carrega chaves do .env para o os.environ
 load_dotenv()
 
-from mbft_gerador.local_adapters import GeminiLLMClient
-from mbft_gerador.orquestrador import OrquestradorGeracao
+from mbft_api.gerador.local_adapters import GeminiLLMClient
+from mbft_api.gerador.orquestrador import OrquestradorGeracao
 
 async def main():
     print("Iniciando teste do Gerador com Gemini Flash Lite 2.5 (Flex Tier)...\n")

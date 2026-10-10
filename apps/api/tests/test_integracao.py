@@ -1,11 +1,11 @@
 import pytest
 from pathlib import Path
-from mbft_recuperador.buscador import BuscadorHibrido
-from mbft_recuperador.local_adapters import LocalSqliteDB, NumpyVectorDB, PyTorchEmbedder
+from mbft_api.recuperador.buscador import BuscadorHibrido
+from mbft_api.recuperador.local_adapters import LocalSqliteDB, NumpyVectorDB, PyTorchEmbedder
 
 @pytest.fixture(scope="module")
 def jsonl_path():
-    p = Path(__file__).parent.parent.parent.parent / "data" / "processed" / "indexador" / "embeddings_mbft.jsonl"
+    p = Path(__file__).resolve().parents[3] / "data" / "processed" / "indexador" / "embeddings_mbft.jsonl"
     if not p.exists():
         pytest.skip(f"Artefato JSONL {p} não encontrado. Execute o indexador antes.")
     return p

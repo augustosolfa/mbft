@@ -27,5 +27,10 @@ data/processed/*/fichas/
 backup_extracao_v1/
 data/archive/
 data/processed/site/
+data/processed/indexador/
+*.parquet
 fila.db
 repomix-output.xml
+
+.github/
+.pytest_cache/

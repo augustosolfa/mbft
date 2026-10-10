@@ -141,9 +141,9 @@ Para viabilizar consultas cruzadas, filtros no banco SQL e expansão de contexto
 
 ### 3.7. Contratos de Dados e Guardrails Compartilhados (`mbft-core`)
 
-Todos os modelos e contratos de validação residem no pacote neutro compartilhado `packages/core` (`mbft-core`). O Enriquecedor consome a saída do Extrator (`Ficha`, `CampoNormativo`) como guardrail de entrada e produz seus artefatos estruturados e vetoriais (`FichaEnriquecida`, `ChunkPayload`, `ChunkMetadados`) a partir desse pacote central, servindo de guardrail de entrada para a Carga (PMS-004):
+Todos os modelos e contratos de validação residem no pacote neutro compartilhado `pipelines/core` (`mbft-core`). O Enriquecedor consome a saída do Extrator (`Ficha`, `CampoNormativo`) como guardrail de entrada e produz seus artefatos estruturados e vetoriais (`FichaEnriquecida`, `ChunkPayload`, `ChunkMetadados`) a partir desse pacote central, servindo de guardrail de entrada para a Carga (PMS-004):
 
-A fim de evitar a defasagem de documentação (*document drift*) e de acordo com as diretrizes do monorepo, os esquemas Pydantic brutos não são transcritos neste documento. A especificação técnica completa, incluindo Enums de domínio e tipagem, reside em `packages/core/src/mbft_core/models/enriquecimento.py`.
+A fim de evitar a defasagem de documentação (*document drift*) e de acordo com as diretrizes do monorepo, os esquemas Pydantic brutos não são transcritos neste documento. A especificação técnica completa, incluindo Enums de domínio e tipagem, reside em `pipelines/core/src/mbft_core/models/enriquecimento.py`.
 
 Em suma, o Enriquecedor materializa os seguintes contratos:
 

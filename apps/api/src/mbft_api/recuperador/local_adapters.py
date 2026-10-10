@@ -7,7 +7,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-from mbft_recuperador.interfaces import IVectorDB, IRelationalDB, IEmbedderClient
+from .interfaces import IVectorDB, IRelationalDB, IEmbedderClient
 
 class LocalSqliteDB(IRelationalDB):
     def __init__(self, jsonl_path: Path):

@@ -4,7 +4,7 @@ Módulo de processamento em lote (*batch*) responsável pela compilação estát
 
 > **Nota de Arquitetura**: Este arquivo é um guia operacional e de desenvolvimento (*Developer Guide*).
 > Para a documentação completa de arquitetura, decisões de design e trade-offs, consulte a **PMS-007** em `docs/PMS-007 - Site Estático (SSG).md` e a **PMS-008** em `docs/PMS-008 - API e Ticketizador.md`.
-> Para o contrato de dados consumido por este pipeline (`FichaEnriquecida`), consulte o pacote **`mbft-core`** em `packages/core/README.md`.
+> Para o contrato de dados consumido por este pipeline (`FichaEnriquecida`), consulte o pacote **`mbft-core`** em `pipelines/core/README.md`.
 
 ---
 

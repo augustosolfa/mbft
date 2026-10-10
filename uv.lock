@@ -13,9 +13,7 @@ members = [
     "mbft-core",
     "mbft-enriquecedor",
     "mbft-extrator",
-    "mbft-gerador",
     "mbft-indexador",
-    "mbft-recuperador",
     "mbft-ssg",
     "mbft-workspace",
 ]
@@ -1078,27 +1076,37 @@ version = "0.1.0"
 source = { editable = "apps/api" }
 dependencies = [
     { name = "fastapi" },
-    { name = "mbft-core" },
-    { name = "mbft-gerador" },
-    { name = "mbft-recuperador" },
     { name = "pyjwt" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "google-genai" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.142.4" },
-    { name = "mbft-core", editable = "packages/core" },
-    { name = "mbft-gerador", editable = "packages/gerador" },
-    { name = "mbft-recuperador", editable = "packages/recuperador" },
     { name = "pyjwt", specifier = ">=2.15.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "google-genai", specifier = ">=2.28.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "uvicorn", specifier = ">=0.54.0" },
 ]
 
 [[package]]
 name = "mbft-core"
 version = "0.1.0"
-source = { editable = "packages/core" }
+source = { editable = "pipelines/core" }
 dependencies = [
     { name = "pydantic" },
 ]
@@ -1119,7 +1127,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mbft-core", editable = "packages/core" },
+    { name = "mbft-core", editable = "pipelines/core" },
     { name = "polars" },
     { name = "sentence-transformers" },
     { name = "torch", index = "https://download.pytorch.org/whl/cu132" },
@@ -1145,7 +1153,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "docling" },
-    { name = "mbft-core", editable = "packages/core" },
+    { name = "mbft-core", editable = "pipelines/core" },
     { name = "pypdfium2" },
     { name = "torch", index = "https://download.pytorch.org/whl/cu132" },
     { name = "torchvision", index = "https://download.pytorch.org/whl/cu132" },
@@ -1153,29 +1161,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=9.1.1" }]
-
-[[package]]
-name = "mbft-gerador"
-version = "0.1.0"
-source = { editable = "packages/gerador" }
-dependencies = [
-    { name = "google-genai" },
-    { name = "mbft-core" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "python-dotenv" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "google-genai", specifier = ">=2.28.0" },
-    { name = "mbft-core", editable = "packages/core" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "python-dotenv", specifier = ">=1.2.4" }]
 
 [[package]]
 name = "mbft-indexador"
@@ -1191,34 +1176,11 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mbft-core", editable = "packages/core" },
+    { name = "mbft-core", editable = "pipelines/core" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "sentence-transformers", specifier = ">=3.0.0" },
     { name = "torch" },
     { name = "tqdm" },
-]
-
-[[package]]
-name = "mbft-recuperador"
-version = "0.1.0"
-source = { editable = "packages/recuperador" }
-dependencies = [
-    { name = "mbft-core" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "mbft-core", editable = "packages/core" }]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-asyncio", specifier = ">=1.4.0" },
 ]
 
 [[package]]
@@ -1233,7 +1195,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "mbft-core", editable = "packages/core" },
+    { name = "mbft-core", editable = "pipelines/core" },
 ]
 
 [[package]]
@@ -1245,22 +1207,36 @@ dependencies = [
     { name = "mbft-core" },
     { name = "mbft-enriquecedor" },
     { name = "mbft-extrator" },
-    { name = "mbft-gerador" },
     { name = "mbft-indexador" },
-    { name = "mbft-recuperador" },
     { name = "mbft-ssg" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "google-genai" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "python-dotenv" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "mbft-api", editable = "apps/api" },
-    { name = "mbft-core", editable = "packages/core" },
+    { name = "mbft-core", editable = "pipelines/core" },
     { name = "mbft-enriquecedor", editable = "pipelines/enriquecedor" },
     { name = "mbft-extrator", editable = "pipelines/extrator" },
-    { name = "mbft-gerador", editable = "packages/gerador" },
     { name = "mbft-indexador", editable = "pipelines/indexador" },
-    { name = "mbft-recuperador", editable = "packages/recuperador" },
     { name = "mbft-ssg", editable = "pipelines/ssg" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "google-genai", specifier = ">=2.28.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-asyncio", specifier = ">=1.4.0" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
+    { name = "uvicorn", specifier = ">=0.54.0" },
 ]
 
 [[package]]

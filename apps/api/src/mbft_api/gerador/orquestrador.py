@@ -1,5 +1,5 @@
-from mbft_gerador.interfaces import ILLMClient
-from mbft_gerador.prompts import SYSTEM_PROMPT_TEMPLATE
+from .interfaces import ILLMClient
+from .prompts import SYSTEM_PROMPT_TEMPLATE
 
 class OrquestradorGeracao:
     """

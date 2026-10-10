@@ -5,7 +5,7 @@ from .routers import health, busca, ticket, chat
 
 from contextlib import asynccontextmanager
 from pathlib import Path
-from mbft_recuperador.buscador import BuscadorHibrido
+from .recuperador.buscador import BuscadorHibrido
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
         
     print("Inicializando modelos pesados do Recuperador (Modo Local)...")
     try:
-        from mbft_recuperador.local_adapters import LocalSqliteDB, NumpyVectorDB, PyTorchEmbedder
+        from .recuperador.local_adapters import LocalSqliteDB, NumpyVectorDB, PyTorchEmbedder
         project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
         jsonl_path = project_root / "data" / "processed" / "indexador" / "embeddings_mbft.jsonl"
         
@@ -36,8 +36,8 @@ async def lifespan(app: FastAPI):
             
         # Tenta carregar o Gerador LLM
         try:
-            from mbft_gerador.local_adapters import GeminiLLMClient
-            from mbft_gerador.orquestrador import OrquestradorGeracao
+            from .gerador.local_adapters import GeminiLLMClient
+            from .gerador.orquestrador import OrquestradorGeracao
             app.state.gerador = OrquestradorGeracao(GeminiLLMClient())
             print("Gerador LLM (Gemini) engatilhado.")
         except Exception as e:

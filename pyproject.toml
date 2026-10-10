@@ -12,8 +12,6 @@ dependencies = [
     "mbft-core",
     "mbft-enriquecedor",
     "mbft-indexador",
-    "mbft-recuperador",
-    "mbft-gerador",
     "mbft-ssg",
     "mbft-api",
 ]
@@ -23,15 +21,23 @@ mbft-extrator = { workspace = true }
 mbft-core = { workspace = true }
 mbft-enriquecedor = { workspace = true }
 mbft-indexador = { workspace = true }
-mbft-recuperador = { workspace = true }
-mbft-gerador = { workspace = true }
 mbft-ssg = { workspace = true }
 mbft-api = { workspace = true }
 
 [tool.uv.workspace]
-members = ["pipelines/*", "packages/*", "apps/*"]
+members = ["pipelines/*", "apps/*"]
 
 [[tool.uv.index]]
 name = "pytorch-cu132"
 url = "https://download.pytorch.org/whl/cu132"
 explicit = true
+
+[dependency-groups]
+dev = [
+    "google-genai>=2.28.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "python-dotenv>=1.2.4",
+    "uvicorn>=0.54.0",
+]
+

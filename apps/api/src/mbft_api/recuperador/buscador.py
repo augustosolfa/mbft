@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from mbft_recuperador.interfaces import IVectorDB, IRelationalDB, IEmbedderClient
+from .interfaces import IVectorDB, IRelationalDB, IEmbedderClient
 
 class BuscadorHibrido:
     """

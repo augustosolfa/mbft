@@ -80,9 +80,9 @@ O extrator atua de ponta a ponta sobre o PDF em pipeline sequencial:
 
 ### Contrato de Dados e Guardrail de Saída (`mbft-core`)
 
-O contrato de dados das fichas reside no pacote neutro compartilhado `packages/core` (`mbft-core`), servindo como guardrail estrito de validação da saída do Extrator e contrato de entrada do Enriquecedor (PMS-003), sem acoplar os pipelines consumidores às dependências pesadas de PDF/visão computacional.
+O contrato de dados das fichas reside no pacote neutro compartilhado `pipelines/core` (`mbft-core`), servindo como guardrail estrito de validação da saída do Extrator e contrato de entrada do Enriquecedor (PMS-003), sem acoplar os pipelines consumidores às dependências pesadas de PDF/visão computacional.
 
-A fim de evitar a defasagem de documentação (*document drift*), os esquemas Pydantic brutos não são transcritos neste documento. Eles podem ser encontrados em sua fonte canônica de verdade: `packages/core/src/mbft_core/models/extracao.py`.
+A fim de evitar a defasagem de documentação (*document drift*), os esquemas Pydantic brutos não são transcritos neste documento. Eles podem ser encontrados em sua fonte canônica de verdade: `pipelines/core/src/mbft_core/models/extracao.py`.
 
 Em suma, o modelo `Ficha` extrai e consolida:
 - **Identificadores**: `id` e `codigo_enquadramento` (validados para manter consistência absoluta).

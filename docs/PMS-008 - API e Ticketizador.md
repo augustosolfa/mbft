@@ -23,10 +23,16 @@ Esta PMS formaliza o uso do **FastAPI** rodando sobre o Pyodide (Python no Cloud
 
 ## 2. Decisões Arquiteturais
 
-### 2.1. Framework e Runtime
-* O *entrypoint* do Cloudflare Workers utilizará **FastAPI**, servido nativamente via `cloudflare-python-asgi` (ou bridge nativa do Workers). 
+### 2.1. Framework, Runtime e Topologia de Monólito Modular
+* O *entrypoint* do Cloudflare Workers (`apps/api`) utiliza **FastAPI**, servido nativamente no runtime Python (Pyodide) do Workers.
 * Ganhamos documentação automática `/docs` (Swagger) e validação de payload com Pydantic de forma fluida.
-* Para economia máxima, o `mbft-gerador` e o `mbft-recuperador` serão importados diretamente na rota, resolvendo suas lógicas na borda (Edge).
+* Para compatibilidade total com o bundler do Cloudflare Workers (que exige dependências PyPI puras em `[project].dependencies` sem pacotes locais de workspace), o pacote `mbft-api` consolida toda a inteligência de borda em uma topologia interna unificada:
+  * `mbft_api.routers`: Rotas HTTP (`/health`, `/busca`, `/ticket`, `/chat`).
+  * `mbft_api.recuperador`: Motor de Busca Híbrida RRF (PMS-005).
+  * `mbft_api.gerador`: Orquestrador de geração Strict RAG e templates de prompt (PMS-006).
+  * `mbft_api.security`: Emissão, assinatura e validação de Tickets JWT (`TicketService`) com proteção anti-replay via KV (`jti`).
+  * `mbft_api.database`: Repositório transacional da fila global (`D1FilaRepository` na nuvem e `SqliteFilaRepository` local).
+* O `apps/api/pyproject.toml` declara apenas `fastapi` e `pyjwt` como dependências de produção, isolando pacotes de desenvolvimento e execução local (`uvicorn`, `google-genai`, `pytest`, `python-dotenv`) em `[dependency-groups] dev`.
 
 ### 2.2. O "Ticketizador" e a Fila Global (Rate Limiter)
 Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fila Indiana Global**.
@@ -34,7 +40,7 @@ Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fil
 1. A rota `/ticket` é o ponto de entrada para quem quer perguntar à IA.
 2. Usaremos o banco **Cloudflare D1** (SQLite) com uma tabela de controle: `fila_global` (de linha única).
 3. Ao solicitar um ticket, um `UPDATE` atômico ajusta a data `next_available` para `max(now(), next_available) + 1 minuto`. O usuário recebe um token JWT assinado criptograficamente contendo a data/hora exata em que seu ticket se torna válido.
-4. Ao chamar a rota `/chat`, o ticket é decodificado (stateless). Se a hora atual for menor que a do ticket, a API recusa com `429 Too Many Requests` avisando o tempo restante. 
+4. Ao chamar a rota `/chat`, o ticket é decodificado (stateless) e seu identificador único (`jti`) é verificado/consumido no Cloudflare KV (`KV_TICKETS`) quando disponível. Se a hora atual for menor que a do ticket, a API recusa com `429 Too Many Requests` avisando o tempo restante. 
 
 ### 2.3. Prevenção de Esgotamento de Fila (WAF)
 Para impedir que um usuário mal-intencionado peça inúmeros tickets em loop (empurrando a fila global horas para o futuro), a rota `/ticket` será protegida nativamente pelo **Cloudflare WAF (Web Application Firewall) - Rate Limiting**.
@@ -60,9 +66,9 @@ As senhas de privilégio serão configuradas via **Segredos de Ambiente** no pai
 | Método | Rota | Descrição | Integração |
 |---|---|---|---|
 | `GET` | `/health` | Checagem de vivacidade da API. | N/A |
-| `GET` | `/busca` | Executa RAG Híbrido. Retorna JSON com excertos e os `links` para os HTMLs estáticos (`/fichas/XXX.html`) gerados no PMS-007. | `mbft-recuperador` e Cloudflare D1/Vectorize |
+| `GET` | `/busca` | Executa RAG Híbrido. Retorna JSON com excertos e os `links` para os HTMLs estáticos (`/fichas/XXX.html`) gerados no PMS-007. | `mbft_api.recuperador` e Cloudflare D1/Vectorize |
 | `POST`| `/ticket` | Insere o usuário na Fila Global e devolve um Ticket JWT com um "timestamp de embarque". Aceita `priority_token`. | D1 (`fila_global`) |
-| `POST`| `/chat` | Recebe a pergunta e o Ticket JWT. Só libera para o `mbft-gerador` se o ticket for válido e a hora de embarque tiver chegado. | `mbft-gerador` |
+| `POST`| `/chat` | Recebe a pergunta e o Ticket JWT. Só libera para o `mbft_api.gerador` se o ticket for válido e a hora de embarque tiver chegado. | `mbft_api.recuperador`, `mbft_api.gerador` e KV (`KV_TICKETS`) |
 
 ---
 
