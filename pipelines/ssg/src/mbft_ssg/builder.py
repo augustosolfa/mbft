@@ -1,4 +1,4 @@
-﻿import json
+import json
 import os
 import shutil
 import logging
@@ -17,6 +17,8 @@ def run_build(
     output_dir: Optional[Path] = None,
     imagens_src: Optional[Path] = None
 ):
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+    logger.setLevel(logging.INFO)
     if fichas_json is None:
         fichas_json = PROCESSED_DIR / "enriquecedor" / "fichas_enriquecidas.json"
     if templates_dir is None:

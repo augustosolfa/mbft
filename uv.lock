@@ -1137,6 +1137,11 @@ dependencies = [
     { name = "torchvision" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "docling" },
@@ -1145,6 +1150,9 @@ requires-dist = [
     { name = "torch", index = "https://download.pytorch.org/whl/cu132" },
     { name = "torchvision", index = "https://download.pytorch.org/whl/cu132" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.1" }]
 
 [[package]]
 name = "mbft-gerador"

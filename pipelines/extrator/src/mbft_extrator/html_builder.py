@@ -5,6 +5,7 @@ e exportação de imagens nativas e de alta resolução.
 
 import logging
 import re
+import html
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
@@ -90,7 +91,7 @@ def montar_celula_html(
         # 1. Linhas do topo (subtítulo)
         if top_lines:
             texto_top = unificar_linhas_e_hifens([l.text for l in top_lines])
-            partes.append(f"<p><strong>{texto_top}</strong></p>")
+            partes.append(f"<p><strong>{html.escape(texto_top)}</strong></p>")
 
         # 2. Imagem com atributo alt descritivo
         alt = default_alt or f"Ilustração da Ficha {codigo_ficha}"
@@ -100,25 +101,25 @@ def montar_celula_html(
             alt = " - ".join(l.text for l in bottom_lines[:2])
 
         rel_path = img.rel_path
-        partes.append(f'<img src="{rel_path}" alt="{alt}" />')
+        partes.append(f'<img src="{rel_path}" alt="{html.escape(alt)}" />')
 
         # 3. Linhas abaixo da imagem (legenda / parágrafo explicativo)
         if bottom_lines:
             if len(bottom_lines) > 2 and any(len(l.text) > 40 for l in bottom_lines):
                 texto_bot = unificar_linhas_e_hifens([l.text for l in bottom_lines])
-                partes.append(f"<p>{texto_bot}</p>")
+                partes.append(f"<p>{html.escape(texto_bot)}</p>")
             else:
                 for l in bottom_lines:
-                    partes.append(f"<p>{l.text}</p>")
+                    partes.append(f"<p>{html.escape(l.text)}</p>")
     else:
         # Sem imagem na célula
         if lines:
             if len(lines) > 2 and any(len(l.text) > 40 for l in lines):
                 texto = unificar_linhas_e_hifens([l.text for l in lines])
-                partes.append(f"<p>{texto}</p>")
+                partes.append(f"<p>{html.escape(texto)}</p>")
             else:
                 for l in lines:
-                    partes.append(f"<p>{l.text}</p>")
+                    partes.append(f"<p>{html.escape(l.text)}</p>")
 
     return "\n".join(partes)
 
@@ -180,7 +181,7 @@ def renderizar_secao(title: str, yt: float, yb: float, page_imgs: List[ImagemExt
     right_lines = agrupar_retangulos_em_linhas(right_rects)
 
     if title:
-        blocos.append(f"<p><strong>{title}</strong></p>")
+        blocos.append(f"<p><strong>{html.escape(title)}</strong></p>")
 
     # Condição para 2 colunas:
     is_2col = (len(left_imgs) > 0 and len(right_imgs) > 0 and len(wide_imgs) == 0) or (

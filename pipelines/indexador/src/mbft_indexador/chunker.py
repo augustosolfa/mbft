@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Dict, Any
+from typing import List, Optional
 from pydantic import BaseModel
 from mbft_core.models.enriquecimento import FichaEnriquecida
 from mbft_core.models.indexacao import ChunkMetadados
@@ -12,9 +12,12 @@ class Secao(str, Enum):
 
 class UnembeddedChunk(BaseModel):
     id: str
-    texto_para_embedding: str
     tokens_estimados: int
     metadata: ChunkMetadados
+
+    @property
+    def texto_para_embedding(self) -> str:
+        return self.metadata.texto_contextualizado
 
 def _estimar_tokens(texto: str) -> int:
     """Estimativa rápida (heurística) de tokens."""
@@ -35,7 +38,12 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[UnembeddedChunk]:
         f"Competência: {competencias_lista}]"
     )
     
-    def _criar_chunk(secao_nome: str, item_numero: int, texto_conteudo: str, natureza: str = None) -> UnembeddedChunk:
+    def _criar_chunk(
+        secao_nome: str,
+        item_numero: int,
+        texto_conteudo: str,
+        natureza: Optional[str] = None
+    ) -> UnembeddedChunk:
         texto_final = f"{prefixo_contexto}\n[Seção: {secao_nome}]\n{texto_conteudo}"
         
         chunk_id = f"{ficha.id}_{secao_nome}"
@@ -56,15 +64,24 @@ def gerar_chunks_ficha(ficha: FichaEnriquecida) -> List[UnembeddedChunk]:
         
         return UnembeddedChunk(
             id=chunk_id,
-            texto_para_embedding=texto_final,
             tokens_estimados=_estimar_tokens(texto_final),
             metadata=metadados
         )
 
-    for secao in Secao:
-        itens = getattr(ficha, secao.value, [])
+    secoes_mapeamento = [
+        ("QUANDO_AUTUAR", ficha.quando_autuar_itens),
+        ("QUANDO_NAO_AUTUAR", ficha.quando_nao_autuar_itens),
+        ("DEFINICOES_PROCEDIMENTOS", ficha.definicoes_procedimentos_itens),
+        ("EXEMPLOS_AIT", ficha.exemplos_observacoes_ait_itens),
+    ]
+
+    for secao_nome, itens in secoes_mapeamento:
         for i, item in enumerate(itens):
-            chunks.append(_criar_chunk(secao.name, i + 1, item.texto.strip(), item.natureza_regra.value))
+            texto = item.texto.strip()
+            if not texto:
+                continue
+            natureza = item.natureza_regra.value if hasattr(item.natureza_regra, "value") else str(item.natureza_regra)
+            chunks.append(_criar_chunk(secao_nome, i + 1, texto, natureza))
             
     # Chunk isolado da ementa / amparo legal (substitui o antigo)
     # Como o prefixo já tem essas informações, o texto base para a ementa é apenas ele mesmo

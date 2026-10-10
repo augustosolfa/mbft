@@ -44,6 +44,41 @@ class BuscadorHibrido:
             
         return resultados_finais
         
+    def _diversificar_por_ficha(self, rrf_results: List[Dict[str, Any]], limit: int) -> List[Dict[str, Any]]:
+        """
+        Prioriza o chunk de maior score RRF de cada ficha (código de enquadramento),
+        evitando que múltiplos chunks da mesma ficha monopolizem o Top-K.
+        Caso haja menos fichas distintas que `limit`, preenche as vagas restantes
+        com os demais chunks na ordem original do RRF.
+        """
+        if limit <= 0 or not rrf_results:
+            return []
+
+        selecionados: List[Dict[str, Any]] = []
+        codigos_vistos = set()
+        ids_selecionados = set()
+
+        for doc in rrf_results:
+            codigo = (doc.get("metadata") or {}).get("codigo")
+            if codigo:
+                if codigo in codigos_vistos:
+                    continue
+                codigos_vistos.add(codigo)
+
+            selecionados.append(doc)
+            ids_selecionados.add(doc["id"])
+            if len(selecionados) >= limit:
+                return selecionados
+
+        for doc in rrf_results:
+            if doc["id"] not in ids_selecionados:
+                selecionados.append(doc)
+                ids_selecionados.add(doc["id"])
+                if len(selecionados) >= limit:
+                    break
+
+        return selecionados
+
     async def recuperar_contexto(self, pergunta: str, limit: int = 5) -> List[Dict[str, Any]]:
         # O pool precisa ser fundo o suficiente para o RRF funcionar
         pool_size = max(limit * 10, 60)
@@ -55,7 +90,7 @@ class BuscadorHibrido:
         dense_results = await self.vector_db.buscar_similares(vetor, limit=pool_size)
         sparse_results = await self.relational_db.buscar_fts(pergunta, limit=pool_size)
         
-        # 3. Mescla via RRF
+        # 3. Mescla via RRF e diversifica por ficha
         rrf_results = self._aplicar_rrf(dense_results, sparse_results)
         
-        return rrf_results[:limit]
+        return self._diversificar_por_ficha(rrf_results, limit)

@@ -26,11 +26,13 @@ torchvision = { index = "pytorch-cu132" }
 mbft-core = { workspace = true }
 
 [project.scripts]
-mbft-extrator = "mbft_extrator:main"
-
-[tool.uv.build-backend]
-module-root = ""
+mbft-extrator = "mbft_extrator.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.12.17,<0.13.0"]
-build-backend = "uv_build"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

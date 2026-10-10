@@ -1,21 +1,29 @@
-﻿import os
+import os
 import sys
 import json
 import logging
 import argparse
 from pathlib import Path
 from tqdm import tqdm
-from typing import List
+from typing import List, Optional
 
 from mbft_core.models import FichaEnriquecida
 from mbft_core.models.indexacao import ChunkPayload
+from mbft_core.paths import PROCESSED_DIR
 from mbft_indexador.chunker import gerar_chunks_ficha
 from mbft_indexador.embedder import Embedder
+
+DIMENSAO_VETOR_ESPERADA = 1024
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-def processar_indexacao(fichas: List[FichaEnriquecida], embedder: Embedder, batch_size: int = 32) -> List[ChunkPayload]:
+def processar_indexacao(
+    fichas: List[FichaEnriquecida],
+    embedder: Embedder,
+    batch_size: int = 32,
+    dimensao_esperada: int = DIMENSAO_VETOR_ESPERADA
+) -> List[ChunkPayload]:
     logger.info("Iniciando processo de chunking...")
     todos_chunks = []
     for ficha in tqdm(fichas, desc="Fazendo chunking"):
@@ -26,6 +34,14 @@ def processar_indexacao(fichas: List[FichaEnriquecida], embedder: Embedder, batc
     
     textos_para_vetorizar = [c.texto_para_embedding for c in todos_chunks]
     vetores = embedder.gerar_embeddings_lote(textos_para_vetorizar, batch_size=batch_size)
+    
+    assert len(vetores) == len(todos_chunks), (
+        f"Quantidade de vetores gerados ({len(vetores)}) difere da quantidade de chunks ({len(todos_chunks)})."
+    )
+    if vetores:
+        assert len(vetores[0]) == dimensao_esperada, (
+            f"Dimensão do vetor ({len(vetores[0])}) difere da esperada ({dimensao_esperada})."
+        )
     
     payloads = []
     for i, c in enumerate(todos_chunks):
@@ -38,18 +54,29 @@ def processar_indexacao(fichas: List[FichaEnriquecida], embedder: Embedder, batc
 
 def main():
     parser = argparse.ArgumentParser(description="MBFT Indexador - Gera chunks e embeddings BAAI/bge-m3 para o Cloudflare Vectorize.")
-    parser.add_argument("--input", "-i", type=str, default="../../data/processed/enriquecedor/fichas_enriquecidas.json", help="Caminho para o JSON das fichas enriquecidas.")
-    parser.add_argument("--output", "-o", type=str, default="../../data/processed/indexador/embeddings_mbft.jsonl", help="Caminho de saída para o JSONL de embeddings.")
+    parser.add_argument("--input", "-i", type=str, default=str(PROCESSED_DIR / "enriquecedor" / "fichas_enriquecidas.json"), help="Caminho para o JSON das fichas enriquecidas.")
+    parser.add_argument("--output", "-o", type=str, default=None, help="Caminho de saída para o JSONL de embeddings.")
     parser.add_argument("--batch-size", "-b", type=int, default=32, help="Tamanho do batch para inferência do modelo na GPU.")
-    parser.add_argument("--skip-embeddings", action="store_true", help="Faz apenas o chunking e salva metadados sem calcular os vetores densos (para debug rápido).")
+    parser.add_argument("--skip-embeddings", action="store_true", help="Modo debug/teste sem modelo real de embeddings (salva em arquivo de debug).")
     parser.add_argument("--deploy", action="store_true", help="Faz o upload do JSONL gerado para o Cloudflare Vectorize via wrangler.")
     
     args = parser.parse_args()
     
     input_path = Path(args.input)
-    output_path = Path(args.output)
+    
+    # Determina arquivo de saída padrão dependendo de --skip-embeddings
+    if args.output is not None:
+        output_path = Path(args.output)
+    else:
+        if args.skip_embeddings:
+            output_path = PROCESSED_DIR / "indexador" / "embeddings_debug.jsonl"
+        else:
+            output_path = PROCESSED_DIR / "indexador" / "embeddings_mbft.jsonl"
 
     if args.deploy:
+        if "debug" in output_path.name.lower() or args.skip_embeddings:
+            logger.error(f"Deploy recusado: arquivo {output_path} é um artefato de debug/teste (--skip-embeddings).")
+            sys.exit(1)
         from mbft_indexador.deploy import fazer_deploy_vectorize
         try:
             fazer_deploy_vectorize(output_path)
@@ -60,7 +87,7 @@ def main():
 
     if not input_path.exists():
         logger.error(f"Arquivo de entrada não encontrado: {input_path}")
-        return
+        sys.exit(1)
         
     os.makedirs(output_path.parent, exist_ok=True)
     

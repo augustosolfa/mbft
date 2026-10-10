@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import logging
+import re
 from typing import List, Dict, Any
 from pathlib import Path
 
@@ -47,15 +48,37 @@ class LocalSqliteDB(IRelationalDB):
                 ))
         self.conn.commit()
 
+    _RE_ROMANO = re.compile(
+        r"^(?=[MDCLXVI]+$)M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})$",
+        re.IGNORECASE,
+    )
+    _FTS_RESERVED = {"AND", "OR", "NOT", "NEAR"}
+
+    @classmethod
+    def _formatar_token_fts(cls, token: str) -> str:
+        if not token:
+            return ""
+        if token.upper() in cls._FTS_RESERVED:
+            return f'"{token}"'
+        if (
+            len(token) >= 4
+            and not any(c.isdigit() for c in token)
+            and not cls._RE_ROMANO.fullmatch(token)
+        ):
+            return f"{token}*"
+        return token
+
     async def buscar_fts(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        # Para FTS5 no SQLite, precisamos escapar a query ou usar syntax de MATCH apropriada.
-        # Por simplicidade, vamos usar o query term por term, adicionando * (prefix search)
-        import re
-        tokens = re.findall(r'\w+', query)
+        # Normaliza símbolo de grau (°) após dígitos para indicador ordinal (º)
+        # e extrai tokens alfanuméricos sem sublinhados (alinhado ao unicode61 do FTS5).
+        query_norm = re.sub(r"(\d)\s*°", r"\1º", query)
+        tokens = re.findall(r"[^\W_]+", query_norm)
         if not tokens:
             return []
             
-        fts_query = " ".join([f"{t}*" for t in tokens])
+        fts_query = " ".join(
+            t_fmt for t in tokens if (t_fmt := self._formatar_token_fts(t))
+        )
         
         cursor = self.conn.cursor()
         # bm25() no FTS5 ordena automaticamente do menor pro maior se quisermos os melhores (mais negativos)

@@ -6,7 +6,9 @@ import unittest
 from mbft_extrator.text_joiner import join_line_fragments, unificar_linhas_e_hifens
 from mbft_extrator.layout_analyzer import LayoutAnalyzer
 from mbft_extrator.pdf_geometry import RE_COLUMN_HEADER
-from mbft_extrator.stitching import extrair_linhas_colunas_pagina
+from mbft_extrator.colunas import extrair_linhas_colunas_pagina
+from mbft_extrator.cabecalho import parse_metadados_markdown
+from mbft_extrator.models import PaginaExtraida, RetanguloTexto
 
 
 class TestTextJoiner(unittest.TestCase):
@@ -72,15 +74,15 @@ class TestLayoutAnalyzer(unittest.TestCase):
 
     def test_detect_column_bounds_fallback(self):
         # Sem objetos na página, deve utilizar fallback proporcional (28%, 50%, 73%)
-        class MockPageVazia:
-            def get_size(self):
-                return (600.0, 800.0)
-
-            def get_objects(self):
-                return []
+        page_ext = PaginaExtraida(
+            largura=600.0,
+            altura=800.0,
+            retangulos=[],
+            linhas_vetoriais=[],
+        )
 
         analyzer = LayoutAnalyzer.__new__(LayoutAnalyzer)
-        analyzer.page = MockPageVazia()
+        analyzer.page_ext = page_ext
         analyzer.width = 600.0
 
         bounds = analyzer.detect_column_bounds()
@@ -90,35 +92,28 @@ class TestLayoutAnalyzer(unittest.TestCase):
         self.assertAlmostEqual(bounds[2], 600.0 * 0.73)
 
     def test_detect_column_bounds_com_tracos_verticais(self):
-        # Com objetos de linha vertical presentes na página
-        class MockObj:
-            def __init__(self, x0, y0, x1, y1):
-                self.type = 2
-                self._bounds = (x0, y0, x1, y1)
-
-            def get_bounds(self):
-                return self._bounds
-
-        class MockPageComLinhas:
-            def get_size(self):
-                return (600.0, 800.0)
-
-            def get_objects(self):
-                return [
-                    # Linha margem esquerda
-                    MockObj(35.0, 100.0, 36.0, 700.0),
-                    # Divisória 1: ~168.0 (dentro da tolerância de 5% de 600*0.28 = 168)
-                    MockObj(168.0, 100.0, 169.0, 700.0),
-                    # Divisória 2: ~302.0 (dentro da tolerância de 5% de 600*0.50 = 300)
-                    MockObj(302.0, 100.0, 303.0, 700.0),
-                    # Divisória 3: ~437.0 (dentro da tolerância de 5% de 600*0.73 = 438)
-                    MockObj(437.0, 100.0, 438.0, 700.0),
-                    # Linha margem direita
-                    MockObj(560.0, 100.0, 561.0, 700.0),
-                ]
+        # Com linhas vetoriais presentes na página
+        linhas = [
+            # Linha margem esquerda
+            (35.0, 100.0, 36.0, 700.0),
+            # Divisória 1: ~168.0 (dentro da tolerância de 5% de 600*0.28 = 168)
+            (168.0, 100.0, 169.0, 700.0),
+            # Divisória 2: ~302.0 (dentro da tolerância de 5% de 600*0.50 = 300)
+            (302.0, 100.0, 303.0, 700.0),
+            # Divisória 3: ~437.0 (dentro da tolerância de 5% de 600*0.73 = 438)
+            (437.0, 100.0, 438.0, 700.0),
+            # Linha margem direita
+            (560.0, 100.0, 561.0, 700.0),
+        ]
+        page_ext = PaginaExtraida(
+            largura=600.0,
+            altura=800.0,
+            retangulos=[],
+            linhas_vetoriais=linhas,
+        )
 
         analyzer = LayoutAnalyzer.__new__(LayoutAnalyzer)
-        analyzer.page = MockPageComLinhas()
+        analyzer.page_ext = page_ext
         analyzer.width = 600.0
 
         bounds = analyzer.detect_column_bounds()
@@ -126,6 +121,14 @@ class TestLayoutAnalyzer(unittest.TestCase):
         self.assertAlmostEqual(bounds[0], 168.5)
         self.assertAlmostEqual(bounds[1], 302.5)
         self.assertAlmostEqual(bounds[2], 437.5)
+
+    def test_detect_column_bounds_erro_real_exposto(self):
+        # Garante que erros reais em page_ext não são silenciados por broad except
+        analyzer = LayoutAnalyzer.__new__(LayoutAnalyzer)
+        analyzer.page_ext = None
+        analyzer.width = 600.0
+        with self.assertRaises(AttributeError):
+            analyzer.detect_column_bounds()
 
     def test_regex_column_headers(self):
         # Verifica se as regexes de cabeçalho casam corretamente
@@ -137,5 +140,33 @@ class TestLayoutAnalyzer(unittest.TestCase):
         self.assertFalse(RE_COLUMN_HEADER.match("1. Autuar condutor sem cinto"))
 
 
+class TestFuncoesPurasExtracao(unittest.TestCase):
+    def test_parse_metadados_markdown(self):
+        md = (
+            "| Infrator: Condutor | Competência: Órgão Municipal |\n"
+            "| Constatação da Infração: Mediante abordagem | Quando autuar |"
+        )
+        res = parse_metadados_markdown(md)
+        self.assertEqual(res.get("infrator"), "Condutor")
+        self.assertEqual(res.get("constatacao_infracao"), "Mediante abordagem")
+
+    def test_extrair_linhas_colunas_pagina_basica(self):
+        retangulos = [
+            RetanguloTexto(x0=50.0, y0=200.0, x1=120.0, y1=212.0, texto="Item 1 autuar"),
+        ]
+        page_ext = PaginaExtraida(
+            largura=595.0,
+            altura=842.0,
+            retangulos=retangulos,
+            linhas_vetoriais=[],
+        )
+        cols_lines, ic_y = extrair_linhas_colunas_pagina(page_ext, is_first_page=False)
+        self.assertIn("Item 1 autuar", cols_lines[0])
+        self.assertEqual(cols_lines[1], [])
+        self.assertEqual(cols_lines[2], [])
+        self.assertEqual(cols_lines[3], [])
+
+
 if __name__ == "__main__":
     unittest.main()
+

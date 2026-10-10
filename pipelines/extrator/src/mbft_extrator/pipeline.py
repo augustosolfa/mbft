@@ -1,14 +1,14 @@
-"""
-Pipeline principal de orquestração da extração de fichas e persistência de checkpoints.
-"""
+from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import List, Dict, Tuple, Optional, Any
+from typing import TYPE_CHECKING, List, Dict, Tuple, Optional, Any
 from dataclasses import dataclass
 
 import pypdfium2 as pdfium
-from docling.document_converter import DocumentConverter
+
+if TYPE_CHECKING:
+    from docling.document_converter import DocumentConverter
 
 from .models import Ficha, FichaMapeada, CampoNormativo, PaginaExtraida, ImagemExtraida, MetadadosCabecalho
 from .pdf_reader import ler_pagina, extrair_imagens_pagina
@@ -261,7 +261,11 @@ def extrair_ficha_completa(
     # 3. Costura geométrica das 4 colunas normativas
     colunas = _extrair_colunas_normativas(doc, mapeada, col_end_page)
 
-    # 4. Informações Complementares e Imagens
+    # 4. Informações Complementares e Imagens (limpa imagens antigas da ficha antes de reextrair)
+    if imagens_dir.exists():
+        for img_antiga in imagens_dir.glob(f"ficha{mapeada.codigo}_*.png"):
+            img_antiga.unlink(missing_ok=True)
+
     if not has_ic:
         ic_html = "<p>Não há.</p>"
         imagens: List[str] = []

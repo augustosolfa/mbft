@@ -63,7 +63,7 @@ def comparar_versoes(v1_path: Path, v2_path: Path, verbose: bool = False):
     if ids_v1 != ids_v2:
         print(f"   ⚠️ Diferença de IDs: apenas em v1: {ids_v1 - ids_v2}, apenas em v2: {ids_v2 - ids_v1}")
     else:
-        print(f"   ✅ Todos os 404 códigos de enquadramento coincidem perfeitamente.")
+        print(f"   ✅ Todos os {len(ids_v1)} códigos de enquadramento coincidem perfeitamente.")
 
     campos_meta = [
         "tipificacao_resumida",

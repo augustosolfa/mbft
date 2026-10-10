@@ -1,4 +1,4 @@
-﻿import json
+import json
 import logging
 import re
 import os
@@ -7,12 +7,13 @@ from typing import List, Dict, Any, Optional
 
 import pypdfium2 as pdfium
 from .models import FichaMapeada
+from .config import PAGINA_INICIO_FICHAS
 from .utils import calcular_hash_pdf, VERSAO_PIPELINE
 
 logger = logging.getLogger("MBFT-Fatiador")
 
 REGEX_ENQUADRAMENTO = re.compile(
-    r"c[oó]digo\s+(?:d?o?\s*)?enquadramento:?\s*([0-9]{3}[-\s][0-9]{1,2})",
+    r"c[oó]digo\s+(?:d?[eo]?\s*)?enquadramento:?\s*([0-9]{3}[-\s][0-9]{1,2})",
     re.IGNORECASE,
 )
 
@@ -33,15 +34,20 @@ def mapear_fichas_no_pdf(
                 dados_cache = json.load(f)
                 
             if isinstance(dados_cache, dict):
-                # New cache format with version and hash
+                # New cache format with version, hash, and regex pattern
                 cache_hash = dados_cache.get("pdf_sha256")
                 cache_versao = dados_cache.get("versao_pipeline")
+                cache_regex = dados_cache.get("regex_enquadramento")
                 fichas_raw = dados_cache.get("fichas", [])
                 
-                if cache_hash == pdf_hash and cache_versao == VERSAO_PIPELINE:
+                if (
+                    cache_hash == pdf_hash
+                    and cache_versao == VERSAO_PIPELINE
+                    and cache_regex == REGEX_ENQUADRAMENTO.pattern
+                ):
                     return [FichaMapeada(**item) for item in fichas_raw]
                 else:
-                    logger.warning("Cache invalidado por diverg\u00eancia de hash do PDF ou vers\u00e3o do pipeline.")
+                    logger.warning("Cache invalidado por diverg\u00eancia de hash do PDF, vers\u00e3o do pipeline ou regex de mapeamento.")
             else:
                 logger.warning("Formato antigo de cache detectado. Ignorando.")
         except Exception as e:
@@ -55,8 +61,8 @@ def mapear_fichas_no_pdf(
         fichas_encontradas: List[Dict[str, Any]] = []
         ocorrencias_codigo: Dict[str, int] = {}
     
-        # As fichas começam na página 32 (índice 31 em 0-index)
-        inicio_fichas_idx = 31
+        # As fichas começam na página definida em PAGINA_INICIO_FICHAS (convertida para 0-index)
+        inicio_fichas_idx = PAGINA_INICIO_FICHAS - 1
     
         for idx in range(inicio_fichas_idx, total_pags):
             tp = doc[idx].get_textpage()
@@ -106,6 +112,7 @@ def mapear_fichas_no_pdf(
         cache_data = {
             "pdf_sha256": pdf_hash,
             "versao_pipeline": VERSAO_PIPELINE,
+            "regex_enquadramento": REGEX_ENQUADRAMENTO.pattern,
             "fichas": [item.model_dump() for item in resultado]
         }
         

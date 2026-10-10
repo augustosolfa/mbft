@@ -41,8 +41,8 @@ def processar_coluna_normativa(lines: List[str]) -> CampoNormativo:
 
     itens: List[str] = []
 
-    re_item_num = re.compile(r"^(\d{1,3})\.\s*(.*)$")
-    re_subitem_num = re.compile(r"^(\d{1,3}\.\d{1,2})\.?\s*(.*)$")
+    re_item_num = re.compile(r"^(\d{1,3})\.(?!\d)\s*(.*)$")
+    re_subitem_num = re.compile(r"^(\d{1,3}(?:\.\d{1,3})+)\.(?!\d)\s*(.*)$")
     re_bullet = re.compile(r"^[-–—*]\s*(.*)$")
     re_letra = re.compile(r"^([a-z]\))\s*(.*)$")
 

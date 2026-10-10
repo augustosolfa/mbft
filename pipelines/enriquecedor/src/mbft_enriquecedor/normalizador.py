@@ -1,5 +1,6 @@
 import re
 import unicodedata
+from itertools import zip_longest
 from typing import List, Tuple
 from mbft_core.models.enriquecimento import (
     GravidadeEnum, PenalidadeEnum, MedidaAdministrativaEnum,
@@ -14,6 +15,12 @@ REGEX_ARTIGO_CTB_VAZADO = re.compile(r"((?:Art\.?\s*)?(\d{1,3}(?:\s*-[A-Za-z]+)?
 # Regex mais flexível para capturar a essência do amparo legal (ex: Art. 330, § 5º e § 6º)
 REGEX_ARTIGO_AMPARO = re.compile(r"(?:Art\.?|c/c)\s*(\d{1,3}(?:\s*-[A-Za-z]+)?)\b(?!\s*-\d{2})", re.IGNORECASE)
 REGEX_PARAGRAFO_AMPARO = re.compile(r"(§\s*\d+º?|par[aá]grafo\s+[uú]nico|§\s*[uú]nico)", re.IGNORECASE)
+ROMANOS_CTB = {
+    "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+    "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX",
+    "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX"
+}
+REGEX_INCISO_AMPARO = re.compile(r"\b(?:inciso\s+)?([IVXLCDM]+)(?:\s*[-–—]|\b)")
 
 def sanitizar_texto(texto: str) -> str:
     if not texto:
@@ -54,7 +61,7 @@ def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaE
     if "RECOLHIMENTO" in t and ("CRLV" in t or "LICENCIAMENTO" in t or "CERTIFICADO DE REGISTRO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CRLV)
     if "RECOLHIMENTO" in t and "PLACA" in t: rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_PLACAS)
     if "TRANSBORDO" in t: rens.append(MedidaAdministrativaEnum.TRANSBORDO_CARGA)
-    if "ALCOOLEMIA" in t or "TESTE" in t: rens.append(MedidaAdministrativaEnum.REALIZACAO_TESTE_ALCOOLEMIA)
+    if "ALCOOLEMIA" in t or bool(re.search(r"\bTESTES?\b", t)): rens.append(MedidaAdministrativaEnum.REALIZACAO_TESTE_ALCOOLEMIA)
     return rens if rens else [MedidaAdministrativaEnum.NAO_APLICAVEL]
 
 def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> Tuple[List[InfratorEnum], bool, List[ReferenciaCTB]]:
@@ -75,13 +82,13 @@ def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> T
             
     # Remover o vazamento do texto do infrator
     texto_infrator_limpo = re.sub(r'Art\.?.*?do\s*CTB', '', texto_infrator, flags=re.IGNORECASE).strip()
-    texto_infrator_limpo = texto_infrator_limpo.replace("SIM", "").replace("NÃO", "").replace("NAO", "").strip()
+    texto_infrator_limpo = re.sub(r'\b(?:SIM|N[ÃA]O)\b', '', texto_infrator_limpo, flags=re.IGNORECASE).strip()
+    texto_infrator_limpo = re.sub(r'\s+', ' ', texto_infrator_limpo).strip()
     
-    tem_crime = False
-    if "SIM" in texto_crime.upper() or "SIM" in texto_infrator.upper():
-        tem_crime = True
-    if artigos_extraidos:
-        tem_crime = True
+    tem_crime = bool(
+        re.search(r'\bSIM\b', texto_crime, re.IGNORECASE) or
+        re.search(r'\bSIM\b', texto_infrator, re.IGNORECASE)
+    )
         
     # Normalizar Infrator (removendo acentos para não perder JURÍDICA / FÍSICA)
     t_inf = _sem_acentos(texto_infrator_limpo)
@@ -139,39 +146,50 @@ def parse_amparo_legal(texto: str) -> List[ReferenciaCTB]:
     artigos_encontrados = list(REGEX_ARTIGO_AMPARO.finditer(texto_ctb))
     if not artigos_encontrados:
         return []
-        
-    # Encontrar os parágrafos mencionados no trecho do CTB
-    paragrafos = []
-    for m in REGEX_PARAGRAFO_AMPARO.finditer(texto_ctb):
-        p = m.group(1) or m.group(2) or m.group(3)
-        if p: paragrafos.append(p)
-        
-    # Encontrar incisos (ex: "III -" ou "inciso III") no trecho do CTB
-    incisos = []
-    for m in re.finditer(r"\b(?:inciso\s+)?([IVXLCDM]+)(?:\s*-|\b)", texto_ctb, re.IGNORECASE):
-        inc = m.group(1).upper()
-        if inc in ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"]:
-            incisos.append(inc)
-            
-    # Processar cada artigo encontrado
+
+    # Processar cada artigo encontrado limitando parágrafos e incisos ao texto após o artigo
     for i, match_artigo in enumerate(artigos_encontrados):
         art_num = match_artigo.group(1).strip()
+        start_pos = match_artigo.end()
+        end_pos = artigos_encontrados[i + 1].start() if i + 1 < len(artigos_encontrados) else len(texto_ctb)
+        texto_apos = texto_ctb[start_pos:end_pos]
         
-        # Só aplicamos parágrafos e incisos ao PRIMEIRO artigo (ou ao artigo principal, assumindo que os c/c são acessórios limpos)
-        # Na verdade, se houver c/c, às vezes os incisos são do segundo artigo. O mais seguro é associar tudo ao último artigo listado, ou a cada um?
-        # É mais seguro vincular os parágrafos e incisos extraídos a todos os artigos ou ao último.
-        # No cenário do MBFT, "c/c 162, I", o inciso "I" se refere a "162". Então o último artigo da lista é o alvo preferencial dos incisos residuais.
-        if i == len(artigos_encontrados) - 1:
-            if not paragrafos and not incisos:
-                artigos.append(ReferenciaCTB(artigo=art_num))
-            else:
-                for p in paragrafos:
-                    artigos.append(ReferenciaCTB(artigo=art_num, paragrafo=p))
-                for inc in incisos:
-                    artigos.append(ReferenciaCTB(artigo=art_num, inciso=inc))
-        else:
-            # Artigos anteriores (geralmente base) entram limpos
+        # Encontrar os parágrafos mencionados no trecho após o artigo
+        paragrafos = []
+        for m in REGEX_PARAGRAFO_AMPARO.finditer(texto_apos):
+            p = m.group(1) or m.group(2) or m.group(3) if m.groups() else m.group(0)
+            p = re.sub(r'\s+', ' ', p).strip()
+            if p and p not in paragrafos:
+                paragrafos.append(p)
+                
+        # Encontrar incisos (case-sensitive) no trecho após o artigo
+        incisos = []
+        for m in REGEX_INCISO_AMPARO.finditer(texto_apos):
+            inc = m.group(1)
+            if inc in ROMANOS_CTB and inc not in incisos:
+                incisos.append(inc)
+                
+        # Emitir ReferenciaCTB combinando parágrafo e inciso na mesma instância
+        if not paragrafos and not incisos:
             artigos.append(ReferenciaCTB(artigo=art_num))
+        elif paragrafos and not incisos:
+            for p in paragrafos:
+                artigos.append(ReferenciaCTB(artigo=art_num, paragrafo=p))
+        elif not paragrafos and incisos:
+            for inc in incisos:
+                artigos.append(ReferenciaCTB(artigo=art_num, inciso=inc))
+        else:
+            if len(paragrafos) == 1:
+                p = paragrafos[0]
+                for inc in incisos:
+                    artigos.append(ReferenciaCTB(artigo=art_num, paragrafo=p, inciso=inc))
+            elif len(incisos) == 1:
+                inc = incisos[0]
+                for p in paragrafos:
+                    artigos.append(ReferenciaCTB(artigo=art_num, paragrafo=p, inciso=inc))
+            else:
+                for p, inc in zip_longest(paragrafos, incisos, fillvalue=None):
+                    artigos.append(ReferenciaCTB(artigo=art_num, paragrafo=p, inciso=inc))
             
     return artigos
 

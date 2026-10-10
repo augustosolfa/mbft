@@ -1,16 +1,14 @@
-﻿import logging
-from typing import Optional, List, Tuple
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING, Optional, List, Tuple, Any, Dict
 from pathlib import Path
 import re
 
-from docling.document_converter import DocumentConverter, PdfFormatOption
-from docling.datamodel.pipeline_options import (
-    PdfPipelineOptions,
-    TableStructureOptions,
-    TableFormerMode,
-    AcceleratorOptions,
-)
-from docling.datamodel.base_models import InputFormat
+from .cabecalho import parse_metadados_markdown
+
+if TYPE_CHECKING:
+    from docling.document_converter import DocumentConverter
 
 logger = logging.getLogger("MBFT-Docling")
 
@@ -30,7 +28,7 @@ def criar_conversor(
     do_ocr: bool,
     num_threads: int = 8,
     device: str = "cuda",
-) -> DocumentConverter:
+) -> Any:
     """
     Inicializa o pipeline do Docling configurado para acelerar via CUDA / GPU
     na NVIDIA GeForce RTX 4070.
@@ -38,6 +36,15 @@ def criar_conversor(
     _patch_transformers()
     
     logger.info(f"Inicializando pipeline Docling (OCR={do_ocr}) com aceleração '{device}'...")
+
+    from docling.document_converter import DocumentConverter, PdfFormatOption
+    from docling.datamodel.pipeline_options import (
+        PdfPipelineOptions,
+        TableStructureOptions,
+        TableFormerMode,
+        AcceleratorOptions,
+    )
+    from docling.datamodel.base_models import InputFormat
 
     pipeline_options = PdfPipelineOptions()
     pipeline_options.do_ocr = do_ocr
@@ -71,24 +78,6 @@ def processar_intervalo_docling(
     conv_result = converter.convert(str(pdf_path), page_range=(pag_ini, pag_fim))
     return conv_result.document
 
-
-def parse_metadados_markdown(md_text: str) -> dict:
-    meta_limpo = {}
-    m_inf = re.search(r'Infrator\s*:?\s*([^|]*?)(?=\n|$|Compet[eê]ncia)', md_text, re.IGNORECASE)
-    if m_inf:
-        val = m_inf.group(1).strip()
-        val = re.sub(r'[\*_\|]', '', val)
-        val = re.sub(r'\s+', ' ', val).strip()
-        meta_limpo['infrator'] = val
-        
-    m_const = re.search(r'Constata[cç][aã]o da Infra[cç][aã]o\s*:?\s*([^|]*?)(?=\n|$|Quando)', md_text, re.IGNORECASE)
-    if m_const:
-        val = m_const.group(1).strip()
-        val = re.sub(r'[\*_\|]', '', val)
-        val = re.sub(r'\s+', ' ', val).strip()
-        meta_limpo['constatacao_infracao'] = val
-        
-    return meta_limpo
 
 
 def extrair_metadados_visuais(converter_ocr: DocumentConverter, pdf_path: Path, pagina: int) -> dict:

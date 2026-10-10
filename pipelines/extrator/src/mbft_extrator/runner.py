@@ -1,33 +1,31 @@
-﻿import argparse
 import json
 import logging
+import os
 import sys
 import time
-import os
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor
-from typing import List, Optional, Tuple, Any
-from functools import lru_cache
 from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, List, Optional, Tuple
+from concurrent.futures import ProcessPoolExecutor
 
 import pypdfium2 as pdfium
 
-from mbft_core.paths import RAW_DIR, PROCESSED_DIR
-
+from mbft_core.paths import PROCESSED_DIR
 from .models import Ficha, FichaMapeada
 from .fatiador import mapear_fichas_no_pdf
 from .pipeline import extrair_ficha_completa, Conversores, ResultadoExtracao
 from .parte_geral import extrair_parte_geral
 from .auditoria import gerar_relatorio_auditoria, CorrecaoOcr
 from .utils import calcular_hash_pdf, VERSAO_PIPELINE
+from .config import PAGINA_INICIO_PARTE_GERAL, PAGINA_FIM_PARTE_GERAL
 
-logger = logging.getLogger("MBFT-CLI")
+logger = logging.getLogger("MBFT-RUNNER")
 
 @lru_cache(maxsize=1)
 def get_conversores() -> Conversores:
     c = Conversores()
     _ = c.padrao
-    _ = c.ocr
     return c
 
 @dataclass(frozen=True)
@@ -58,10 +56,13 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> ResultadoExtracao:
             
             if cache_hash == tarefa.pdf_hash and cache_versao == VERSAO_PIPELINE:
                 if "dados" in c_data and "correcoes" in c_data:
-                    return ResultadoExtracao(
-                        ficha=Ficha.model_validate(c_data["dados"]),
-                        correcoes_ocr=[CorrecaoOcr(**c) for c in c_data["correcoes"]]
-                    )
+                    paginas_esperadas = list(range(m.pag_ini, m.pag_fim + 1))
+                    if c_data["dados"].get("paginas") == paginas_esperadas:
+                        return ResultadoExtracao(
+                            ficha=Ficha.model_validate(c_data["dados"]),
+                            correcoes_ocr=[CorrecaoOcr(**c) for c in c_data["correcoes"]]
+                        )
+                    logger.info(f"Intervalo de páginas da ficha {m.identificador} mudou ({c_data['dados'].get('paginas')} -> {paginas_esperadas}), reprocessando...")
         except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
             logger.warning(f"Cache corrompido para ficha {m.identificador}, reprocessando: {e}")
 
@@ -106,21 +107,13 @@ def _processar_uma_ficha_worker(tarefa: TarefaFicha) -> ResultadoExtracao:
 
     return resultado
 
-def cmd_geral(args):
-    pdf_path = Path(args.pdf)
-    saida = Path(args.saida_md)
-    saida.parent.mkdir(parents=True, exist_ok=True)
-    logger.info(f"=== Extraindo Parte Geral de {pdf_path} ===")
-    extrair_parte_geral(pdf_path, saida, pag_ini=1, pag_fim=31)
-    logger.info("Extração da Parte Geral concluída com sucesso.")
-
 def parse_faixa(range_str: str) -> Tuple[int, int]:
     partes = range_str.split("-")
     if len(partes) != 2 or not partes[0].isdigit() or not partes[1].isdigit():
         raise ValueError(f"Formato de faixa inválido: '{range_str}'. Use o formato INICIO-FIM (ex: 32-35).")
     return int(partes[0]), int(partes[1])
 
-def filtrar_por_faixa(mapeadas: List[FichaMapeada], paginas: Optional[str] = None, fichas: Optional[str] = None):
+def filtrar_por_faixa(mapeadas: List[FichaMapeada], paginas: Optional[str] = None, fichas: Optional[str] = None) -> List[FichaMapeada]:
     if paginas:
         v_ini, v_fim = parse_faixa(paginas)
         filtradas = [m for m in mapeadas if (m.pag_ini <= v_fim and m.pag_fim >= v_ini)]
@@ -133,8 +126,7 @@ def filtrar_por_faixa(mapeadas: List[FichaMapeada], paginas: Optional[str] = Non
         return filtradas
     return mapeadas
 
-
-def construir_tarefas(mapeadas, pdf_path, pdf_hash, imagens_dir, cache_fichas_dir, pasta_individuais, force):
+def construir_tarefas(mapeadas: List[FichaMapeada], pdf_path: Path, pdf_hash: str, imagens_dir: Path, cache_fichas_dir: Path, pasta_individuais: Optional[Path], force: bool) -> List[TarefaFicha]:
     return [
         TarefaFicha(
             pdf_path=str(pdf_path),
@@ -148,7 +140,7 @@ def construir_tarefas(mapeadas, pdf_path, pdf_hash, imagens_dir, cache_fichas_di
         for m in mapeadas
     ]
 
-def executar_tarefas(tasks, workers, total_fichas):
+def executar_tarefas(tasks: List[TarefaFicha], workers: int, total_fichas: int) -> Tuple[List[Ficha], List[Any]]:
     fichas_extraidas = []
     correcoes_totais = []
     concluidas = 0
@@ -170,7 +162,7 @@ def executar_tarefas(tasks, workers, total_fichas):
                 
     return fichas_extraidas, correcoes_totais
 
-def salvar_consolidado(fichas_extraidas, saida_json, elapsed):
+def salvar_consolidado(fichas_extraidas: List[Ficha], saida_json: Path, elapsed: float) -> None:
     saida_json.parent.mkdir(parents=True, exist_ok=True)
     temp_json = saida_json.with_suffix(".tmp")
     with open(temp_json, "w", encoding="utf-8") as f:
@@ -178,10 +170,21 @@ def salvar_consolidado(fichas_extraidas, saida_json, elapsed):
     os.replace(temp_json, saida_json)
     logger.info(f"Consolidado salvo em: {saida_json} ({len(fichas_extraidas)} fichas, tempo: {elapsed:.1f}s)")
 
-def cmd_fichas(args):
-    pdf_path = Path(args.pdf)
-    saida_json = Path(args.saida_json)
-    
+def executar_extracao_geral(pdf_path: Path, saida_md: Path) -> None:
+    saida_md.parent.mkdir(parents=True, exist_ok=True)
+    logger.info(f"=== Extraindo Parte Geral de {pdf_path} ===")
+    extrair_parte_geral(pdf_path, saida_md, pag_ini=PAGINA_INICIO_PARTE_GERAL, pag_fim=PAGINA_FIM_PARTE_GERAL)
+    logger.info("Extração da Parte Geral concluída com sucesso.")
+
+def executar_extracao_fichas(
+    pdf_path: Path,
+    saida_json: Path,
+    paginas: Optional[str] = None,
+    fichas: Optional[str] = None,
+    salvar_individuais: bool = False,
+    force: bool = False,
+    workers: int = 4,
+) -> None:
     cache_fichas_dir = PROCESSED_DIR.parent.parent / "pipelines" / "extrator" / ".cache_extracao" / "fichas"
     cache_fichas_dir.mkdir(parents=True, exist_ok=True)
     mapa_cache = cache_fichas_dir.parent / "mapa_fichas.json"
@@ -189,7 +192,7 @@ def cmd_fichas(args):
     imagens_dir = saida_json.parent / "imagens"
     imagens_dir.mkdir(parents=True, exist_ok=True)
     
-    pasta_individuais = (saida_json.parent / "fichas") if args.salvar_individuais else None
+    pasta_individuais = (saida_json.parent / "fichas") if salvar_individuais else None
 
     logger.info(f"=== Iniciando Extração de Fichas de {pdf_path} ===")
     
@@ -199,22 +202,22 @@ def cmd_fichas(args):
         
     pdf_hash = calcular_hash_pdf(pdf_path)
     
-    mapeadas = mapear_fichas_no_pdf(pdf_path, cache_path=mapa_cache, force=args.force)
+    mapeadas = mapear_fichas_no_pdf(pdf_path, cache_path=mapa_cache, force=force)
     
     try:
-        mapeadas = filtrar_por_faixa(mapeadas, paginas=args.paginas, fichas=args.fichas)
+        mapeadas = filtrar_por_faixa(mapeadas, paginas=paginas, fichas=fichas)
     except ValueError as e:
         logger.error(str(e))
         sys.exit(1)
 
     total = len(mapeadas)
-    workers = max(1, getattr(args, "workers", 4))
-    logger.info(f"Processando {total} fichas com {workers} worker(s) paralelos...")
+    workers_num = max(1, workers)
+    logger.info(f"Processando {total} fichas com {workers_num} worker(s) paralelos...")
 
-    tasks = construir_tarefas(mapeadas, pdf_path, pdf_hash, imagens_dir, cache_fichas_dir, pasta_individuais, args.force)
+    tasks = construir_tarefas(mapeadas, pdf_path, pdf_hash, imagens_dir, cache_fichas_dir, pasta_individuais, force)
 
     t0 = time.time()
-    fichas_extraidas, correcoes_totais = executar_tarefas(tasks, workers, total)
+    fichas_extraidas, correcoes_totais = executar_tarefas(tasks, workers_num, total)
     elapsed = time.time() - t0
 
     salvar_consolidado(fichas_extraidas, saida_json, elapsed)
@@ -226,58 +229,3 @@ def cmd_fichas(args):
         gerar_relatorio_auditoria(fichas_extraidas, len(doc_total), relatorio_path, correcoes_totais)
     finally:
         doc_total.close()
-
-def cmd_tudo(args):
-    cmd_geral(args)
-    cmd_fichas(args)
-
-
-def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
-    
-    default_pdf = RAW_DIR / "mbft.pdf"
-    default_md = PROCESSED_DIR / "extrator" / "mbft_parte_geral.md"
-    default_json = PROCESSED_DIR / "extrator" / "fichas_mbft.json"
-
-    parser = argparse.ArgumentParser(
-        description="Extrator de Alta Fidelidade do Manual Brasileiro de Fiscalização de Trânsito (MBFT)"
-    )
-    parser.add_argument("--pdf", default=str(default_pdf), help=f"Caminho do arquivo mbft.pdf (padrão: {default_pdf})")
-    subparsers = parser.add_subparsers(dest="subcomando", required=True)
-
-    p_geral = subparsers.add_parser("geral", help="Extrai a Parte Geral (páginas 1 a 31) para Markdown")
-    p_geral.add_argument("--saida-md", default=str(default_md), help=f"Arquivo de saída Markdown (padrão: {default_md})")
-
-    p_fichas = subparsers.add_parser("fichas", help="Extrai as Fichas Estruturadas para JSON")
-    p_fichas.add_argument("--saida-json", default=str(default_json), help=f"Arquivo JSON consolidado (padrão: {default_json})")
-    p_fichas.add_argument("--paginas", help="Filtrar por faixa de páginas no PDF (ex: 32-37)")
-    p_fichas.add_argument("--fichas", help="Filtrar por índice das fichas (ex: 1-5)")
-    p_fichas.add_argument("--salvar-individuais", action="store_true", help="Salva cada ficha em fichas/ficha_<id>.json")
-    p_fichas.add_argument("--force", action="store_true", help="Ignora checkpoints e reprocessa do zero")
-    p_fichas.add_argument("--workers", type=int, default=4, help="Número de workers paralelos (padrão: 4)")
-
-    p_tudo = subparsers.add_parser("tudo", help="Executa o pipeline completo (Parte Geral + Fichas)")
-    p_tudo.add_argument("--saida-md", default=str(default_md))
-    p_tudo.add_argument("--saida-json", default=str(default_json))
-    p_tudo.add_argument("--paginas", help="Filtrar por faixa de páginas no PDF (ex: 32-37)")
-    p_tudo.add_argument("--fichas", help="Filtrar por índice das fichas (ex: 1-5)")
-    p_tudo.add_argument("--salvar-individuais", action="store_true")
-    p_tudo.add_argument("--force", action="store_true")
-    p_tudo.add_argument("--workers", type=int, default=4, help="Número de workers paralelos (padrão: 4)")
-
-    args = parser.parse_args()
-
-    if args.subcomando == "geral":
-        cmd_geral(args)
-    elif args.subcomando == "fichas":
-        cmd_fichas(args)
-    elif args.subcomando == "tudo":
-        cmd_tudo(args)
-
-
-if __name__ == "__main__":
-    main()

@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 class ChunkMetadados(BaseModel):
     """
@@ -14,8 +14,15 @@ class ChunkMetadados(BaseModel):
     gravidade: str = Field(..., description="Nível de gravidade (ex: GRAVISSIMA)")
     infratores: List[str] = Field(default_factory=list, description="Lista de infratores aplicáveis")
     competencias: List[str] = Field(default_factory=list, description="Lista de esferas de competência")
-    texto_contextualizado: str = Field(..., description="Texto do fragmento original com prefixo (usado para RAG)")
+    texto_contextualizado: str = Field(..., min_length=1, description="Texto do fragmento original com prefixo (usado para RAG)")
     natureza_regra: Optional[str] = Field(default=None, description="Classificação semântica da regra atômica (ex: EXCECAO_DESVIO)")
+
+    @field_validator("texto_contextualizado")
+    @classmethod
+    def validar_texto_contextualizado_nao_vazio(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("O campo 'texto_contextualizado' não pode ser vazio.")
+        return v
 
 
 class ChunkPayload(BaseModel):

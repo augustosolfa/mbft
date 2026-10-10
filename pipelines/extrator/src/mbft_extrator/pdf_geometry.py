@@ -3,26 +3,29 @@ from typing import List, Tuple, Any
 
 import pypdfium2 as pdfium
 
+from .config import DEFAULT_LAYOUT_CONFIG
+
 FPDF_PAGEOBJ_PATH = pdfium.raw.FPDF_PAGEOBJ_PATH
 FPDF_PAGEOBJ_IMAGE = pdfium.raw.FPDF_PAGEOBJ_IMAGE
 
-Y_TOP_LIMIT_DEFAULT = 40.0
-Y_MIN_IMAGE = 30.0
-MIN_IMG_SIZE = 25.0
-MARGEM_ESQUERDA_TITULO = 60.0
-MARGEM_ESQUERDA_SECAO_NUMERADA = 80.0
-COL_BOUNDS_PCT = [0.28, 0.50, 0.73]
-Y_LIMIT_HEADER = 350.0
-Y_TOP_PRIMEIRA_PAGINA = 715
+# Constantes retrocompatíveis espelhadas a partir de DEFAULT_LAYOUT_CONFIG
+Y_TOP_LIMIT_DEFAULT = DEFAULT_LAYOUT_CONFIG.y_top_limit_default
+Y_MIN_IMAGE = DEFAULT_LAYOUT_CONFIG.y_min_image
+MIN_IMG_SIZE = DEFAULT_LAYOUT_CONFIG.min_img_size
+MARGEM_ESQUERDA_TITULO = DEFAULT_LAYOUT_CONFIG.margem_esquerda_titulo
+MARGEM_ESQUERDA_SECAO_NUMERADA = DEFAULT_LAYOUT_CONFIG.margem_esquerda_secao_numerada
+COL_BOUNDS_PCT = DEFAULT_LAYOUT_CONFIG.col_bounds_pct
+Y_LIMIT_HEADER = DEFAULT_LAYOUT_CONFIG.y_limit_header
+Y_TOP_PRIMEIRA_PAGINA = DEFAULT_LAYOUT_CONFIG.y_top_primeira_pagina
 
-X_LEFT_COL_MAX = 290.0
-X_RIGHT_COL_MIN = 280.0
-X_TEXT_LEFT_MAX = 300.0
+X_LEFT_COL_MAX = DEFAULT_LAYOUT_CONFIG.x_left_col_max
+X_RIGHT_COL_MIN = DEFAULT_LAYOUT_CONFIG.x_right_col_min
+X_TEXT_LEFT_MAX = DEFAULT_LAYOUT_CONFIG.x_text_left_max
 
 RE_IC_HEADER = re.compile(r"^informa[cç][oõ]es\s+complementares:?$", re.IGNORECASE)
 RE_QUANDO_AUTUAR = re.compile(r"quando\s+autuar", re.IGNORECASE)
 RE_COLUMN_HEADER = re.compile(
-    r"^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es.*|exemplos.*):?$",
+    r"^(?:quando\s+autuar|quando\s+n[ãa]o\s+autuar|defini[cç][oõ]es\s+e\s+procedimentos|exemplos\s+(?:do\s+campo\s+)?(?:de\s+)?['\"‘“]?observa[cç][oõ]es['\"’”]?(?:\s+do\s+ait)?):?$",
     re.IGNORECASE,
 )
 

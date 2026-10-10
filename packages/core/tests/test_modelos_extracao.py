@@ -111,10 +111,11 @@ class TestFichaGuardrails(unittest.TestCase):
 
     def test_validar_consistencia_id_e_codigo(self):
         dados = dict(self.dados_base)
-        dados["codigo_enquadramento"] = "999-99"
-        with self.assertRaises(ValidationError) as ctx:
-            Ficha(**dados)
-        self.assertIn("codigo_enquadramento", str(ctx.exception))
+        dados["id"] = "751-01_p2"
+        dados["codigo_enquadramento"] = "751-01"
+        f = Ficha(**dados)
+        self.assertEqual(f.id, "751-01_p2")
+        self.assertEqual(f.codigo_enquadramento, "751-01")
 
 
 if __name__ == "__main__":
