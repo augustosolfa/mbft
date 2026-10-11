@@ -31,6 +31,7 @@ class MedidaAdministrativaEnum(str, Enum):
     TRANSBORDO_CARGA = "TRANSBORDO_CARGA"
     REALIZACAO_TESTE_ALCOOLEMIA = "REALIZACAO_TESTE_ALCOOLEMIA"
     RECOLHIMENTO_PLACAS = "RECOLHIMENTO_PLACAS"
+    REMOCAO_MERCADORIA_MATERIAL = "REMOCAO_MERCADORIA_MATERIAL"
     NAO_APLICAVEL = "NAO_APLICAVEL"
 
 class InfratorEnum(str, Enum):
@@ -67,6 +68,12 @@ class NaturezaRegraEnum(str, Enum):
     CONCOMITANCIA = "CONCOMITANCIA"
     PROCEDIMENTO_GERAL = "PROCEDIMENTO_GERAL"
     EXEMPLO_OBSERVACAO = "EXEMPLO_OBSERVACAO"
+
+class TipoSecaoParteGeralEnum(str, Enum):
+    APOIO = "APOIO"
+    GLOSSARIO = "GLOSSARIO"
+    GLOBAL = "GLOBAL"
+    TEMATICO = "TEMATICO"
 
 
 class ReferenciaCTB(BaseModel):
@@ -135,6 +142,39 @@ class FichaEnriquecida(BaseModel):
     # Metadados de Fallback de IA
     campos_inferidos_por_llm: List[str] = Field(default_factory=list, description="Lista de campos onde a extração determinística falhou e o LLM atuou como fallback")
     revisao_manual_necessaria: bool = Field(default=False, description="True se a ficha sofreu intervenção de LLM e precisa de auditoria humana")
+
+
+class ItemGlossario(BaseModel):
+    sigla: str = Field(..., description="Sigla ou abreviatura oficial (ex.: 'AIT', 'CRLV-e')")
+    significado: str = Field(..., description="Significado completo da sigla no MBFT")
+
+
+class SecaoParteGeral(BaseModel):
+    id: str = Field(..., description="Identificador canônico da seção (ex.: 'PG_4', 'PG_8_1')")
+    slug: str = Field(..., description="Âncora HTML amigável (ex.: 'pg_8_1')")
+    numero: str = Field(default="", description="Numeração ou chave da seção no manual (ex.: '4', '8.1', '7.concorrentes')")
+    titulo: str = Field(..., description="Título limpo da seção")
+    capitulo_pai: Optional[str] = Field(default=None, description="Título do capítulo pai quando for subseção")
+    tipo: TipoSecaoParteGeralEnum
+    texto: str = Field(..., description="Texto normativo consolidado da seção")
+    paragrafos: List[str] = Field(default_factory=list, description="Parágrafos e itens atômicos da seção")
+    aplica_a_todos: bool = Field(default=False, description="True se a regra se aplica globalmente a todas as fichas")
+    infratores_associados: List[InfratorEnum] = Field(default_factory=list)
+    medidas_associadas: List[MedidaAdministrativaEnum] = Field(default_factory=list)
+    artigos_ctb: List[ReferenciaCTB] = Field(default_factory=list)
+    resolucoes_contran: List[str] = Field(default_factory=list)
+    codigos_citados: List[str] = Field(default_factory=list)
+    enquadramentos_alvo: List[str] = Field(
+        default_factory=list,
+        description="Códigos de fichas vinculados deterministicamente a esta seção temática",
+    )
+
+
+class ParteGeralEnriquecida(BaseModel):
+    secoes_descartadas: int = Field(default=0, description="Quantidade de blocos pré-textuais/editoriais descartados")
+    secoes: List[SecaoParteGeral] = Field(default_factory=list)
+    glossario: List[ItemGlossario] = Field(default_factory=list)
+
 
 
 

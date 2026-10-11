@@ -7,8 +7,17 @@ from .enriquecimento import (
     GravidadeEnum,
     CompetenciaEnum,
     CompetenciaFonteEnum,
+    InfratorEnum,
+    PenalidadeEnum,
+    MedidaAdministrativaEnum,
+    ConstatacaoInfracaoEnum,
+    NaturezaRegraEnum,
+    TipoSecaoParteGeralEnum,
     ReferenciaCTB,
     FichaEnriquecida,
+    ItemGlossario,
+    SecaoParteGeral,
+    ParteGeralEnriquecida,
 )
 from .indexacao import (
     ChunkMetadados,
@@ -22,8 +31,19 @@ __all__ = [
     "GravidadeEnum",
     "CompetenciaEnum",
     "CompetenciaFonteEnum",
+    "InfratorEnum",
+    "PenalidadeEnum",
+    "MedidaAdministrativaEnum",
+    "ConstatacaoInfracaoEnum",
+    "NaturezaRegraEnum",
+    "TipoSecaoParteGeralEnum",
     "ReferenciaCTB",
     "FichaEnriquecida",
+    "ItemGlossario",
+    "SecaoParteGeral",
+    "ParteGeralEnriquecida",
     "ChunkMetadados",
     "ChunkPayload",
 ]
+
+

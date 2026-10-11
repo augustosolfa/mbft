@@ -50,8 +50,26 @@
             {% for medida in ficha.medidas_administrativas %}
                 <span class="badge">{{ medida.value }}</span>
             {% endfor %}
+            {% if ficha.medida_administrativa_original %}
+                <br>
+                <small>
+                    {{ ficha.medida_administrativa_original }}
+                    {% if ancora_medida_pg %}
+                        — <a href="../parte-geral/{{ ancora_medida_pg }}.html">Ver procedimento na Parte Geral</a>
+                    {% endif %}
+                </small>
+            {% endif %}
         </div>
     </div>
+
+    {% if ficha.enquadramentos_correlatos %}
+    <div style="margin-top: 0.75rem;">
+        <strong>Enquadramentos Correlatos:</strong>
+        {% for cod in ficha.enquadramentos_correlatos %}
+            <a href="{{ cod }}.html" class="badge" style="text-decoration: none;">{{ cod }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <hr>
     
@@ -113,5 +131,26 @@
     </section>
     {% endif %}
 
+    {% if secoes_parte_geral %}
+    <hr>
+    <section>
+        <details>
+            <summary><strong>Regras Aplicáveis da Parte Geral do MBFT ({{ secoes_parte_geral | length }})</strong></summary>
+            <p style="margin-top: 0.5rem;">
+                Consulte também a <a href="../parte-geral/index.html">Parte Geral completa</a> para regras gerais de autuação, abordagem e glossário de siglas.
+            </p>
+            <ul>
+                {% for secao_pg in secoes_parte_geral %}
+                <li>
+                    <a href="../parte-geral/{{ secao_pg.slug }}.html"><strong>{{ secao_pg.titulo }}</strong></a>:
+                    {{ secao_pg.paragrafos[0] if secao_pg.paragrafos else "" }}
+                </li>
+                {% endfor %}
+            </ul>
+        </details>
+    </section>
+    {% endif %}
+
 </article>
 {% endblock %}
+

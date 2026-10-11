@@ -212,6 +212,28 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(PAGINA_INICIO_FICHAS, PAGINA_FIM_PARTE_GERAL + 1)
 
 
+class TestParteGeralGeometrica(unittest.TestCase):
+    def test_reconstruir_markdown_linhas_preserva_ordem_e_promove_subtitulos(self):
+        from mbft_extrator.parte_geral import reconstruir_markdown_linhas
+
+        # Tuplas no formato (num_pagina, x0, yc, texto) esperado por reconstruir_markdown_linhas
+        linhas = [
+            (1, 70.0, 700.0, "7. AUTUAÇÃO"),
+            (1, 95.0, 660.0, "A autuação é ato administrativo, vinculado na forma da"),
+            (1, 70.0, 645.0, "lei, da autoridade de trânsito."),
+            (1, 70.0, 600.0, "Infrações Sucessivas"),
+            (1, 95.0, 575.0, "Caracterizam-se pelo cometimento de repetidas condutas."),
+            (1, 70.0, 545.0, "● Caso 1: possível sem abordagem."),
+        ]
+
+        md = reconstruir_markdown_linhas(linhas)
+        self.assertIn("## 7. AUTUAÇÃO", md)
+        self.assertIn("A autuação é ato administrativo, vinculado na forma da lei, da autoridade de trânsito.", md)
+        self.assertIn("## Infrações Sucessivas", md)
+        self.assertIn("- Caso 1: possível sem abordagem.", md)
+
+
 if __name__ == "__main__":
     unittest.main()
+
 

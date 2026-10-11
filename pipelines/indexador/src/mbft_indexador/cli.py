@@ -7,10 +7,10 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import List, Optional
 
-from mbft_core.models import FichaEnriquecida
+from mbft_core.models import FichaEnriquecida, ParteGeralEnriquecida
 from mbft_core.models.indexacao import ChunkPayload
 from mbft_core.paths import PROCESSED_DIR
-from mbft_indexador.chunker import gerar_chunks_ficha
+from mbft_indexador.chunker import gerar_chunks_ficha, gerar_chunks_parte_geral
 from mbft_indexador.embedder import Embedder
 
 DIMENSAO_VETOR_ESPERADA = 1024
@@ -22,13 +22,19 @@ def processar_indexacao(
     fichas: List[FichaEnriquecida],
     embedder: Embedder,
     batch_size: int = 32,
-    dimensao_esperada: int = DIMENSAO_VETOR_ESPERADA
+    dimensao_esperada: int = DIMENSAO_VETOR_ESPERADA,
+    parte_geral: Optional[ParteGeralEnriquecida] = None,
 ) -> List[ChunkPayload]:
     logger.info("Iniciando processo de chunking...")
     todos_chunks = []
     for ficha in tqdm(fichas, desc="Fazendo chunking"):
         chunks = gerar_chunks_ficha(ficha)
         todos_chunks.extend(chunks)
+
+    if parte_geral is not None:
+        chunks_pg = gerar_chunks_parte_geral(parte_geral)
+        logger.info(f"Adicionando {len(chunks_pg)} chunks da Parte Geral.")
+        todos_chunks.extend(chunks_pg)
         
     logger.info(f"Total de {len(todos_chunks)} chunks gerados.")
     
@@ -55,6 +61,7 @@ def processar_indexacao(
 def main(argv: Optional[List[str]] = None):
     parser = argparse.ArgumentParser(description="MBFT Indexador - Gera chunks semânticos e embeddings densos BAAI/bge-m3 em formato JSONL.")
     parser.add_argument("--input", "-i", type=str, default=str(PROCESSED_DIR / "enriquecedor" / "fichas_enriquecidas.json"), help="Caminho para o JSON das fichas enriquecidas.")
+    parser.add_argument("--parte-geral", "-p", type=str, default=None, help="Caminho opcional para o JSON da Parte Geral enriquecida.")
     parser.add_argument("--output", "-o", type=str, default=None, help="Caminho de saída para o JSONL de embeddings.")
     parser.add_argument("--batch-size", "-b", type=int, default=32, help="Tamanho do batch para inferência do modelo na GPU.")
     parser.add_argument("--skip-embeddings", action="store_true", help="Modo debug/teste sem modelo real de embeddings (salva em arquivo de debug).")
@@ -84,6 +91,14 @@ def main(argv: Optional[List[str]] = None):
         
     fichas = [FichaEnriquecida.model_validate(f) for f in fichas_data]
     logger.info(f"{len(fichas)} fichas validadas com sucesso.")
+
+    parte_geral: Optional[ParteGeralEnriquecida] = None
+    pg_path = Path(args.parte_geral) if args.parte_geral else (input_path.parent / "parte_geral_enriquecida.json")
+    if pg_path.exists():
+        logger.info(f"Lendo Parte Geral enriquecida de: {pg_path}")
+        with open(pg_path, "r", encoding="utf-8") as f_pg:
+            pg_data = json.load(f_pg)
+        parte_geral = ParteGeralEnriquecida.model_validate(pg_data)
     
     if args.skip_embeddings:
         logger.info("Pulando geração de embeddings (modo skip). Usando FakeEmbedder.")
@@ -94,7 +109,7 @@ def main(argv: Optional[List[str]] = None):
         from mbft_indexador.embedder import GeradorEmbeddings
         embedder = GeradorEmbeddings()
 
-    payloads = processar_indexacao(fichas, embedder, args.batch_size)
+    payloads = processar_indexacao(fichas, embedder, args.batch_size, parte_geral=parte_geral)
             
     logger.info(f"Salvando artefato JSONL (NDJSON) em {output_path}...")
     with open(output_path, "w", encoding="utf-8") as out_f:
@@ -105,3 +120,4 @@ def main(argv: Optional[List[str]] = None):
 
 if __name__ == "__main__":
     main()
+

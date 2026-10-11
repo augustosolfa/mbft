@@ -692,3 +692,15 @@ async def test_fluxo_asgi_completo_ticket_busca_chat_e_protecao_kv_contra_queima
         assert resp_cors_ok.headers.get("access-control-allow-origin") == "https://mbft-site.pages.dev"
         resp_cors_bloqueado = await client.get("/health/", headers={"Origin": "https://site-malicioso.evil"})
         assert resp_cors_bloqueado.headers.get("access-control-allow-origin") is None
+
+        # 8. Rota GET /busca/ mapeia chunks da Parte Geral (PG_*) para /parte-geral/<slug>.html
+        conn.execute(
+            "INSERT INTO fts_chunks (id, codigo, artigo, secao, texto_contextualizado) VALUES (?, ?, ?, ?, ?)",
+            ("PG_8_1", "PG_8_1", "270", "PARTE_GERAL", "[Parte Geral do MBFT - 8.1. Retenção do Veículo] Imobilização no local."),
+        )
+        conn.commit()
+        resp_busca_pg = await client.get("/busca/", params={"q": "Imobilização", "limit": 5})
+        assert resp_busca_pg.status_code == 200
+        urls_pg = [r["url"] for r in resp_busca_pg.json()["resultados"] if r["codigo"] == "PG_8_1"]
+        assert urls_pg == ["/parte-geral/pg_8_1.html"]
+

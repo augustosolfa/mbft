@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Parte Geral - Manual Brasileiro de Fiscalização de Trânsito (MBFT){% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ul>
+    <li><a href="../index.html">Início</a></li>
+    <li>Parte Geral do MBFT</li>
+  </ul>
+</nav>
+
+<article>
+    <header>
+        <h2>Parte Geral do MBFT</h2>
+        <p>Normas gerais de fiscalização, responsabilidade pela infração, autuação, medidas administrativas e glossário oficial de siglas.</p>
+        <p>
+            <a href="#sumario" role="button" class="outline">Sumário das Seções ({{ parte_geral.secoes | length }})</a>
+            {% if parte_geral.glossario %}
+            <a href="#glossario" role="button" class="outline">Glossário de Siglas ({{ parte_geral.glossario | length }})</a>
+            {% endif %}
+        </p>
+    </header>
+
+    <section id="sumario">
+        <h3>Sumário da Parte Geral</h3>
+        <ul>
+            {% for secao in parte_geral.secoes %}
+            <li>
+                <a href="{{ secao.slug }}.html"><strong>{{ secao.titulo }}</strong></a>
+                <span class="badge">{{ secao.tipo.value }}</span>
+                {% if not secao.aplica_a_todos and secao.enquadramentos_alvo %}
+                    <small>({{ secao.enquadramentos_alvo | length }} fichas vinculadas)</small>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if parte_geral.glossario %}
+    <hr>
+    <section id="glossario" style="margin-top: 2rem;">
+        <h3>Glossário de Abreviaturas e Siglas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Sigla</th>
+                    <th scope="col">Significado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in parte_geral.glossario %}
+                <tr>
+                    <td><strong>{{ item.sigla }}</strong></td>
+                    <td>{{ item.significado }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    {% endif %}
+</article>
+{% endblock %}

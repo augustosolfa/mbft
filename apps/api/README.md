@@ -70,7 +70,7 @@ apps/api/
 | `CF_LLM_MODEL` | Não (padrão em `wrangler.jsonc`) | Modelo do Cloudflare Workers AI usado por `WorkersAILLMClient` (padrão: `@cf/meta/llama-3.1-8b-instruct-fp8-fast`). |
 | `CORS_ORIGINS` | Não | Lista de origens adicionais permitidas no CORS separadas por vírgula (ex.: `https://mbft-site.pages.dev`). Portas locais (`localhost:3000/5500/8080`) já são incluídas automaticamente. |
 | `LLM_PROVIDER` | Não | Override explícito do provedor de geração (`workers_ai`/`cloudflare` ou `gemini`). Sem override, detecta `env.AI` no Workers e faz fallback para `app.state.gerador` localmente. |
-| `GEMINI_API_KEY` | Apenas no modo local (`gemini`) | Chave da API Google Gemini utilizada por `GeminiLLMClient`. |
+| `GEMINI_API_KEY` | Apenas no modo local (`gemini`) | Chave da API Google Gemini utilizada por `GeminiLLMClient` (também aceita `GOOGLE_API_KEY`). Carregada automaticamente do `.env` da raiz por `mbft dev`; sem ela, o chat fica indisponível (HTTP 503) e a API registra um aviso na inicialização. |
 | `DB`, `VECTORIZE`, `AI`, `KV_TICKETS` | Em produção (Workers) | Bindings declarados em `wrangler.jsonc` para Cloudflare D1, Vectorize, Workers AI e KV. |
 
 ---
@@ -94,6 +94,10 @@ npx wrangler d1 execute mbft-d1 --local --file=apps/api/schema.sql
 npx wrangler d1 execute mbft-d1 --remote --file=apps/api/schema.sql
 
 # 5. Iniciar servidor FastAPI local
+#    `mbft dev api` carrega o `.env` da raiz automaticamente (GEMINI_API_KEY).
+uv run mbft dev api
+
+# Alternativa direta via uvicorn, com as variáveis do `.env`
 $env:JWT_SECRET="segredo-local-de-desenvolvimento"
-uv run uvicorn mbft_api.main:app --reload --port 8000
+uv run uvicorn mbft_api.main:app --reload --port 8000 --env-file .env
 ```

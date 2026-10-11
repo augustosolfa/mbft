@@ -29,8 +29,13 @@ def buscador(jsonl_path):
     
     # Textual misto
     ("dirigir sob influência de álcool", ["516-91"]), # O denso trazia o 516-92
+
+    # Consultas de Parte Geral (medidas administrativas e regras de autuação)
+    ("prazo para regularização na retenção do veículo CRLV-e", ["PG_8_1", "PG_8_4"]),
+    ("diferença entre infrações concorrentes e concomitantes", ["PG_7_CONCORRENTES", "PG_7_CONCOMITANTES"]),
 ])
 async def test_busca_hibrida_integracao(buscador, query, expected_code_options):
+
     resultados = await buscador.recuperar_contexto(query, limit=5)
     
     # Validações

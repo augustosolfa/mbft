@@ -149,9 +149,13 @@ Em suma, o Enriquecedor materializa os seguintes contratos:
 
 1. **`FichaEnriquecida`**: Herda estruturalmente os campos extraídos, mas converte literais em tipos de domínio estritos.
    - **Original vs Normalizado**: Mantém atributos como `gravidade_original` para auditoria, ao mesmo tempo em que os classifica em `GravidadeEnum`.
-   - **Estruturação de Listas**: Transforma strings como "Retenção do veículo e remoção" em listas como `['Retenção do veículo', 'Remoção do veículo']`.
+   - **Estruturação de Listas**: Transforma strings como "Retenção do veículo e remoção" em listas controladas de `MedidaAdministrativaEnum` (incluindo medidas inominadas como `REMOCAO_MERCADORIA_MATERIAL` e `RECOLHIMENTO_PLACAS`).
    - **Resolução de Competência**: Cruza as lacunas da Lei 14.599/23 e infere as listas de competências (ex: `[MUNICIPAL, ESTADUAL]`), definindo a `CompetenciaFonteEnum`.
-   - **Mapeamento Jurídico**: Popula listas formais de `artigos_ctb` e `resolucoes_contran`.
+   - **Mapeamento Jurídico e Grafo de Correlatos**: Popula listas formais de `artigos_ctb`, `resolucoes_contran` e `enquadramentos_correlatos` (consolidando redirecionamentos, concomitâncias e menções cruzadas).
+2. **`ParteGeralEnriquecida`**: Estrutura a Parte Geral do manual (`mbft_parte_geral.md`):
+   - **Curadoria Semântica**: Descarta ruídos pré-textuais (capa, lista de autoridades, sumário), textos editoriais (`1.1`, `3`) e ponteiros vazios (`11`), contabilizando-os em `secoes_descartadas`.
+   - **Classificação (`TipoSecaoParteGeralEnum`)**: Categoriza as 28 seções úteis em `APOIO` (`1.2`), `GLOSSARIO` (`2`, extraído em `ItemGlossario`), `GLOBAL` (`4`, `5`, `6`, `7`, `Continuadas`, `Sucessivas`, `Abordagem`, `8`, `8.6`, `9`, `10`, com `aplica_a_todos = True`) e `TEMATICO` (`6.1`–`6.5`, `Concorrentes`, `Concomitantes`, `7.1`, `8.1`–`8.5`, `8.7`, `9.1`).
+   - **Vinculação Determinística (`enquadramentos_alvo`)**: Cruza o vocabulário controlado de cada seção `TEMATICO` (`medidas_associadas`, `infratores_associados`, `artigos_ctb` e regras de concomitância/redirecionamento) contra as 412 fichas enriquecidas.
 
 ---
 
@@ -169,8 +173,10 @@ Para os casos anômalos onde as expressões regulares ou a tabela canônica não
 
 Todos os artefatos são gravados no diretório `data/processed/enriquecedor/`:
 
-1. `fichas_enriquecidas.json`: Array serializado das 404 fichas enriquecidas com o schema `FichaEnriquecida`.
-2. `relatorio_enriquecimento.md`: Relatório executivo de auditoria detalhando estatísticas de normalização, distribuição de competências resolvidas e densidade de referências ao CTB.
+1. `fichas_enriquecidas.json`: Array serializado das 412 fichas enriquecidas com o schema `FichaEnriquecida`.
+2. `parte_geral_enriquecida.json`: Objeto serializado com o schema `ParteGeralEnriquecida` contendo as 28 seções normativas/temáticas e as 38 siglas do glossário oficial.
+3. `relatorio_enriquecimento.md`: Relatório executivo de auditoria detalhando estatísticas de normalização, fichas com enquadramentos correlatos e métricas da Parte Geral.
+
 
 ---
 

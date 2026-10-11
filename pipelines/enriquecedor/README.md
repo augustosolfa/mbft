@@ -21,6 +21,10 @@ Módulo de processamento em lote (*batch*) responsável pelo enriquecimento sem�
    - Extrai referências canônicas a artigos e incisos do CTB (`ReferenciaCTB`).
    - Extrai menções formais a resoluções do CONTRAN.
    - Decompõe seções normativas (*Quando Autuar*, *Quando Não Autuar*, *Definições e Procedimentos*, *Exemplos de AIT*) em itens atômicos estruturados (`ItemRegra`), identificando códigos concomitantes e de redirecionamento.
+4. **Cura da Parte Geral**:
+   - Descartar ruído pré-textual/editorial e seções de mero ponteiro (`secoes_descartadas`).
+   - Extrair o glossário de siglas (`ItemGlossario`) e classificar as seções (`TipoSecaoParteGeralEnum`).
+   - Vincular deterministicamente as seções temáticas às fichas (`enquadramentos_alvo`) e popular `enquadramentos_correlatos` em cada ficha.
 
 ---
 
@@ -28,8 +32,10 @@ Módulo de processamento em lote (*batch*) responsável pelo enriquecimento sem�
 
 - **Entrada**:
   - `data/processed/extrator/fichas_mbft.json` (artefato bruto consolidado do Extrator).
+  - `data/processed/extrator/mbft_parte_geral.md` (Parte Geral em Markdown; opcional — processada quando presente).
 - **Saídas**:
   - `data/processed/enriquecedor/fichas_enriquecidas.json` (JSON consolidado aderente ao contrato `FichaEnriquecida`).
+  - `data/processed/enriquecedor/parte_geral_enriquecida.json` (Parte Geral curada aderente ao contrato `ParteGeralEnriquecida`: seções classificadas, glossário de siglas e vínculos determinísticos às fichas).
   - `data/processed/enriquecedor/relatorio_enriquecimento.md` (relatório de auditoria e estatísticas da base).
 
 ---

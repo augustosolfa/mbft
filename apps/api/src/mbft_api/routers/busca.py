@@ -15,8 +15,15 @@ async def buscar(
     resultados_formatados = []
     for item in resultados_brutos:
         codigo = item["metadata"].get("codigo", "")
-        # Se houver um código (ex: "518-51"), montamos a URL do SSG
-        url_estatica = f"/fichas/{codigo}.html" if codigo else None
+        secao = item["metadata"].get("secao", "")
+        # Se for uma seção da Parte Geral (ex: "PG_8_1"), aponta para /parte-geral/{codigo.lower()}.html
+        if secao == "PARTE_GERAL" or codigo.startswith("PG_"):
+            url_estatica = f"/parte-geral/{codigo.lower()}.html"
+        elif codigo:
+            url_estatica = f"/fichas/{codigo}.html"
+        else:
+            url_estatica = None
+
         
         resultados_formatados.append({
             "id": item["id"],

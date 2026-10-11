@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ secao.titulo }} - Parte Geral do MBFT{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ul>
+    <li><a href="../index.html">Início</a></li>
+    <li><a href="index.html">Parte Geral</a></li>
+    <li>{{ secao.titulo }}</li>
+  </ul>
+</nav>
+
+<nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <div>
+    {% if secao_anterior %}
+      <a href="{{ secao_anterior.slug }}.html" role="button" class="outline">← {{ secao_anterior.titulo }}</a>
+    {% else %}
+      <span style="visibility: hidden;">Anterior</span>
+    {% endif %}
+  </div>
+  <div>
+    <a href="index.html" role="button" class="secondary">Índice</a>
+  </div>
+  <div>
+    {% if secao_proxima %}
+      <a href="{{ secao_proxima.slug }}.html" role="button" class="outline">{{ secao_proxima.titulo }} →</a>
+    {% else %}
+      <span style="visibility: hidden;">Próximo</span>
+    {% endif %}
+  </div>
+</nav>
+
+<article>
+    <header>
+        <h2>
+            {{ secao.titulo }}
+            <span class="badge">{{ secao.tipo.value }}</span>
+        </h2>
+        {% if secao.capitulo_pai %}
+            <p><small>Capítulo: {{ secao.capitulo_pai }}</small></p>
+        {% endif %}
+    </header>
+
+    {% if secao.artigos_ctb or secao.medidas_associadas or secao.infratores_associados %}
+    <p>
+        {% if secao.artigos_ctb %}
+            <strong>Artigos CTB citados:</strong>
+            {% for art in secao.artigos_ctb %}
+                <span class="badge">Art. {{ art.artigo }}</span>
+            {% endfor %}
+        {% endif %}
+        {% if secao.medidas_associadas %}
+            <strong>Medidas:</strong>
+            {% for med in secao.medidas_associadas %}
+                <span class="badge">{{ med.value }}</span>
+            {% endfor %}
+        {% endif %}
+        {% if secao.infratores_associados %}
+            <strong>Infratores:</strong>
+            {% for inf in secao.infratores_associados %}
+                <span class="badge">{{ inf.value }}</span>
+            {% endfor %}
+        {% endif %}
+    </p>
+    {% endif %}
+
+    <section style="margin-top: 1.5rem;">
+        {% for p in secao.paragrafos %}
+            <p>{{ p }}</p>
+        {% endfor %}
+    </section>
+
+    {% if secao.enquadramentos_alvo %}
+    <hr>
+    <section>
+        <details>
+            <summary><strong>Fichas de enquadramento vinculadas a esta regra ({{ secao.enquadramentos_alvo | length }})</strong></summary>
+            <p style="margin-top: 0.5rem;">
+                {% for cod in secao.enquadramentos_alvo %}
+                    <a href="../fichas/{{ cod }}.html" class="badge" style="text-decoration: none; margin-bottom: 0.25rem;">{{ cod }}</a>
+                {% endfor %}
+            </p>
+        </details>
+    </section>
+    {% endif %}
+</article>
+
+<nav style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+  <div>
+    {% if secao_anterior %}
+      <a href="{{ secao_anterior.slug }}.html" role="button" class="outline">← {{ secao_anterior.titulo }}</a>
+    {% endif %}
+  </div>
+  <div>
+    <a href="index.html" role="button" class="secondary">Índice</a>
+  </div>
+  <div>
+    {% if secao_proxima %}
+      <a href="{{ secao_proxima.slug }}.html" role="button" class="outline">{{ secao_proxima.titulo }} →</a>
+    {% endif %}
+  </div>
+</nav>
+{% endblock %}

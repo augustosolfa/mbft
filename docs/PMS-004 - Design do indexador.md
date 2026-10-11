@@ -50,6 +50,7 @@ Para busca vetorial em RAG jurídico, prefixos monolíticos muito longos causam 
 
 * **Tipos de Chunks por Ficha**: Fragmentados pelas seções (que preenchem a variável `{secao}`):
   `EMENTA`, `QUANDO_AUTUAR`, `QUANDO_NAO_AUTUAR`, `DEFINICOES_PROCEDIMENTOS`, `EXEMPLOS_AIT`, `INFORMACOES_COMPLEMENTARES`.
+* **Chunks da Parte Geral (`PARTE_GERAL`)**: Gerados a partir de `parte_geral_enriquecida.json` (`ParteGeralEnriquecida`), agrupando parágrafos coesos de cada seção (`GLOBAL`, `TEMATICO`, `APOIO`, `GLOSSARIO`) com `secao="PARTE_GERAL"` e `codigo=secao.id` (ex.: `PG_8_1`), preservando a deduplicação por seção no `BuscadorHibrido` e o roteamento para `/parte-geral/<slug>.html`.
 
 Atributos administrativos (ex: `gravidade`, `infrator`, `competencia`) são excluídos da vetorização e registrados como **Metadados Estruturados** para viabilizar *pre-filtering* exato.
 
@@ -60,12 +61,13 @@ Atributos administrativos (ex: `gravidade`, `infrator`, `competencia`) são excl
   O Indexador gera os embeddings na GPU (FP32). O Recuperador (PMS-005) rodará na Cloudflare consumindo cotas de Neurons e modelos tipicamente quantizados (FP16/INT8). Assume-se que a divergência vetorial residual é tolerável para métricas de similaridade de cosseno.
 
 ### 3.3. Contratos de Dados e Artefatos
-As 404 fichas geram aproximadamente 1.600 a 2.500 chunks. Considerando os vetores de ponto flutuante, o artefato consome ~15 MB.
+As 412 fichas e as 28 seções da Parte Geral geram 6.648 chunks (6.604 de fichas e 44 da Parte Geral).
 * **Formato de Saída (`embeddings_mbft.jsonl`)**: NDJSON canônico validado por `ChunkPayload` (`mbft-core`), consumido diretamente tanto pelos adaptadores locais da API quanto pelo módulo de publicação (`mbft-deploy`, PMS-010).
 * **Schema**:
   - `id` (`string`);
   - `values` (`array<float32>`);
   - `metadata` (`object` com filtros administrativos e texto).
+
 
 ---
 

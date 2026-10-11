@@ -56,13 +56,17 @@ def normalizar_medidas_administrativas(texto: str) -> List[MedidaAdministrativaE
     t = _sem_acentos(sanitizar_texto(texto))
     rens = []
     if "RETENCAO" in t: rens.append(MedidaAdministrativaEnum.RETENCAO_VEICULO)
-    if "REMOCAO" in t: rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
+    if "REMOCAO" in t and ("MERCADORIA" in t or "MATERIAL" in t):
+        rens.append(MedidaAdministrativaEnum.REMOCAO_MERCADORIA_MATERIAL)
+    if "REMOCAO" in t and ("VEICULO" in t or ("MERCADORIA" not in t and "MATERIAL" not in t)):
+        rens.append(MedidaAdministrativaEnum.REMOCAO_VEICULO)
     if "RECOLHIMENTO" in t and ("CNH" in t or "DOCUMENTO DE HABILITACAO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CNH)
     if "RECOLHIMENTO" in t and ("CRLV" in t or "LICENCIAMENTO" in t or "CERTIFICADO DE REGISTRO" in t): rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_CRLV)
-    if "RECOLHIMENTO" in t and "PLACA" in t: rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_PLACAS)
+    if ("RECOLHIMENTO" in t or "APREENSAO" in t) and "PLACA" in t: rens.append(MedidaAdministrativaEnum.RECOLHIMENTO_PLACAS)
     if "TRANSBORDO" in t: rens.append(MedidaAdministrativaEnum.TRANSBORDO_CARGA)
     if "ALCOOLEMIA" in t or bool(re.search(r"\bTESTES?\b", t)): rens.append(MedidaAdministrativaEnum.REALIZACAO_TESTE_ALCOOLEMIA)
     return rens if rens else [MedidaAdministrativaEnum.NAO_APLICAVEL]
+
 
 def higienizar_infrator_crime(texto_infrator: str, texto_crime: str | None) -> Tuple[List[InfratorEnum], bool, List[ReferenciaCTB]]:
     texto_infrator = sanitizar_texto(texto_infrator)

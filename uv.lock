@@ -1222,6 +1222,7 @@ dependencies = [
     { name = "mbft-extrator" },
     { name = "mbft-indexador" },
     { name = "mbft-ssg" },
+    { name = "python-dotenv" },
 ]
 
 [package.dev-dependencies]
@@ -1229,7 +1230,6 @@ dev = [
     { name = "google-genai" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
-    { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
 
@@ -1242,6 +1242,7 @@ requires-dist = [
     { name = "mbft-extrator", editable = "pipelines/extrator" },
     { name = "mbft-indexador", editable = "pipelines/indexador" },
     { name = "mbft-ssg", editable = "pipelines/ssg" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
 ]
 
 [package.metadata.requires-dev]
@@ -1249,7 +1250,6 @@ dev = [
     { name = "google-genai", specifier = ">=2.28.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
-    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "uvicorn", specifier = ">=0.54.0" },
 ]
 

@@ -49,6 +49,10 @@ uv run mbft pipeline ssg
 
 ### 2. Ambiente de Desenvolvimento Local (`mbft dev`)
 
+O comando carrega automaticamente o arquivo `.env` da raiz do monorepo (quando presente),
+sem sobrescrever variáveis já exportadas no shell — é assim que `GEMINI_API_KEY` chega ao
+Gerador LLM local. Crie o `.env` na raiz (ele é ignorado pelo Git) antes de subir o ambiente.
+
 ```bash
 # Subir API FastAPI (porta 8000) + Site Estático (porta 3000) simultaneamente
 uv run mbft dev

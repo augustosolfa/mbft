@@ -19,6 +19,12 @@ uv run mbft-indexador
 # Especificar caminhos customizados e tamanho de batch na GPU
 uv run mbft-indexador --input data/processed/enriquecedor/fichas_enriquecidas.json --output data/processed/indexador/embeddings_mbft.jsonl --batch-size 64
 
+# Incluir os chunks da Parte Geral (auto-detecta parte_geral_enriquecida.json ao lado do input)
+uv run mbft-indexador --parte-geral
+
+# Ou informar um caminho explícito para a Parte Geral enriquecida
+uv run mbft-indexador --parte-geral data/processed/enriquecedor/parte_geral_enriquecida.json
+
 # Modo debug/teste rápido sem carregar o modelo real de embeddings (salva em embeddings_debug.jsonl)
 uv run mbft-indexador --skip-embeddings
 ```
@@ -42,11 +48,12 @@ uv run python pipelines/indexador/scripts/avaliacao_aderencia.py --jsonl data/pr
 - **Saídas**:
   - `data/processed/indexador/embeddings_mbft.jsonl`: Artefato NDJSON contendo `id`, `values` (vetor float32 de 1024 dimensões normalizado L2) e `metadata` (`ChunkPayload`).
   - `data/processed/indexador/embeddings_debug.jsonl`: Artefato de inspeção rápida gerado quando a flag `--skip-embeddings` é utilizada.
+  - Quando `--parte-geral` (ou a auto-detecção de `parte_geral_enriquecida.json`) está ativo, também são gerados chunks da Parte Geral com `secao=PARTE_GERAL` e `codigo=PG_*` (ex.: `PG_8_1`).
 
 ---
 
 ## 3. Estrutura do Código-Fonte (`src/mbft_indexador/`)
 
 - **`cli.py`**: Ponto de entrada da CLI (`mbft-indexador`), validação de argumentos e orquestração do fluxo batch.
-- **`chunker.py`**: Fracionamento das fichas enriquecidas por seções temáticas (`EMENTA`, `QUANDO_AUTUAR`, `QUANDO_NAO_AUTUAR`, `DEFINICOES_PROCEDIMENTOS`, `EXEMPLOS_AIT`, `INFORMACOES_COMPLEMENTARES`) e montagem do prefixo contextual enxuto.
+- **`chunker.py`**: Fracionamento das fichas enriquecidas por seções temáticas (`EMENTA`, `QUANDO_AUTUAR`, `QUANDO_NAO_AUTUAR`, `DEFINICOES_PROCEDIMENTOS`, `EXEMPLOS_AIT`, `INFORMACOES_COMPLEMENTARES`) e montagem do prefixo contextual enxuto. Também expõe `gerar_chunks_parte_geral` para as seções da Parte Geral.
 - **`embedder.py`**: Integração com `sentence-transformers` e PyTorch CUDA para inferência em lotes do modelo `BAAI/bge-m3`.

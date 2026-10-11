@@ -39,7 +39,8 @@ uv run python pipelines/extrator/scripts/comparar_versoes.py
 
 - **Python 3.14**: Execução gerenciada nativamente via `uv`.
 - **PyTorch (CUDA 13.2)**: Aceleração GPU para inferência de modelos de layout e OCR.
-- **Docling**: Extração semântica com `AcceleratorOptions(device="cuda")` com *fallback* inteligente para extração vetorial direta via `pypdfium2`.
+- **Docling**: Extração semântica das **fichas** com `AcceleratorOptions(device="cuda")` e *fallback* inteligente para extração vetorial direta via `pypdfium2`.
+- **pypdfium2**: Extração **geométrica da Parte Geral** (páginas 1 a 31) por agrupamento de linhas, dispensando o Docling nessa etapa e preservando a ordem linear de leitura dos parágrafos.
 - **ProcessPoolExecutor**: Execução paralela de extração de fichas multipáginas com múltiplos *workers* e carregamento *lazy* dos modelos de visão na GPU.
 
 ---
@@ -49,7 +50,7 @@ uv run python pipelines/extrator/scripts/comparar_versoes.py
 - **`cli.py`**: Ponto de entrada CLI e orquestração de workers paralelos.
 - **`pipeline.py`**: Orquestrador principal da extração de uma ficha completa.
 - **`models.py`**: Re-exportação de retrocompatibilidade dos contratos em `mbft-core`.
-- **`parte_geral.py`**: Pipeline das páginas 1 a 31 para Markdown.
+- **`parte_geral.py`**: Extração geométrica da Parte Geral (páginas 1 a 31) para Markdown, agrupando linhas por coordenada `y` (via `pypdfium2`) e reconstruindo cabeçalhos (`##`) e parágrafos sem embaralhar o texto.
 - **`fatiador.py`**: Detecção vetorial rápida e mapeamento geométrico das fichas no PDF.
 - **`stitching.py`**: Algoritmo de canais de colunas e costura entre páginas consecutivas.
 - **`docling_extractor.py`**: Integração com Docling e inferência CUDA.

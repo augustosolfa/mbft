@@ -129,5 +129,17 @@ class TestNormalizador(unittest.TestCase):
         self.assertEqual(refs[3], ReferenciaCTB(artigo="277", paragrafo="§ 3º", inciso="IV"))
         self.assertEqual(refs[4], ReferenciaCTB(artigo="277", paragrafo="§ 4º", inciso="IV"))
 
+    def test_normalizar_medidas_administrativas_inominadas_mercadoria_e_placas(self):
+        res_mercadoria = normalizar_medidas_administrativas("Remoção da mercadoria ou do material.")
+        self.assertEqual(res_mercadoria, [MedidaAdministrativaEnum.REMOCAO_MERCADORIA_MATERIAL])
+
+        res_veiculo = normalizar_medidas_administrativas("Remoção do veículo (Vide a Parte Geral deste Manual).")
+        self.assertEqual(res_veiculo, [MedidaAdministrativaEnum.REMOCAO_VEICULO])
+
+        res_apreensao_placas = normalizar_medidas_administrativas("Multa e apreensão das placas irregulares.")
+        self.assertEqual(res_apreensao_placas, [MedidaAdministrativaEnum.RECOLHIMENTO_PLACAS])
+
+
 if __name__ == "__main__":
     unittest.main()
+

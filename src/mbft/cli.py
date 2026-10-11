@@ -278,6 +278,7 @@ def _executar_testes(args: argparse.Namespace) -> None:
         if args.alvo == "rapidos" and args.modulo == "api":
             pytest_args.append(f"--ignore={RAIZ_REPO / 'apps' / 'api' / 'tests' / 'test_integracao.py'}")
     else:
+        pytest_args.append(str(RAIZ_REPO))
         if args.alvo == "rapidos":
             pytest_args.append(f"--ignore={RAIZ_REPO / 'apps' / 'api' / 'tests' / 'test_integracao.py'}")
 
@@ -286,8 +287,29 @@ def _executar_testes(args: argparse.Namespace) -> None:
         sys.exit(int(code))
 
 
+def _carregar_env_local(env: Dict[str, str]) -> None:
+    """
+    Carrega o `.env` da raiz do monorepo no ambiente dos subprocessos locais,
+    preservando variáveis já definidas no shell (o ambiente real tem precedência).
+    """
+    env_file = RAIZ_REPO / ".env"
+    if not env_file.is_file():
+        return
+    try:
+        from dotenv import dotenv_values
+    except ImportError:
+        logger.warning(
+            "python-dotenv ausente: '.env' ignorado. Exporte as variáveis no shell (ex.: GEMINI_API_KEY)."
+        )
+        return
+    for chave, valor in dotenv_values(env_file).items():
+        if valor is not None and chave not in env:
+            env[chave] = valor
+
+
 def _executar_dev(args: argparse.Namespace) -> None:
     env = os.environ.copy()
+    _carregar_env_local(env)
     if not env.get("JWT_SECRET") or env.get("JWT_SECRET") == "MUDAR_EM_PRODUCAO":
         env["JWT_SECRET"] = "segredo-local-de-desenvolvimento-mbft"
 

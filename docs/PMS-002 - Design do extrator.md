@@ -50,7 +50,7 @@ O extrator atua de ponta a ponta sobre o PDF em pipeline sequencial:
 ```
 [ PDF MBFT (826 págs) ]
          │
-         ├─── (pp. 1-31)  ──> [ Parser Documental Docling ] ──> mbft_parte_geral.md
+         ├─── (pp. 1-31)  ──> [ Extrator Geométrico Linear pypdfium2 ] ──> mbft_parte_geral.md
          │
          └─── (pp. 32-826) ─> [ Extrator Vetorial pypdfium2 ] (fatiamento e colunas)
                                     │
@@ -70,7 +70,7 @@ O extrator atua de ponta a ponta sobre o PDF em pipeline sequencial:
 ```
 
 ### Estratégia de Parsing e Costura Multipágina
-1. **Parte Geral:** Processamento linear das páginas 1 a 31 via representação semântica do Docling, emitindo Markdown canônico com formatação de listas e tabelas preservada.
+1. **Parte Geral:** Processamento geométrico linear das páginas 1 a 31 via `pypdfium2` (agrupamento de caracteres por coordenada vertical $Y$ e ordenação horizontal $X$), reconstruindo parágrafos contínuos sem embaralhamento de recuos de primeira linha e promovendo cabeçalhos numerados e subtítulos temáticos (`Infrações Concorrentes`, `Infrações Concomitantes`, `Infrações Continuadas`, `Infrações Sucessivas`) para `##` em Markdown canônico (`mbft_parte_geral.md`). A higienização semântica de elementos pré-textuais é delegada ao Enriquecedor (PMS-003).
 2. **Segmentação e Stitching de Fichas:** O parser percorre as páginas 32 a 826 mantendo uma máquina de estados:
    * A detecção de um código de infração validado exclusivamente no campo de código do bloco de cabeçalho (`^\d{3}-\d{2}$`) inicializa uma nova ficha. Se o código for idêntico ao da ficha ativa (cabeçalho repetido em quebra de página), é tratado como continuidade da mesma ficha.
    * Quando uma página não contém novo código de enquadramento em cabeçalho, seus blocos de layout são tratados como extensão da ficha ativa. Listas ordenadas e parágrafos quebrados pela transição de página são concatenados e higienizados.
@@ -98,8 +98,10 @@ Uma rotina de validação acoplada inferirá automaticamente a *flag* `competenc
 
 ## 4. Alternativas Consideradas
 
-* **Parsers Textuais Lineares (`pypdf` / `pdfplumber`):** Descartados por extraírem o texto em ordem de fluxo vetorial bruto, quebrando a correlação geométrica de tabelas e falhando na reconstituição de blocos fracionados por quebras de página. Também não oferecem suporte integrado à segmentação e extração de imagens e diagramas.
+* **Exportação da Parte Geral (pp. 1–31) via `Docling.export_to_markdown()`:** Descartada após auditoria empírica demonstrar que o detector visual de layout do Docling interpretava recuos de primeira linha de parágrafos (nas páginas 12, 17, 20, 22, 25 e 30) como blocos de múltiplas colunas independentes, intercalando frases fora de ordem e omitindo o cabeçalho `## Infrações Sucessivas`. A extração geométrica linear via `pypdfium2` eliminou 100% do embaralhamento mantendo velocidade sub-segundo.
+* **Parsers Textuais Lineares Sem Geometria (`pypdf` / `pdfplumber` puro nas fichas):** Descartados para as fichas (pp. 32–826) por extraírem o texto sem fatiamento explícito das 4 colunas normativas e do cabeçalho estruturado.
 * **OCR Integral com Tesseract:** Descartado devido ao alto custo computacional sobre 826 páginas e alta incidência de degradação em caracteres jurídicos especiais (`§`, incisos e alíneas) em um PDF que já possui camada textual vetorial nativa.
+
 
 ---
 

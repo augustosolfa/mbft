@@ -5,14 +5,24 @@ from .interfaces import ILLMClient
 
 class GeminiLLMClient(ILLMClient):
     """
-    Implementação local do ILLMClient para o Gemini 2.5 Flash-Lite.
+    Implementação local do ILLMClient para o Gemini 3.1 Flash-Lite.
     Utiliza o SDK oficial google-genai.
     
-    Atenção: Requer a variável de ambiente GEMINI_API_KEY configurada.
+    Atenção: Requer a variável de ambiente GEMINI_API_KEY (ou GOOGLE_API_KEY) configurada.
     """
+
     def __init__(self):
-        # O Client() puxa automaticamente o GEMINI_API_KEY do os.environ
-        self.client = genai.Client()
+        # Valida a credencial ANTES de instanciar o SDK. Sem chave, `genai.Client()` falha
+        # no meio da construção e o `__del__` do SDK agenda um `aclose()` em um cliente
+        # incompleto, vazando "Task exception was never retrieved" no console.
+        api_key = (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
+        if not api_key:
+            raise ValueError(
+                "GEMINI_API_KEY não configurada: o Gerador LLM local está indisponível. "
+                "Defina a variável no .env da raiz do monorepo (carregado por `mbft dev`) "
+                "para habilitar o chat."
+            )
+        self.client = genai.Client(api_key=api_key)
         self.model = "gemini-3.1-flash-lite"
         
     async def gerar_resposta(

@@ -41,6 +41,11 @@
                 <a href="lista.html" role="button" class="outline">Ver Tabela</a>
             </article>
             <article>
+                <header>Parte Geral</header>
+                <p>Consulte conceitos gerais, medidas administrativas, autuação e glossário de siglas.</p>
+                <a href="parte-geral/index.html" role="button" class="outline">Ler Parte Geral</a>
+            </article>
+            <article>
                 <header>Oráculo (IA)</header>
                 <p>Faça uma pergunta complexa para nossa IA treinada com o MBFT.</p>
                 <a href="chat.html" role="button">Abrir Chat</a>
@@ -87,12 +92,14 @@
                         
                         if (item.url) {
                             const a = document.createElement('a');
-                            // Garantir que a URL só comece com /fichas/ para previnir javascript:
-                            if (item.url.startsWith('/fichas/')) {
+                            // Garantir que a URL só comece com /fichas/ ou /parte-geral/ para prevenir javascript:
+                            if (item.url.startsWith('/fichas/') || item.url.startsWith('/parte-geral/')) {
                                 a.href = item.url;
                                 a.target = '_blank';
                                 const strong = document.createElement('strong');
-                                strong.textContent = `Abrir Ficha ${item.codigo}`;
+                                strong.textContent = item.url.startsWith('/parte-geral/')
+                                    ? `Abrir Parte Geral (${item.codigo})`
+                                    : `Abrir Ficha ${item.codigo}`;
                                 a.appendChild(strong);
                                 pHeader.appendChild(a);
                             } else {
@@ -105,6 +112,7 @@
                             strong.textContent = `Código: ${item.codigo}`;
                             pHeader.appendChild(strong);
                         }
+
 
                         const pTrecho = document.createElement('p');
                         pTrecho.style.fontSize = '0.9em';

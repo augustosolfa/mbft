@@ -56,6 +56,10 @@ site/
 ├── chat.html                  # Interface estática do chat conectada ao Ticketizador
 ├── config.js                  # Configuração runtime neutra (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações extraídas (300 DPI)
+├── parte-geral/               # Subdiretório modular da Parte Geral
+│   ├── index.html             # Índice com listagem de seções, contadores e glossário
+│   ├── pg_1_2.html            # Páginas dedicadas por seção normativa ({slug}.html)
+│   └── ...
 └── fichas/
     ├── 518-51.html            # Rota /fichas/518-51.html
     └── ...
@@ -67,7 +71,10 @@ No frontend, um script em Javascript puro lê caixas de seleção (`<select>`) d
 
 ### 3.4. Composição de Dados
 
-O motor de *templates* consumirá as classes pydantic definidas em `mbft-core`. Campos tipicamente difíceis de visualizar no JSON bruto (como medidas administrativas, flags booleanas de recolhimento de CNH) serão transformados em seções visuais ("badges" ou painéis de destaque) na interface HTML.
+O motor de *templates* consumirá as classes pydantic definidas em `mbft-core` (`FichaEnriquecida` e `ParteGeralEnriquecida`). Campos tipicamente difíceis de visualizar no JSON bruto (como medidas administrativas, flags booleanas de recolhimento de CNH e enquadramentos correlatos) são transformados em seções visuais ("badges" ou painéis de destaque) na interface HTML.
+
+Adicionalmente, o SSG gera o módulo da Parte Geral em `parte-geral/` composto por um índice consolidado (`parte-geral/index.html` contendo sumário navegável e glossário de siglas) e páginas individuais para cada seção temática (`parte-geral/{slug}.html`, provendo breadcrumbs, paginação sequencial e fichas vinculadas). O SSG injeta em cada `fichas/{codigo}.html` links diretos para a respectiva página da seção na Parte Geral (ex.: `../parte-geral/pg_8_1.html` para Retenção, `../parte-geral/pg_8_2.html` para Remoção), além do bloco colapsável listando todas as seções temáticas vinculadas apontando para suas páginas dedicadas.
+
 
 ---
 
@@ -75,6 +82,8 @@ O motor de *templates* consumirá as classes pydantic definidas em `mbft-core`. 
 
 * **Uso de MkDocs ou Sphinx:** 
   * *Por que foi rejeitada:* Embora fantásticos para documentação escrita à mão, o MBFT é gerado puramente a partir de JSON estruturado (modelos Pydantic contendo campos enumerados, imagens recortadas, flags criminais). O uso cru do `Jinja2` permite controle absoluto sobre o HTML injetado por ficha e sobre a semântica da página, sem precisar hackear um sistema de plugins do MkDocs.
+* **Página única monolítica da Parte Geral (`parte-geral.html` com âncoras `#pg_*`):**
+  * *Por que foi superada:* Reunir todos os capítulos normativos e de apoio em um único HTML dificultava a legibilidade em dispositivos móveis, inflava o DOM e tornava a navegação linear confusa. A divisão em `parte-geral/index.html` + `parte-geral/{slug}.html` modulariza a leitura, oferece paginação sequencial e alinha as URLs diretamente aos chunks do Indexador e às rotas da API.
 
 ---
 

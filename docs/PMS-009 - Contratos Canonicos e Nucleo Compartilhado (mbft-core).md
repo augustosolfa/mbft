@@ -68,9 +68,12 @@ O pacote é subdividido por domínio de fronteira:
 * **Fronteira de Indexação (`mbft_core.models.indexacao`):**
   - Contratos: `ChunkMetadados`, `ChunkPayload`.
   - **Produtor:** `mbft-indexador` (PMS-004) ao exportar `embeddings_mbft.jsonl`.
+* **Contratos da Parte Geral (`mbft_core.models.enriquecimento`):**
+  - `TipoSecaoParteGeralEnum`, `ItemGlossario`, `SecaoParteGeral` e `ParteGeralEnriquecida`: definem o contrato canônico de curadoria, glossário e vinculação temática da Parte Geral do MBFT (`parte_geral_enriquecida.json`), produzido pelo `mbft-enriquecedor` (PMS-003) e consumido pelo `mbft-indexador` (PMS-004) e pelo `mbft-ssg` (PMS-007).
 * **Resolução de Caminhos (`mbft_core.paths`):**
   - Expõe constantes imutáveis de localização no monorepo (`RAIZ_REPO`, `DATA_DIR`, `RAW_DIR`,
     `PROCESSED_DIR`), ancoradas na descoberta da raiz do UV Workspace.
+
 
 ---
 

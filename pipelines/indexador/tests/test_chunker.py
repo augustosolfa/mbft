@@ -109,5 +109,40 @@ class TestChunker(unittest.TestCase):
         self.assertEqual(len(ementa_chunks), 1)
         self.assertEqual(ementa_chunks[0].id, "751-01_EMENTA")
 
+    def test_gerar_chunks_parte_geral_contextualizados(self):
+        from mbft_core.models.enriquecimento import (
+            ParteGeralEnriquecida,
+            SecaoParteGeral,
+            TipoSecaoParteGeralEnum,
+        )
+        from mbft_indexador.chunker import gerar_chunks_parte_geral
+
+        pg = ParteGeralEnriquecida(
+            secoes=[
+                SecaoParteGeral(
+                    id="PG_8_1",
+                    slug="pg_8_1",
+                    numero="8.1",
+                    titulo="8.1. Retenção do Veículo",
+                    tipo=TipoSecaoParteGeralEnum.TEMATICO,
+                    texto="Consiste na imobilização do veículo.",
+                    paragrafos=["Consiste na imobilização do veículo."],
+                    medidas_associadas=[MedidaAdministrativaEnum.RETENCAO_VEICULO],
+                    artigos_ctb=[ReferenciaCTB(artigo="270")],
+                    enquadramentos_alvo=["518-51"],
+                )
+            ]
+        )
+
+        chunks_pg = gerar_chunks_parte_geral(pg)
+        self.assertEqual(len(chunks_pg), 1)
+        self.assertEqual(chunks_pg[0].id, "PG_8_1")
+        self.assertEqual(chunks_pg[0].metadata.secao, "PARTE_GERAL")
+        self.assertEqual(chunks_pg[0].metadata.codigo, "PG_8_1")
+        self.assertEqual(chunks_pg[0].metadata.artigo, "270")
+        self.assertIn("8.1. Retenção do Veículo", chunks_pg[0].texto_para_embedding)
+
+
 if __name__ == "__main__":
     unittest.main()
+

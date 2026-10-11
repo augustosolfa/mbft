@@ -24,6 +24,10 @@ Módulo de processamento em lote (*batch*) responsável pela compilação estát
    - Disponibiliza o portal estático de entrada integrado à rota `/busca` da API RAG e a interface do assistente (**Oráculo MBFT**), que implementa o fluxo visual de fila global (`/ticket` com *countdown* e suporte a `priority-token` + `/chat`).
 5. **Empacotamento de Ativos Visuais**:
    - Copia o acervo de ilustrações e placas de sinalização em alta definição (300 DPI) extraídas do PDF para o diretório final de publicação.
+6. **Módulo da Parte Geral (`parte-geral/`)**:
+   - Gera o índice (`parte-geral/index.html`) com o sumário completo de seções e a tabela do glossário oficial de siglas.
+   - Gera páginas dedicadas para cada seção temática (`parte-geral/{slug}.html`, ex.: `pg_8_1.html`), com breadcrumbs, paginação sequencial e fichas de enquadramento vinculadas.
+   - Injeta nas fichas os links de medida administrativa apontando para `../parte-geral/{slug}.html` e os enquadramentos correlatos.
 
 ---
 
@@ -31,6 +35,7 @@ Módulo de processamento em lote (*batch*) responsável pela compilação estát
 
 - **Entradas**:
   - `data/processed/enriquecedor/fichas_enriquecidas.json`: Base consolidada e normalizada pelo módulo `mbft-enriquecedor`.
+  - `data/processed/enriquecedor/parte_geral_enriquecida.json`: Parte Geral curada (opcional; auto-detectada quando presente) para gerar o índice e as páginas de seção em `parte-geral/`, além das âncoras de medida administrativa nas fichas.
   - `data/processed/extrator/imagens/`: Diretório de imagens e recortes vetoriais/bitmaps gerados pelo módulo `mbft-extrator`.
 - **Saída (`data/processed/site/`)**:
   - Diretório autocontido pronto para publicação estática, seguindo a topologia abaixo:
@@ -42,6 +47,10 @@ data/processed/site/
 ├── chat.html                  # Interface do Oráculo MBFT integrada ao Ticketizador (/ticket e /chat)
 ├── config.js                  # Configuração neutra de runtime (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações e placas de sinalização (300 DPI)
+├── parte-geral/               # Subdiretório modular da Parte Geral
+│   ├── index.html             # Índice com listagem de seções, contadores e glossário
+│   ├── pg_1_2.html            # Páginas individuais por seção normativa ({slug}.html)
+│   └── ...
 └── fichas/
     ├── 501-00.html            # Página individual da ficha (/fichas/{id}.html)
     └── ...
@@ -94,6 +103,8 @@ Acesse `http://localhost:3000` (ou `http://127.0.0.1:3000`).
 - **`builder.py`**: Orquestrador do pipeline SSG (`run_build`), responsável pela limpeza do diretório de destino, cópia de imagens, validação Pydantic, verificação de colisões de ID e renderização dos templates Jinja2.
 - **`templates/base.html`**: Layout base compartilhado pelas páginas de conteúdo normativo, carregando o Pico.css (*classless*) e definindo os estilos de *badges* de gravidade.
 - **`templates/ficha.html`**: Template individual de cada ficha de enquadramento (`/fichas/{id}.html`).
+- **`templates/parte_geral_index.html`**: Template do índice da Parte Geral (`/parte-geral/index.html`) com o sumário navegável de seções e tabela do glossário.
+- **`templates/parte_geral_secao.html`**: Template individual de seção da Parte Geral (`/parte-geral/{slug}.html`) com breadcrumbs, paginação sequencial e fichas vinculadas.
 - **`templates/lista.html`**: Template da tabela completa de infrações com atributos `data-*` e script de filtragem client-side.
 - **`templates/index.html`**: Portal inicial com formulário de busca semântica conectado à API e atalhos de navegação.
 - **`templates/chat.html`**: Interface do Oráculo MBFT com suporte a fila global (Ticketizador), barra de progresso de espera e envio de token de prioridade (`priority-token`).

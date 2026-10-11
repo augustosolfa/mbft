@@ -3,24 +3,61 @@ import os
 import shutil
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Dict, List, Optional
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from mbft_core.models.enriquecimento import FichaEnriquecida
+from mbft_core.models.enriquecimento import (
+    FichaEnriquecida,
+    MedidaAdministrativaEnum,
+    ParteGeralEnriquecida,
+    SecaoParteGeral,
+)
 from mbft_core.paths import PROCESSED_DIR
 
 logger = logging.getLogger(__name__)
+
+
+def _obter_ancora_medida_pg(ficha: FichaEnriquecida) -> Optional[str]:
+    """
+    Determina a âncora específica de Medida Administrativa na Parte Geral
+    quando a ficha referencia a Parte Geral ou prevê medida administrativa.
+    """
+    medidas = ficha.medidas_administrativas
+    if MedidaAdministrativaEnum.RETENCAO_VEICULO in medidas:
+        return "pg_8_1"
+    if MedidaAdministrativaEnum.REMOCAO_VEICULO in medidas:
+        return "pg_8_2"
+    if MedidaAdministrativaEnum.RECOLHIMENTO_CNH in medidas:
+        return "pg_8_3"
+    if MedidaAdministrativaEnum.RECOLHIMENTO_CRLV in medidas:
+        return "pg_8_4"
+    if MedidaAdministrativaEnum.TRANSBORDO_CARGA in medidas:
+        return "pg_8_5"
+    if (
+        MedidaAdministrativaEnum.RECOLHIMENTO_PLACAS in medidas
+        or MedidaAdministrativaEnum.REMOCAO_MERCADORIA_MATERIAL in medidas
+    ):
+        return "pg_8_7"
+    if "PARTE GERAL" in (ficha.medida_administrativa_original or "").upper():
+        return "pg_8"
+    return None
+
 
 def run_build(
     fichas_json: Optional[Path] = None,
     templates_dir: Optional[Path] = None,
     output_dir: Optional[Path] = None,
-    imagens_src: Optional[Path] = None
+    imagens_src: Optional[Path] = None,
+    parte_geral_json: Optional[Path] = None,
 ):
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     logger.setLevel(logging.INFO)
     if fichas_json is None:
         fichas_json = PROCESSED_DIR / "enriquecedor" / "fichas_enriquecidas.json"
+    if parte_geral_json is None:
+        candidato_pg = fichas_json.parent / "parte_geral_enriquecida.json"
+        if candidato_pg.exists():
+            parte_geral_json = candidato_pg
     if templates_dir is None:
         templates_dir = Path(__file__).resolve().parent / "templates"
     if output_dir is None:
@@ -47,6 +84,17 @@ def run_build(
         autoescape=select_autoescape(["html", "xml"])
     )
     template_ficha = env.get_template("ficha.html")
+
+    # Carrega Parte Geral enriquecida quando disponível
+    parte_geral: Optional[ParteGeralEnriquecida] = None
+    mapa_secoes_por_ficha: Dict[str, List[SecaoParteGeral]] = {}
+    if parte_geral_json is not None and parte_geral_json.exists():
+        logger.info(f"Lendo Parte Geral enriquecida de: {parte_geral_json}")
+        with open(parte_geral_json, "r", encoding="utf-8") as f_pg:
+            parte_geral = ParteGeralEnriquecida.model_validate(json.load(f_pg))
+        for secao in parte_geral.secoes:
+            for cod in secao.enquadramentos_alvo:
+                mapa_secoes_por_ficha.setdefault(cod, []).append(secao)
     
     # Carrega e converte os dados
     logger.info(f"Lendo dados de: {fichas_json}")
@@ -64,10 +112,41 @@ def run_build(
             raise ValueError(f"Colisão de ID detectada: o arquivo {ficha.id}.html seria sobrescrito.")
         seen_ids.add(ficha.id)
         
+        secoes_pg_ficha = mapa_secoes_por_ficha.get(ficha.codigo_enquadramento, [])
+        ancora_medida_pg = _obter_ancora_medida_pg(ficha) if parte_geral is not None else None
+
         # Gera HTML da Ficha
-        html_ficha = template_ficha.render(ficha=ficha)
+        html_ficha = template_ficha.render(
+            ficha=ficha,
+            secoes_parte_geral=secoes_pg_ficha,
+            ancora_medida_pg=ancora_medida_pg,
+        )
         out_ficha = fichas_out_dir / f"{ficha.id}.html"
         out_ficha.write_text(html_ficha, encoding="utf-8")
+
+    # Gera HTML da Parte Geral quando disponível e os templates existirem
+    if parte_geral is not None and (templates_dir / "parte_geral_index.html").exists():
+        pg_out_dir = output_dir / "parte-geral"
+        pg_out_dir.mkdir(parents=True, exist_ok=True)
+        
+        template_pg_index = env.get_template("parte_geral_index.html")
+        html_pg_index = template_pg_index.render(parte_geral=parte_geral)
+        out_pg_index = pg_out_dir / "index.html"
+        out_pg_index.write_text(html_pg_index, encoding="utf-8")
+
+        if (templates_dir / "parte_geral_secao.html").exists():
+            template_pg_secao = env.get_template("parte_geral_secao.html")
+            num_secoes = len(parte_geral.secoes)
+            for i, secao in enumerate(parte_geral.secoes):
+                secao_ant = parte_geral.secoes[i - 1] if i > 0 else None
+                secao_prox = parte_geral.secoes[i + 1] if i + 1 < num_secoes else None
+                html_secao = template_pg_secao.render(
+                    secao=secao,
+                    secao_anterior=secao_ant,
+                    secao_proxima=secao_prox,
+                )
+                out_secao = pg_out_dir / f"{secao.slug}.html"
+                out_secao.write_text(html_secao, encoding="utf-8")
         
     # Gera HTML da Lista Completa
     template_lista = env.get_template("lista.html")
@@ -99,3 +178,4 @@ def run_build(
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     run_build()
+

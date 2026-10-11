@@ -97,7 +97,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "751-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -304,7 +306,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "525-82",
+      "737-40",
+      "751-01",
+      "761-71",
+      "761-72",
+      "761-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -539,7 +548,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "751-01",
+      "752-82"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -748,7 +760,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "525-82",
+      "737-40",
+      "751-02",
+      "752-81",
+      "761-71",
+      "761-72",
+      "761-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -1019,7 +1039,22 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "502-91",
+      "502-92",
+      "503-71",
+      "503-72",
+      "504-50",
+      "505-31",
+      "505-32",
+      "505-33",
+      "505-34",
+      "506-10",
+      "511-80",
+      "691-20",
+      "774-91",
+      "774-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -1394,7 +1429,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "502-92",
+      "507-01",
+      "512-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -1562,7 +1602,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "502-91",
+      "507-02",
+      "512-62",
+      "774-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -1749,7 +1795,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "503-72",
+      "504-50",
+      "508-81",
+      "513-41",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -1940,7 +1993,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "503-71",
+      "508-82",
+      "513-42",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -2134,7 +2193,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "502-91",
+      "502-92",
+      "503-71",
+      "509-60",
+      "514-20",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -2314,7 +2381,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "583-50",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -2461,7 +2531,10 @@
       "886/2021",
       "927/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "583-50",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -2597,7 +2670,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-34",
+      "583-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -2732,7 +2808,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "583-50",
+      "661-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -2966,7 +3045,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "686-61",
+      "686-62",
+      "755-22",
+      "773-31",
+      "773-32",
+      "774-92",
+      "778-11"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -3437,7 +3524,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "686-61",
+      "686-62",
+      "755-22",
+      "773-31",
+      "773-32",
+      "774-91",
+      "778-11"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -3631,7 +3726,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "511-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -3818,7 +3916,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "502-91",
+      "506-10",
+      "507-02",
+      "512-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -4009,7 +4112,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "502-92",
+      "506-10",
+      "507-01",
+      "512-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -4195,7 +4303,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "503-71",
+      "506-10",
+      "508-82",
+      "513-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -4390,7 +4503,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "503-72",
+      "506-10",
+      "508-81",
+      "513-41",
+      "513-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -4587,7 +4706,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "504-50",
+      "506-10",
+      "514-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -4795,7 +4919,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-31",
+      "515-01",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -4981,7 +5109,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-32",
+      "515-02",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -5168,7 +5300,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-33",
+      "510-04",
+      "515-03",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -5363,7 +5500,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-34",
+      "515-04",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -5559,7 +5700,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "774-91",
+      "777-32",
+      "778-11"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -5761,7 +5906,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "774-92",
+      "777-31",
+      "778-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -5949,7 +6098,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "506-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -6129,7 +6281,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "502-91",
+      "506-10",
+      "507-01",
+      "512-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -6311,7 +6468,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "502-92",
+      "507-02",
+      "511-80",
+      "512-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -6488,7 +6650,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "503-71",
+      "508-81",
+      "511-80",
+      "513-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -6671,7 +6838,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "503-72",
+      "508-82",
+      "511-80",
+      "513-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -6845,7 +7017,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "504-50",
+      "509-60",
+      "511-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -7046,7 +7222,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-31",
+      "510-01",
+      "510-02",
+      "510-04",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -7225,7 +7407,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-32",
+      "510-01",
+      "510-02",
+      "510-04",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -7405,7 +7593,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-33",
+      "510-01",
+      "510-02",
+      "510-04",
+      "515-04",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -7590,7 +7785,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-34",
+      "510-01",
+      "510-02",
+      "510-04",
+      "517-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -7772,7 +7973,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "774-91",
+      "777-31",
+      "778-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -7973,7 +8178,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "774-92",
+      "777-31",
+      "777-32"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -8179,7 +8388,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "516-92",
+      "733-10",
+      "757-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -8432,7 +8645,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "516-91",
+      "733-10",
+      "757-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -8628,7 +8845,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "516-91",
+      "516-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -8808,7 +9028,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "503-71",
+      "504-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -9015,7 +9239,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "764-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -9221,7 +9447,20 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "510-01",
+      "510-02",
+      "510-03",
+      "510-04",
+      "515-01",
+      "515-02",
+      "515-03",
+      "515-04",
+      "516-91",
+      "516-92",
+      "583-50",
+      "733-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -9498,7 +9737,14 @@
       "658/1985",
       "939/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "518-52",
+      "519-30",
+      "663-71",
+      "663-72",
+      "664-50",
+      "685-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -9854,7 +10100,13 @@
       "518/2015",
       "939/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "518-51",
+      "663-71",
+      "663-72",
+      "664-50",
+      "685-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -10216,7 +10468,11 @@
     "resolucoes_contran": [
       "819/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "656-40",
+      "685-80",
+      "694-71"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -10556,7 +10812,24 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "527-41",
+      "527-42",
+      "527-43",
+      "606-81",
+      "607-60",
+      "663-72",
+      "694-71",
+      "703-01",
+      "704-81",
+      "709-91",
+      "735-80",
+      "736-62",
+      "763-31",
+      "763-32",
+      "768-42",
+      "771-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -11058,7 +11331,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "521-52",
+      "522-31",
+      "524-00",
+      "612-20",
+      "613-00",
+      "614-90",
+      "615-70",
+      "616-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -11227,7 +11509,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "521-51",
+      "522-32",
+      "524-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -11387,7 +11673,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "522-32",
+      "523-11",
+      "523-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -11534,7 +11824,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "522-31",
+      "523-11",
+      "523-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -11684,7 +11978,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "523-12",
+      "647-50",
+      "678-51",
+      "678-52",
+      "678-53",
+      "679-30",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -11858,7 +12160,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "523-11",
+      "647-50",
+      "678-51",
+      "678-52",
+      "678-53",
+      "679-30",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -12030,7 +12340,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "521-52",
+      "526-61",
+      "527-41",
+      "527-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -12182,7 +12497,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "525-82",
+      "525-83",
+      "526-61",
+      "526-62",
+      "526-63"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -12371,7 +12692,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "525-81",
+      "525-83",
+      "526-61",
+      "526-62",
+      "526-63"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -12573,7 +12900,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "525-81",
+      "525-82",
+      "526-61",
+      "526-62",
+      "526-63"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -12750,7 +13083,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "524-00",
+      "525-81",
+      "525-82",
+      "525-83",
+      "526-62",
+      "526-63"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -12960,7 +13300,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "524-00",
+      "525-81",
+      "525-82",
+      "525-83",
+      "526-61",
+      "526-63"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -13196,7 +13543,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "524-00",
+      "525-81",
+      "525-82",
+      "525-83",
+      "526-61",
+      "526-62",
+      "527-41",
+      "527-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -13416,7 +13772,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "524-00",
+      "526-61",
+      "526-62",
+      "526-63",
+      "527-42",
+      "705-61",
+      "705-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -13631,7 +13995,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "524-00",
+      "526-61",
+      "526-62",
+      "526-63",
+      "527-41",
+      "705-61",
+      "705-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -13909,7 +14281,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "529-00",
+      "530-40",
+      "531-20",
+      "532-00",
+      "533-90",
+      "645-92",
+      "646-70",
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -14164,7 +14545,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "528-20",
+      "530-40",
+      "531-20",
+      "532-00",
+      "645-91",
+      "645-92",
+      "646-70",
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -14439,7 +14829,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "528-20",
+      "529-00",
+      "531-20",
+      "532-00",
+      "645-92",
+      "646-70",
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -14688,7 +15086,17 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "528-20",
+      "529-00",
+      "530-40",
+      "532-00",
+      "534-70",
+      "583-50",
+      "645-92",
+      "646-70",
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -14924,7 +15332,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "528-20",
+      "529-00",
+      "530-40",
+      "531-20",
+      "583-50",
+      "645-92",
+      "646-70",
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -15125,7 +15542,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "528-20",
+      "529-00",
+      "530-40",
+      "531-20",
+      "532-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -15293,7 +15716,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "528-20",
+      "529-00",
+      "530-40",
+      "531-20",
+      "532-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -15476,7 +15905,11 @@
     "resolucoes_contran": [
       "36/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "536-30",
+      "537-10",
+      "645-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -15671,7 +16104,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -15883,7 +16318,10 @@
     "resolucoes_contran": [
       "36/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50",
+      "536-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -16063,7 +16501,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "557-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -16206,7 +16646,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "540-10",
+      "541-00",
+      "548-70",
+      "558-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -16402,7 +16847,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "539-80",
+      "541-00",
+      "545-25",
+      "545-26",
+      "545-27",
+      "548-70",
+      "559-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -16639,7 +17092,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "540-10",
+      "554-11",
+      "560-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -16799,7 +17256,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "536-30",
+      "542-82",
+      "542-83",
+      "542-84",
+      "544-40",
+      "561-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -16966,7 +17430,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50",
+      "542-81",
+      "542-83",
+      "542-84",
+      "544-40",
+      "561-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -17134,7 +17605,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50",
+      "542-81",
+      "542-82",
+      "542-84",
+      "544-40",
+      "561-43"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -17307,7 +17785,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "536-30",
+      "542-81",
+      "542-82",
+      "542-83",
+      "544-40",
+      "561-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -17474,7 +17959,9 @@
     "resolucoes_contran": [
       "31/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -17624,7 +18111,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "645-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -17929,7 +18418,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "562-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -18214,7 +18705,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "549-50",
+      "562-23"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -18383,7 +18877,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "542-83",
+      "549-50",
+      "554-11",
+      "562-24"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -18564,7 +19063,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-25",
+      "562-25"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -18716,7 +19218,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-21",
+      "545-25"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -18895,7 +19400,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-21"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -19045,7 +19552,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "548-70",
+      "737-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -19195,7 +19705,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "539-80",
+      "547-90",
+      "558-40",
+      "559-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -19339,7 +19854,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "538-00",
+      "545-22",
+      "545-23",
+      "545-24",
+      "563-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -19735,7 +20256,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "551-72",
+      "551-73",
+      "564-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -19915,7 +20440,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "551-71",
+      "551-73",
+      "564-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -20077,7 +20606,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "551-71",
+      "551-72",
+      "564-93"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -20234,7 +20767,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "565-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -20379,7 +20914,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "523-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -20569,7 +21106,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-12",
+      "554-13",
+      "554-14",
+      "554-17",
+      "762-51",
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -20756,7 +21300,14 @@
     "resolucoes_contran": [
       "965/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-11",
+      "554-13",
+      "554-14",
+      "554-17",
+      "762-51",
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -20956,7 +21507,14 @@
     "resolucoes_contran": [
       "965/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-11",
+      "554-12",
+      "554-14",
+      "554-17",
+      "762-51",
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -21146,7 +21704,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-11",
+      "554-12",
+      "554-13",
+      "554-17",
+      "762-51",
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -21268,7 +21833,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-11",
+      "554-12",
+      "554-13",
+      "554-14",
+      "762-51",
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -21445,7 +22017,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-11",
+      "554-12",
+      "554-13",
+      "554-14",
+      "556-80",
+      "762-51",
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -21619,7 +22199,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "555-00",
+      "566-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -21781,7 +22364,9 @@
       "304/2008",
       "965/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "762-52"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -22051,7 +22636,9 @@
       "303/2008",
       "965/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "762-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -22286,7 +22873,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "538-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -22443,7 +23032,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "539-80",
+      "559-20",
+      "560-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -22653,7 +23246,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "540-10",
+      "558-40",
+      "563-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -22882,7 +23479,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "541-00",
+      "559-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -23042,7 +23642,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50",
+      "536-30",
+      "542-81",
+      "561-42",
+      "561-43",
+      "561-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -23209,7 +23816,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "535-50",
+      "536-30",
+      "542-82",
+      "561-41",
+      "561-43",
+      "561-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -23374,7 +23988,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "542-83",
+      "561-41",
+      "561-42",
+      "561-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -23531,7 +24150,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "542-84",
+      "561-41",
+      "561-42",
+      "561-43"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -23694,7 +24318,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-21",
+      "574-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -23863,7 +24490,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-22",
+      "567-31"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -24046,7 +24676,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-24",
+      "563-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -24223,7 +24856,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-25",
+      "559-20",
+      "563-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -24372,7 +25009,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-26",
+      "559-20",
+      "563-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -24537,7 +25178,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "559-20",
+      "562-22",
+      "567-31"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -24761,7 +25406,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "551-71",
+      "564-92",
+      "564-93"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -24961,7 +25610,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "551-72",
+      "564-91",
+      "564-93"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -25140,7 +25793,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "551-73",
+      "564-91",
+      "564-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -25447,7 +26104,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "556-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -25579,7 +26238,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "545-23"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -25729,7 +26390,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "562-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -25907,7 +26570,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "569-00",
+      "581-92",
+      "758-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -26191,7 +26858,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "568-10",
+      "581-92",
+      "758-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -26481,7 +27152,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "568-10",
+      "569-00",
+      "581-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -26806,7 +27481,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "585-11",
+      "585-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -27096,7 +27774,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "570-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -27325,7 +28005,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "573-80",
+      "579-70",
+      "606-81"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -27564,7 +28248,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "574-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -27801,7 +28488,9 @@
       "129/2001",
       "573/2015"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "574-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -28003,7 +28692,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "574-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -28131,7 +28822,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "682-32",
+      "683-11",
+      "683-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -28304,7 +28999,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "580-00",
+      "720-01",
+      "720-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -29614,7 +30313,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80",
+      "579-70",
+      "589-40",
+      "592-41",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -29859,7 +30565,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80",
+      "601-71",
+      "744-71"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -30087,7 +30798,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80",
+      "581-91",
+      "601-76"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -30328,7 +31044,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-91",
+      "581-94",
+      "581-95",
+      "601-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -30497,7 +31218,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80",
+      "601-74"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -30674,7 +31399,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80",
+      "601-72"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -30863,7 +31592,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -31030,7 +31762,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "573-80",
+      "590-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -31513,7 +32249,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "531-20",
+      "534-70",
+      "605-02",
+      "627-00",
+      "697-10",
+      "698-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -31789,7 +32532,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "584-32",
+      "584-33",
+      "584-34",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -31974,7 +32722,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "584-31",
+      "584-33",
+      "584-34",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -32166,7 +32919,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "584-31",
+      "584-32",
+      "584-34",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -32390,7 +33148,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "584-31",
+      "584-32",
+      "584-33",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -32590,7 +33353,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-96",
+      "585-12",
+      "619-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -32789,7 +33556,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-96",
+      "585-11",
+      "597-50",
+      "619-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -32990,7 +33762,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "577-01",
+      "577-02",
+      "577-03",
+      "577-05"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -33161,7 +33938,22 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "588-60",
+      "590-80",
+      "591-61",
+      "591-62",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-42",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -33407,7 +34199,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "580-00",
+      "587-80",
+      "590-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -33573,7 +34370,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "638-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -33715,7 +34514,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-97"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -33883,7 +34684,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "588-60",
+      "590-80",
+      "591-62",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-41",
+      "608-42",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -34169,7 +34986,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "588-60",
+      "590-80",
+      "591-61",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-41",
+      "608-42",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -34443,7 +35276,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "592-42",
+      "593-20",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -34636,7 +35475,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "592-41",
+      "593-20",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -34844,7 +35689,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "592-41",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -35040,7 +35890,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "592-41",
+      "593-20",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -35265,7 +36121,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "592-41",
+      "593-20",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -35487,7 +36349,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "579-70",
+      "592-41",
+      "593-20",
+      "596-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -35681,7 +36549,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "595-92",
+      "595-93",
+      "595-94",
+      "598-30",
+      "608-41",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -35885,7 +36761,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "595-93",
+      "595-94",
+      "598-30",
+      "608-41",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -36091,7 +36975,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "595-92",
+      "595-94",
+      "598-30",
+      "608-41",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -36301,7 +37192,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "595-91",
+      "595-92",
+      "595-93",
+      "598-30",
+      "608-41",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -36512,7 +37411,20 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "588-60",
+      "590-80",
+      "591-61",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "598-30",
+      "608-42",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -36731,7 +37643,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "585-11",
+      "585-12"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -36879,7 +37794,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "595-91",
+      "595-92",
+      "595-94",
+      "608-41",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -38127,7 +39049,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-95"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -38294,7 +39218,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-93"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -38463,7 +39389,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-94"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -38743,7 +39671,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "581-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -38900,7 +39830,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "573-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -39174,7 +40106,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "574-61",
+      "581-96",
+      "599-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -39393,7 +40329,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "574-61",
+      "581-96",
+      "597-50",
+      "599-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -39611,7 +40552,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "563-00",
+      "567-31",
+      "605-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -39825,7 +40770,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "583-50",
+      "605-01"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -40043,7 +40991,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "607-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -40247,7 +41197,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "606-81"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -40550,7 +41502,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "773-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -40674,7 +41628,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "773-01"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -40817,7 +41773,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "606-81"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -40966,7 +41924,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "587-80",
+      "588-60",
+      "590-80",
+      "591-61",
+      "591-62",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-42",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -41219,7 +42193,22 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "587-80",
+      "588-60",
+      "590-80",
+      "591-61",
+      "591-62",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-43",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -41470,7 +42459,22 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "587-80",
+      "588-60",
+      "590-80",
+      "591-61",
+      "591-62",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-42",
+      "608-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -41741,7 +42745,22 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "572-00",
+      "587-80",
+      "588-60",
+      "590-80",
+      "591-61",
+      "591-62",
+      "595-91",
+      "595-92",
+      "595-93",
+      "595-94",
+      "596-70",
+      "598-30",
+      "608-42",
+      "608-43"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42019,7 +43038,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "605-01",
+      "605-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42147,7 +43169,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "626-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42272,7 +43296,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "577-01",
+      "577-02",
+      "577-03",
+      "577-04",
+      "577-05",
+      "610-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42433,7 +43464,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "613-00",
+      "614-90",
+      "615-70",
+      "616-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42619,7 +43655,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "612-20",
+      "614-90",
+      "615-70",
+      "616-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42784,7 +43825,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "612-20",
+      "615-70",
+      "616-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -42951,7 +43996,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "612-20",
+      "614-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -43092,7 +44140,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "605-01",
+      "612-20",
+      "614-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -43255,7 +44307,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "605-02",
+      "617-32",
+      "618-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -43399,7 +44455,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "605-02",
+      "617-31",
+      "618-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -43547,7 +44607,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "605-02",
+      "617-31",
+      "617-32",
+      "618-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -43720,7 +44785,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "605-02"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -43995,7 +45062,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "584-31",
+      "619-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -44147,7 +45217,10 @@
     "resolucoes_contran": [
       "798/2020"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "746-30",
+      "747-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -44314,7 +45387,10 @@
     "resolucoes_contran": [
       "798/2020"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "745-50",
+      "747-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -44483,7 +45559,10 @@
     "resolucoes_contran": [
       "798/2020"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "745-50",
+      "746-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -44788,7 +45867,25 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "627-00",
+      "628-91",
+      "628-92",
+      "629-70",
+      "630-00",
+      "631-90",
+      "632-70",
+      "635-10",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-42",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -45074,7 +46171,27 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "583-50",
+      "610-60",
+      "611-40",
+      "626-20",
+      "628-91",
+      "628-92",
+      "629-70",
+      "630-00",
+      "631-90",
+      "632-70",
+      "633-50",
+      "635-10",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-43",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -45366,7 +46483,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "629-70",
+      "630-00",
+      "631-90",
+      "632-70",
+      "633-50",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -45636,7 +46769,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "626-20",
+      "627-00",
+      "628-91",
+      "629-70",
+      "630-00",
+      "631-90",
+      "632-70",
+      "633-50",
+      "635-10",
+      "636-00",
+      "637-80",
+      "639-41",
+      "639-42",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -45909,7 +47058,25 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "630-00",
+      "631-90",
+      "632-70",
+      "633-50",
+      "635-10",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -46168,7 +47335,24 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "631-90",
+      "632-70",
+      "633-50",
+      "635-10",
+      "636-00",
+      "637-80",
+      "639-41",
+      "639-42",
+      "639-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -46423,7 +47607,25 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "630-00",
+      "632-70",
+      "635-10",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-42",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -46677,7 +47879,24 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "630-00",
+      "631-90",
+      "633-50",
+      "635-10",
+      "636-00",
+      "637-80",
+      "639-41",
+      "639-42",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -46956,7 +48175,25 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "630-00",
+      "631-90",
+      "632-70",
+      "635-10",
+      "636-00",
+      "637-80",
+      "639-41",
+      "639-42",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -47233,7 +48470,26 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "631-90",
+      "632-70",
+      "633-50",
+      "635-10",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-42",
+      "639-44",
+      "664-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -47511,7 +48767,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "630-00",
+      "631-90",
+      "634-30",
+      "636-00",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -47799,7 +49071,23 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "630-00",
+      "631-90",
+      "634-30",
+      "635-10",
+      "637-80",
+      "638-60",
+      "639-41",
+      "639-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -48085,7 +49373,24 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "610-60",
+      "611-40",
+      "626-20",
+      "627-00",
+      "628-32",
+      "628-91",
+      "629-70",
+      "630-00",
+      "631-90",
+      "634-30",
+      "635-10",
+      "636-00",
+      "638-60",
+      "639-41",
+      "639-42",
+      "639-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -48348,7 +49653,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "589-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -48500,7 +49807,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "639-42",
+      "639-43",
+      "639-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -48673,7 +49984,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "639-41",
+      "639-43",
+      "639-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -48860,7 +50175,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "626-20",
+      "639-41",
+      "639-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -49077,7 +50396,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "626-20",
+      "639-41",
+      "639-42",
+      "639-43"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -49266,7 +50590,8 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_PLACAS"
     ],
     "infratores": [
       "PROPRIETARIO"
@@ -49297,7 +50622,12 @@
       "957/2022",
       "969/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "655-61",
+      "655-62",
+      "658-00",
+      "660-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -49764,7 +51094,8 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "RETENCAO_VEICULO"
+      "RETENCAO_VEICULO",
+      "RECOLHIMENTO_PLACAS"
     ],
     "infratores": [
       "PESSOA_FISICA_OU_JURIDICA"
@@ -49796,7 +51127,9 @@
       "957/2022",
       "969/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -50088,7 +51421,9 @@
     "resolucoes_contran": [
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "666-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -50244,7 +51579,12 @@
       "667/2017",
       "681/2017"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "643-22",
+      "644-00",
+      "667-00",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -50407,7 +51747,12 @@
       "667/2017",
       "681/2017"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "643-21",
+      "644-00",
+      "667-00",
+      "676-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -50586,7 +51931,12 @@
       "667/2017",
       "681/2017"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "643-21",
+      "643-22",
+      "667-00",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -50757,7 +52107,9 @@
     "resolucoes_contran": [
       "36/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -50947,7 +52299,10 @@
     "resolucoes_contran": [
       "36/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "544-40",
+      "647-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -51147,7 +52502,10 @@
     "resolucoes_contran": [
       "36/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "647-50",
+      "678-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -51347,7 +52705,9 @@
     "resolucoes_contran": [
       "36/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -51493,7 +52853,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "649-10",
+      "650-50",
+      "651-30",
+      "652-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -51673,7 +53038,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-30",
+      "650-50",
+      "651-30",
+      "652-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -51857,7 +53227,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-30",
+      "649-10",
+      "651-30",
+      "652-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -52030,7 +53405,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-30",
+      "649-10",
+      "650-50",
+      "652-10",
+      "666-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -52219,7 +53600,9 @@
       "35",
       "764"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-72"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -52461,7 +53844,9 @@
     "resolucoes_contran": [
       "958/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "654-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -52589,7 +53974,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "652-10",
+      "653-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -52731,7 +54119,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-80",
+      "655-62",
+      "655-63",
+      "655-64",
+      "655-65"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -52948,7 +54342,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "655-61",
+      "655-63",
+      "655-64",
+      "655-65",
+      "659-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -53163,7 +54563,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "655-61",
+      "655-62",
+      "655-64",
+      "655-65",
+      "659-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -53357,7 +54763,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-80",
+      "655-61",
+      "655-62",
+      "655-63",
+      "655-65",
+      "660-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -53588,7 +55001,13 @@
     "resolucoes_contran": [
       "944/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "655-61",
+      "655-62",
+      "655-63",
+      "655-64",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -53841,7 +55260,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "694-71"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -54053,7 +55474,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "660-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -54232,7 +55655,10 @@
       "587/2016",
       "955/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-80",
+      "659-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -54501,7 +55927,14 @@
     "resolucoes_contran": [
       "911/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "640-80",
+      "663-71",
+      "664-50",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -55033,7 +56466,10 @@
     "resolucoes_contran": [
       "110/2000"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "659-91",
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -55239,7 +56675,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "640-80",
+      "655-64",
+      "657-20",
+      "658-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -55745,7 +57186,12 @@
       "917/2022",
       "921/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "661-01",
+      "664-50",
+      "666-10",
+      "667-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -56179,7 +57625,11 @@
       "716/2017",
       "810/2020"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "672-62",
+      "755-21",
+      "755-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -56384,7 +57834,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-72",
+      "664-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -56786,7 +58239,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-71",
+      "664-50",
+      "665-31",
+      "665-32",
+      "668-80",
+      "672-61",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -57231,7 +58692,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-71",
+      "663-72",
+      "668-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -57736,7 +59201,11 @@
     "resolucoes_contran": [
       "958/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-71",
+      "664-50",
+      "665-32"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -57923,7 +59392,11 @@
     "resolucoes_contran": [
       "958/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-72",
+      "664-50",
+      "665-31"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -58212,7 +59685,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "653-00",
+      "654-80",
+      "657-20",
+      "658-00",
+      "661-02",
+      "667-00",
+      "694-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -58973,7 +60455,10 @@
       "681/2017",
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "666-10",
+      "676-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -59317,7 +60802,12 @@
       "912/2022",
       "938/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-71",
+      "664-50",
+      "697-10",
+      "756-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -59659,7 +61149,12 @@
     "resolucoes_contran": [
       "960/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "666-10",
+      "669-62",
+      "670-00",
+      "671-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -59954,7 +61449,12 @@
     "resolucoes_contran": [
       "960/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "666-10",
+      "669-61",
+      "670-00",
+      "671-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -60271,7 +61771,12 @@
     "resolucoes_contran": [
       "960/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "666-10",
+      "669-61",
+      "671-80",
+      "693-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -60714,7 +62219,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "669-61",
+      "670-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -60905,7 +62413,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-72",
+      "664-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -61235,7 +62746,9 @@
     "resolucoes_contran": [
       "716/2017"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "662-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -61468,7 +62981,10 @@
     "resolucoes_contran": [
       "224/2006"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-71",
+      "663-72"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -61640,7 +63156,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "661-02",
+      "662-90",
+      "686-61",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -62765,7 +64286,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-51",
+      "678-52",
+      "678-53",
+      "679-30",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -62940,7 +64467,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-52",
+      "678-53",
+      "679-30",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -63089,7 +64621,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-51",
+      "678-53",
+      "679-30",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -63238,7 +64775,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-51",
+      "678-52",
+      "679-30",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -63389,7 +64931,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-51",
+      "678-52",
+      "678-53",
+      "680-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -63558,7 +65105,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "678-51",
+      "678-52",
+      "678-53",
+      "679-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -63977,7 +65529,12 @@
       "882/2021",
       "955/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "684-01",
+      "684-02",
+      "691-20",
+      "710-21"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -64323,7 +65880,9 @@
     "resolucoes_contran": [
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -64553,7 +66112,14 @@
       "547/2015",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "675-00",
+      "683-12",
+      "683-13",
+      "684-02",
+      "691-20",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -64961,7 +66527,12 @@
       "547/2015",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "675-00",
+      "683-11",
+      "683-13",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -65206,7 +66777,12 @@
       "547/2015",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "675-00",
+      "683-11",
+      "683-12",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -65446,7 +67022,10 @@
       "872/2021",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "682-02",
+      "682-31"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -65684,7 +67263,10 @@
       "872/2021",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "682-31",
+      "684-01"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -65864,7 +67446,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "656-40",
+      "707-21",
+      "707-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -66046,7 +67632,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "674-20",
+      "686-62",
+      "755-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -66281,7 +67871,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "686-61",
+      "755-21"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -66478,7 +68071,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "687-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -66600,7 +68195,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "687-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -66755,7 +68352,12 @@
       "872/2021",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "675-00",
+      "689-00",
+      "690-40",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -67016,7 +68618,12 @@
       "872/2021",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "675-00",
+      "688-20",
+      "690-40",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -67277,7 +68884,12 @@
       "872/2021",
       "882/2021"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "675-00",
+      "688-20",
+      "689-00",
+      "696-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -67538,7 +69150,14 @@
       "911/2022",
       "969/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "501-00",
+      "674-20",
+      "697-10",
+      "755-22",
+      "774-91",
+      "774-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -67797,7 +69416,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "692-02",
+      "692-03",
+      "692-04",
+      "700-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -67963,7 +69587,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "692-01",
+      "692-03",
+      "692-04",
+      "700-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -68118,7 +69747,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "692-01",
+      "692-02",
+      "692-04",
+      "693-02",
+      "700-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -68281,7 +69916,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "692-01",
+      "693-02",
+      "693-03",
+      "700-51"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -68439,7 +70079,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "693-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -68601,7 +70243,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "693-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -68753,7 +70397,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "656-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -69502,7 +71148,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "708-00"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -69686,7 +71334,10 @@
     "resolucoes_contran": [
       "24/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "663-72",
+      "666-10"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -70152,7 +71803,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "691-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -70497,7 +72150,9 @@
       "810/2020",
       "967/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "662-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -70678,7 +72333,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "692-01",
+      "696-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -70841,7 +72499,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "692-01",
+      "696-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -71267,7 +72928,9 @@
       "810/2020",
       "967/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "699-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -71441,7 +73104,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "664-50",
+      "704-81",
+      "768-41",
+      "768-42",
+      "771-41",
+      "771-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -71728,7 +73400,18 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "664-50",
+      "703-01",
+      "704-81",
+      "734-00",
+      "768-41",
+      "768-42",
+      "771-41",
+      "771-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -72016,7 +73699,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "664-50",
+      "703-01",
+      "768-41",
+      "768-42",
+      "771-41",
+      "771-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -72295,7 +73986,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "685-80",
+      "707-21",
+      "707-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -72446,7 +74141,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "526-61",
+      "526-62",
+      "527-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -72591,7 +74290,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "707-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -72717,7 +74418,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "707-21"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -73107,7 +74810,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "736-62",
+      "763-31",
+      "763-32"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -73253,7 +74960,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "686-62",
+      "710-23",
+      "732-32",
+      "732-33",
+      "755-21"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -73453,7 +75166,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "686-62",
+      "710-21",
+      "732-32",
+      "732-33",
+      "755-21",
+      "755-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -73684,7 +75404,18 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "661-02",
+      "664-50",
+      "666-10",
+      "686-61",
+      "686-62",
+      "703-03",
+      "708-00",
+      "710-21",
+      "710-23",
+      "755-22"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -74021,7 +75752,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "661-02",
+      "686-61",
+      "686-62",
+      "703-03",
+      "708-00",
+      "710-21"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -74278,7 +76016,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "664-50",
+      "703-01",
+      "704-81",
+      "768-42",
+      "771-41",
+      "771-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -74580,7 +76327,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "664-50",
+      "703-01",
+      "704-81",
+      "768-41",
+      "771-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -74885,7 +76640,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "664-50",
+      "703-01",
+      "704-81",
+      "768-41",
+      "768-42",
+      "771-42"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -75192,7 +76956,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "574-61",
+      "664-50",
+      "703-01",
+      "704-81",
+      "768-41",
+      "771-41"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -75461,7 +77233,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "712-93"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -75606,7 +77380,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "712-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -75740,7 +77516,7 @@
       "MULTA"
     ],
     "medidas_administrativas": [
-      "REMOCAO_VEICULO"
+      "REMOCAO_MERCADORIA_MATERIAL"
     ],
     "infratores": [
       "PESSOA_FISICA_OU_JURIDICA"
@@ -75767,7 +77543,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "715-32",
+      "716-12",
+      "717-02",
+      "718-82",
+      "719-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -75954,7 +77736,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-32",
+      "716-12",
+      "717-02",
+      "718-82",
+      "719-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -76141,7 +77930,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-31",
+      "716-11",
+      "717-01",
+      "718-81",
+      "719-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -76342,7 +78138,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-32",
+      "716-12",
+      "717-02",
+      "718-82",
+      "719-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -76522,7 +78325,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-31",
+      "716-11",
+      "717-01",
+      "718-81",
+      "719-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -76718,7 +78528,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-32",
+      "716-12",
+      "717-02",
+      "718-82",
+      "719-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -76905,7 +78722,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-31",
+      "716-11",
+      "717-01",
+      "718-81",
+      "719-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -77107,7 +78931,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-32",
+      "716-12",
+      "717-02",
+      "718-82",
+      "719-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -77294,7 +79125,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-31",
+      "716-11",
+      "717-01",
+      "718-81",
+      "719-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -77496,7 +79334,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-32",
+      "716-12",
+      "717-02",
+      "718-82",
+      "719-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -77683,7 +79528,14 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "714-50",
+      "715-31",
+      "716-11",
+      "717-01",
+      "718-81",
+      "719-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -77896,7 +79748,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "712-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -78249,7 +80103,10 @@
     "resolucoes_contran": [
       "26/1998"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "682-31",
+      "694-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -78448,7 +80305,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "566-50",
+      "676-93",
+      "722-62"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -78637,7 +80498,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "566-50",
+      "676-90",
+      "722-61"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -78830,7 +80695,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "676-90",
+      "724-20",
+      "725-00",
+      "726-90",
+      "730-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -79059,7 +80930,14 @@
     "resolucoes_contran": [
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "676-90",
+      "723-40",
+      "724-22",
+      "725-00",
+      "726-90",
+      "772-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -79238,7 +81116,14 @@
     "resolucoes_contran": [
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "676-90",
+      "723-40",
+      "724-21",
+      "725-00",
+      "726-90",
+      "772-20"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -79427,7 +81312,10 @@
     "resolucoes_contran": [
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "676-90",
+      "723-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -79561,7 +81449,10 @@
     "resolucoes_contran": [
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "676-90",
+      "723-40"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -79704,7 +81595,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "723-40",
+      "724-21",
+      "724-22",
+      "725-00",
+      "726-90"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -79911,7 +81808,13 @@
     "resolucoes_contran": [
       "970/2022"
     ],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "658-00",
+      "660-20",
+      "663-71",
+      "667-00",
+      "676-91"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -80080,7 +81983,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "775-72"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -80230,7 +82136,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "775-71"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -80397,7 +82306,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "554-11",
+      "730-70"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -80589,7 +82501,9 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "729-30"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -80748,7 +82662,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "520-70",
+      "694-71",
+      "735-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -80883,7 +82801,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "519-30",
+      "694-71",
+      "732-32",
+      "732-33",
+      "735-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -81025,7 +82949,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "694-72",
+      "732-31",
+      "732-33",
+      "735-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -81164,7 +83093,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "694-73",
+      "732-31",
+      "732-32",
+      "735-80"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -81312,7 +83246,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "505-31",
+      "505-32",
+      "516-92"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -81645,7 +83583,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "709-91",
+      "731-50"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -81975,7 +83916,10 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "736-61",
+      "763-32"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -82265,7 +84209,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "709-91",
+      "735-80",
+      "736-61",
+      "736-62",
+      "763-32"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -82453,7 +84403,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "709-91",
+      "735-80",
+      "736-61",
+      "736-62",
+      "763-31"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -82648,7 +84604,13 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "537-10",
+      "563-00",
+      "761-71",
+      "761-72",
+      "761-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -82855,7 +84817,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "531-20",
+      "534-70",
+      "537-10",
+      "737-40",
+      "760-90",
+      "761-72",
+      "761-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -83111,7 +85081,16 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "531-20",
+      "534-70",
+      "537-10",
+      "576-20",
+      "737-40",
+      "760-90",
+      "761-71",
+      "761-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -83359,7 +85338,15 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "531-20",
+      "534-70",
+      "537-10",
+      "737-40",
+      "760-90",
+      "761-71",
+      "761-72"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -83607,7 +85594,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "761-71",
+      "761-72",
+      "761-73"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -83792,7 +85783,12 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "606-81",
+      "606-82",
+      "606-83",
+      "607-60"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -83936,7 +85932,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "754-42",
+      "754-43",
+      "754-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -84115,7 +86115,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "754-41",
+      "754-43",
+      "754-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -84290,7 +86294,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "754-41",
+      "754-42",
+      "754-44"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
@@ -84466,7 +86474,11 @@
       }
     ],
     "resolucoes_contran": [],
-    "enquadramentos_correlatos": [],
+    "enquadramentos_correlatos": [
+      "754-41",
+      "754-42",
+      "754-43"
+    ],
     "termos_chave": [],
     "quando_autuar_itens": [
       {
