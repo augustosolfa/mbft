@@ -21,9 +21,24 @@ Esta PMS formaliza o uso do **FastAPI** rodando sobre o Pyodide (Python no Cloud
 
 ---
 
-## 2. Decisões Arquiteturais
+## 2. Objetivos e Não Objetivos
 
-### 2.1. Framework, Runtime e Topologia de Monólito Modular
+* **Objetivos (Goals):**
+  * Fornecer um *entrypoint* HTTP unificado em **FastAPI** sobre o runtime Python (Pyodide) do Cloudflare Workers (`apps/api`), expondo documentação OpenAPI (`/docs`) e validação via Pydantic.
+  * Implementar um limitador de taxa global determinístico (**Ticketizador**) apoiado pelo Cloudflare D1 (`fila_global`), garantindo o teto máximo de 1 requisição pública de chat por minuto.
+  * Emitir e validar tickets JWT assinados (`TicketService`) com verificação *stateless* na rota `/chat` e proteção anti-replay via Cloudflare KV (`KV_TICKETS`).
+  * Suportar vias expressas de prioridade (`priority_token`) para testes e administração sem bloquear o fluxo de homologação.
+
+* **Não Objetivos (Non-Goals):**
+  * Não é meta implementar autenticação de sessão ou cadastro de usuários finais; o controle de acesso público baseia-se exclusivamente em tickets temporais efêmeros.
+  * Não é meta manter conexões persistentes (WebSockets) para fila de espera; o cliente aguarda o *timestamp* do ticket localmente (`LocalStorage`) e consulta a rota `/chat` no horário agendado.
+  * Não é meta acoplar pacotes locais de workspace como dependências de produção de `apps/api/pyproject.toml`, preservando compatibilidade estrita com o bundler Pyodide do Cloudflare Workers.
+
+---
+
+## 3. Design da Solução
+
+### 3.1. Framework, Runtime e Topologia de Monólito Modular
 * O *entrypoint* do Cloudflare Workers (`apps/api`) utiliza **FastAPI**, servido nativamente no runtime Python (Pyodide) do Workers.
 * Ganhamos documentação automática `/docs` (Swagger) e validação de payload com Pydantic de forma fluida.
 * Para compatibilidade total com o bundler do Cloudflare Workers (que exige dependências PyPI puras em `[project].dependencies` sem pacotes locais de workspace), o pacote `mbft-api` consolida toda a inteligência de borda em uma topologia interna unificada:
@@ -34,24 +49,15 @@ Esta PMS formaliza o uso do **FastAPI** rodando sobre o Pyodide (Python no Cloud
   * `mbft_api.database`: Repositório transacional da fila global (`D1FilaRepository` na nuvem e `SqliteFilaRepository` local).
 * O `apps/api/pyproject.toml` declara apenas `fastapi` e `pyjwt` como dependências de produção, isolando pacotes de desenvolvimento e execução local (`uvicorn`, `google-genai`, `pytest`, `python-dotenv`) em `[dependency-groups] dev`.
 
-### 2.2. O "Ticketizador" e a Fila Global (Rate Limiter)
+### 3.2. O "Ticketizador" e a Fila Global (Rate Limiter)
 Em vez do tradicional balde furado (Token Bucket), adotamos uma lógica de **Fila Indiana Global**.
 
 1. A rota `/ticket` é o ponto de entrada para quem quer perguntar à IA.
 2. Usaremos o banco **Cloudflare D1** (SQLite) com uma tabela de controle: `fila_global` (de linha única).
 3. Ao solicitar um ticket, um `UPDATE` atômico ajusta a data `next_available` para `max(now(), next_available) + 1 minuto`. O usuário recebe um token JWT assinado criptograficamente contendo a data/hora exata em que seu ticket se torna válido.
-4. Ao chamar a rota `/chat`, o ticket é decodificado (stateless) e seu identificador único (`jti`) é verificado/consumido no Cloudflare KV (`KV_TICKETS`) quando disponível. Se a hora atual for menor que a do ticket, a API recusa com `429 Too Many Requests` avisando o tempo restante. 
+4. Ao chamar a rota `/chat`, o ticket é decodificado (stateless) e seu identificador único (`jti`) é verificado/consumido no Cloudflare KV (`KV_TICKETS`) quando disponível. Se a hora atual for menor que a do ticket, a API recusa com `429 Too Many Requests` avisando o tempo restante.
 
-### 2.3. Prevenção de Esgotamento de Fila (WAF)
-Para impedir que um usuário mal-intencionado peça inúmeros tickets em loop (empurrando a fila global horas para o futuro), a rota `/ticket` será protegida nativamente pelo **Cloudflare WAF (Web Application Firewall) - Rate Limiting**.
-Uma regra bloqueará requisições excessivas (ex: máximo de 1 por minuto) vindas do mesmo IP antes mesmo que elas alcancem o Worker ou faturem leitura no banco D1, garantindo custo zero contra abusos. No lado do cliente, o ticket será persistido no `LocalStorage` do navegador.
-
-### 2.4. Blindagem de API: Limites de Caracteres e CORS
-Além do rate limiting, a API possui salvaguardas rigorosas contra *Prompt Injection* e abuso de infraestrutura:
-* **Validação de Tamanho (FastAPI Query):** A rota de `/busca` limita estritamente `q` a **200 caracteres**, e a rota de `/chat` limita `pergunta` a **500 caracteres**. Textos fora desse escopo são rejeitados instantaneamente no *Edge* sem acionar modelos, poupando tokens e barrando *payloads* gigantes ou ataques DDoS de strings enormes.
-* **Política CORS Estrita:** A configuração do `CORSMiddleware` abandonou o curinga `allow_origins=["*"]`. A API aceita requisições exclusivamente dos domínios oficiais (ex: `https://mbft.exemplo.com`) e ambientes locais (`localhost`). Isso inviabiliza que desenvolvedores terceiros embutam o frontend do MBFT em seus sites para sugar nossa fila ou conta da IA.
-
-### 2.5. Vias Expressas (VIP / Prioridades)
+### 3.3. Vias Expressas (VIP / Prioridades)
 Para evitar que a cota global bloqueie usos em apresentação, especialização ou familiares, o Ticketizador aceitará um parâmetro/header de autenticação especial (`priority_token`).
 As senhas de privilégio serão configuradas via **Segredos de Ambiente** no painel da Cloudflare (ex: `TOKEN_ADMIN`, `TOKEN_TESTES`).
 
@@ -59,9 +65,7 @@ As senhas de privilégio serão configuradas via **Segredos de Ambiente** no pai
 * **Fluxo Especial/Testes (`TOKEN_TESTES`):** Ticket com +10 segundos de espera.
 * **Fluxo Admin (`TOKEN_ADMIN`):** Ticket imediato (fura-fila).
 
----
-
-## 3. Especificação das Rotas da API
+### 3.4. Especificação das Rotas da API
 
 | Método | Rota | Descrição | Integração |
 |---|---|---|---|
@@ -70,9 +74,7 @@ As senhas de privilégio serão configuradas via **Segredos de Ambiente** no pai
 | `POST`| `/ticket` | Insere o usuário na Fila Global e devolve um Ticket JWT com um "timestamp de embarque". Aceita `priority_token`. | D1 (`fila_global`) |
 | `POST`| `/chat` | Recebe a pergunta e o Ticket JWT. Só libera para o `mbft_api.gerador` se o ticket for válido e a hora de embarque tiver chegado. | `mbft_api.recuperador`, `mbft_api.gerador` e KV (`KV_TICKETS`) |
 
----
-
-## 4. Estrutura do Banco (Migração D1 Necessária)
+### 3.5. Estrutura do Banco (Migração D1 Necessária)
 
 Será necessário criar a tabela transacional de fila:
 
@@ -86,8 +88,21 @@ INSERT INTO fila_global (id) VALUES (1);
 
 ---
 
-## 5. Benefícios da Abordagem
+## 4. Alternativas Consideradas
 
-1. **Custo Controlado:** É matematicamente impossível gastar mais tokens do que 1 requisição por minuto na camada pública.
-2. **Stateless no Chat:** A rota de chat não bate no banco de dados para validar o ticket, reduzindo faturamento do D1 (basta checar a assinatura HMAC do ticket).
-3. **Frontend Amigável:** O RAG entrega direto os links estáticos `/fichas/`, permitindo que a SPA do site seja leve e burra (basta colocar a URL em um `<iframe src="...">` ou num link `<a href>`).
+* **Rate Limiting por Token Bucket tradicional (por IP/usuário):**
+  * *Por que foi rejeitada:* Limites por IP não impedem que picos simultâneos de usuários legítimos disparem dezenas de chamadas concorrentes ao LLM no mesmo minuto. A Fila Indiana Global garante matematicamente o teto máximo de 1 requisição pública por minuto, tornando o custo financeiro previsível.
+* **Validação Stateful do Ticket no Banco D1 a cada chamada `/chat`:**
+  * *Por que foi rejeitada:* Consultar o D1 em toda tentativa prematura de `/chat` geraria leituras desnecessárias sob *polling* do cliente. A validação *stateless* via assinatura HMAC (JWT) barra chamadas adiantadas na borda sem tocar no banco relacional, reservando o KV (`KV_TICKETS`) apenas para o consumo definitivo do `jti`.
+
+---
+
+## 5. Preocupações Transversais
+
+* **Prevenção de Esgotamento de Fila (Cloudflare WAF):**
+  Para impedir que um usuário mal-intencionado peça inúmeros tickets em loop (empurrando a fila global horas para o futuro), a rota `/ticket` é protegida pelo **Cloudflare WAF — Rate Limiting**, bloqueando requisições excessivas (ex.: máximo de 1 por minuto por IP) antes que alcancem o Worker ou gerem leituras/escritas no D1. No cliente, o ticket é persistido no `LocalStorage` do navegador.
+* **Blindagem de API (Limites de Caracteres e CORS Estrito):**
+  * **Validação de Tamanho (FastAPI Query):** A rota `/busca` limita estritamente `q` a **200 caracteres**, e a rota `/chat` limita `pergunta` a **500 caracteres**. Textos fora desse escopo são rejeitados instantaneamente na borda sem acionar modelos, poupando tokens e mitigando *Prompt Injection* ou payloads abusivos.
+  * **Política CORS Estrita:** O `CORSMiddleware` rejeita o curinga `allow_origins=["*"]`, aceitando requisições exclusivamente dos domínios oficiais e de ambientes locais (`localhost`).
+* **Previsibilidade de Custo e Integração Frontend:**
+  O teto de 1 requisição por minuto na camada pública elimina surpresas de faturamento de tokens, a validação *stateless* do JWT reduz o consumo do D1, e a entrega direta dos links estáticos `/fichas/XXX.html` permite que o frontend opere sem estado adicional.

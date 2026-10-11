@@ -13,13 +13,13 @@ Monorepo para processamento, extração de dados estruturados, indexação híbr
   - **`indexador/`**: `embeddings_mbft.jsonl` com chunks contextualizados e vetores densos (`BAAI/bge-m3`).
   - **`site/`**: Páginas estáticas HTML geradas para consulta rápida (`/fichas/XXX.html`, `index.html`, `lista.html`, `chat.html`).
 - **`pipelines/`**:
-  - **`core/` (`mbft-core`)**: Modelos de domínio e contratos Pydantic compartilhados entre os pipelines.
+  - **`core/` (`mbft-core`)**: Modelos de domínio e contratos Pydantic compartilhados entre os pipelines (PMS-009).
   - **`extrator/` (`mbft-extrator`)**: Ingestão do PDF, OCR, costura geométrica de colunas e serialização com aceleração CUDA (PMS-002).
   - **`enriquecedor/` (`mbft-enriquecedor`)**: Enriquecimento determinístico e semântico das fichas (PMS-003).
   - **`indexador/` (`mbft-indexador`)**: Geração de chunks e embeddings densos a partir das fichas enriquecidas (PMS-004).
   - **`ssg/` (`mbft-ssg`)**: Gerador de site estático HTML via Jinja2 (PMS-007).
 - **`apps/api/` (`mbft-api`)**: API Gateway FastAPI para Cloudflare Workers (Pyodide), consolidando o **Ticketizador** de fila global (PMS-008), o **Recuperador** de busca híbrida RRF (`mbft_api.recuperador`, PMS-005) e o **Gerador** Strict RAG (`mbft_api.gerador`, PMS-006).
-- **`docs/`**: Propostas de Melhoria do Sistema (`PMS-000` a `PMS-008`) documentando todas as decisões de arquitetura.
+- **`docs/`**: Propostas de Melhoria do Sistema (PMS) documentando todas as decisões de arquitetura (visão geral do mecanismo RAG na `PMS-001` e template na `PMS-000`).
 
 ---
 
@@ -59,4 +59,4 @@ uv run uvicorn mbft_api.main:app --reload --port 8000
 uv run pytest
 ```
 
-Consulte [GEMINI.md](file:///d:/dev/mbft%20-%20extrator/GEMINI.md), [pipelines/extrator/README.md](file:///d:/dev/mbft%20-%20extrator/pipelines/extrator/README.md) e [apps/api/README.md](file:///d:/dev/mbft%20-%20extrator/apps/api/README.md) para detalhes técnicos de cada módulo.
+Consulte [GEMINI.md](./GEMINI.md) e os guias operacionais de cada módulo ([core](./pipelines/core/README.md), [extrator](./pipelines/extrator/README.md), [enriquecedor](./pipelines/enriquecedor/README.md), [indexador](./pipelines/indexador/README.md), [ssg](./pipelines/ssg/README.md) e [api](./apps/api/README.md)) para detalhes técnicos e opções de CLI.

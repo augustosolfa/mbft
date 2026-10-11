@@ -2,6 +2,7 @@
 name = "mbft-indexador"
 version = "0.1.0"
 description = "Pipeline batch para geração de chunks semânticos e embeddings densos (BAAI/bge-m3) a partir das fichas enriquecidas do MBFT, gerando JSONL para o Vectorize."
+readme = "README.md"
 authors = [
     {name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net"}
 ]

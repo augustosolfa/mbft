@@ -2,6 +2,12 @@
 
 API Gateway, **Ticketizador** de Fila Global e Motor **RAG Híbrido** (Recuperador + Gerador) do Manual Brasileiro de Fiscalização de Trânsito, projetado para rodar no **Cloudflare Workers** (runtime Python/Pyodide) e em ambiente local via **FastAPI**.
 
+> **Nota de Arquitetura**: Este arquivo é um guia operacional e de desenvolvimento (*Developer Guide*).
+> Para a documentação completa de arquitetura, decisões de design e trade-offs dos subsistemas unificados neste serviço, consulte os Documentos de Design:
+> - **PMS-005** (`docs/PMS-005 - Design do recuperador.md`) — Motor de Busca Híbrida RRF (`mbft_api.recuperador`);
+> - **PMS-006** (`docs/PMS-006 - Design do gerador.md`) — Orquestrador Strict RAG e engenharia de prompt (`mbft_api.gerador`);
+> - **PMS-008** (`docs/PMS-008 - API e Ticketizador.md`) — API Gateway FastAPI e Fila Global (`mbft_api.routers`, `mbft_api.security`, `mbft_api.database`).
+
 ---
 
 ## Arquitetura Interna (`src/mbft_api/`)

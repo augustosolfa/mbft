@@ -1,6 +1,10 @@
 # MBFT Enriquecedor (`mbft-enriquecedor`)
 
-Módulo de processamento em lote (*batch*) responsável pelo enriquecimento semântico, normalização categórica sob vocabulário controlado e extração atômica de regras normativas das fichas do Manual Brasileiro de Fiscalização de Trânsito (**MBFT**), conforme especificado na **PMS-003**.
+Módulo de processamento em lote (*batch*) responsável pelo enriquecimento semântico, normalização categórica sob vocabulário controlado e extração atômica de regras normativas das fichas do Manual Brasileiro de Fiscalização de Trânsito (**MBFT**).
+
+> **Nota de Arquitetura**: Este arquivo é um guia operacional e de desenvolvimento (*Developer Guide*).
+> Para a documentação completa de arquitetura, taxonomia normativa e decisões de design, consulte o Documento de Design **PMS-003** em `docs/PMS-003 - Design do enriquecedor.md`.
+> Para os contratos de dados de entrada (`Ficha`) e saída (`FichaEnriquecida`), consulte a **PMS-009** e o pacote **`mbft-core`** em `pipelines/core/README.md`.
 
 ---
 

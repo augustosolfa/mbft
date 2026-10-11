@@ -4,7 +4,7 @@ Módulo responsável pela extração estruturada de alta fidelidade do **Manual 
 
 > **Nota de Arquitetura**: Este arquivo é um guia operacional e de desenvolvimento (*Developer Guide*). 
 > Para a documentação completa de arquitetura, design da solução, diagramas e trade-offs, consulte o Documento de Design **PMS-002** em `docs/PMS-002 - Design do extrator.md`.
-> Para o contrato de dados gerado por este pipeline, consulte o pacote **`mbft-core`** em `pipelines/core/README.md`.
+> Para o contrato de dados gerado por este pipeline (`Ficha`), consulte a **PMS-009** e o pacote **`mbft-core`** em `pipelines/core/README.md`.
 
 ---
 
