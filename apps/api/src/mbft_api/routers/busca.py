@@ -1,16 +1,15 @@
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
+from ..dependencies import get_buscador
+from ..recuperador.buscador import BuscadorHibrido
 
 router = APIRouter(prefix="/busca", tags=["Busca"])
 
 @router.get("/")
-async def buscar(request: Request, q: str = Query(..., min_length=2, max_length=200), limit: int = Query(5, ge=1, le=50)):
-    buscador = getattr(request.app.state, "buscador", None)
-    if not buscador:
-        # TODO: Se estivermos na nuvem (Cloudflare), instanciar o BuscadorHibrido
-        # usando os bindings do Workers (Vectorize, D1, AI) do request.scope["env"].
-        # Como o scope local ainda não usa isso, levantamos erro.
-        raise HTTPException(status_code=503, detail="Mecanismo de busca indisponível.")
-        
+async def buscar(
+    q: str = Query(..., min_length=2, max_length=200),
+    limit: int = Query(5, ge=1, le=50),
+    buscador: BuscadorHibrido = Depends(get_buscador),
+):
     resultados_brutos = await buscador.recuperar_contexto(q, limit=limit)
     
     resultados_formatados = []
@@ -31,3 +30,4 @@ async def buscar(request: Request, q: str = Query(..., min_length=2, max_length=
         "query": q, 
         "resultados": resultados_formatados
     }
+

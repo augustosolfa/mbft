@@ -43,8 +43,9 @@ Esta PMS formaliza o uso do **FastAPI** rodando sobre o Pyodide (Python no Cloud
 * Ganhamos documentação automática `/docs` (Swagger) e validação de payload com Pydantic de forma fluida.
 * Para compatibilidade total com o bundler do Cloudflare Workers (que exige dependências PyPI puras em `[project].dependencies` sem pacotes locais de workspace), o pacote `mbft-api` consolida toda a inteligência de borda em uma topologia interna unificada:
   * `mbft_api.routers`: Rotas HTTP (`/health`, `/busca`, `/ticket`, `/chat`).
-  * `mbft_api.recuperador`: Motor de Busca Híbrida RRF (PMS-005).
-  * `mbft_api.gerador`: Orquestrador de geração Strict RAG e templates de prompt (PMS-006).
+  * `mbft_api.dependencies`: Provedores de Injeção de Dependência por requisição via `Depends()` (`get_buscador`, `get_gerador`), detectando automaticamente os bindings em `request.scope["env"]` no Cloudflare Workers (`DB`, `VECTORIZE`, `AI`) com fallback para o cache de `app.state` no modo local e suporte a override do provedor LLM via `LLM_PROVIDER`.
+  * `mbft_api.recuperador`: Motor de Busca Híbrida RRF e adaptadores locais/Cloudflare (PMS-005).
+  * `mbft_api.gerador`: Orquestrador de geração Strict RAG, templates de prompt e adaptadores de LLM (PMS-006).
   * `mbft_api.security`: Emissão, assinatura e validação de Tickets JWT (`TicketService`) com proteção anti-replay via KV (`jti`).
   * `mbft_api.database`: Repositório transacional da fila global (`D1FilaRepository` na nuvem e `SqliteFilaRepository` local).
 * O `apps/api/pyproject.toml` declara apenas `fastapi` e `pyjwt` como dependências de produção, isolando pacotes de desenvolvimento e execução local (`uvicorn`, `google-genai`, `pytest`, `python-dotenv`) em `[dependency-groups] dev`.
@@ -76,14 +77,23 @@ As senhas de privilégio serão configuradas via **Segredos de Ambiente** no pai
 
 ### 3.5. Estrutura do Banco (Migração D1 Necessária)
 
-Será necessário criar a tabela transacional de fila:
+O schema consolidado em `apps/api/schema.sql` declara tanto a tabela transacional da fila global (`D1FilaRepository`) quanto a tabela virtual FTS5 de busca textual (`D1RelationalDB`):
 
 ```sql
-CREATE TABLE fila_global (
+CREATE TABLE IF NOT EXISTS fila_global (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     next_available DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-INSERT INTO fila_global (id) VALUES (1);
+INSERT OR IGNORE INTO fila_global (id) VALUES (1);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS fts_chunks USING fts5(
+    id UNINDEXED,
+    codigo,
+    artigo,
+    secao,
+    texto_contextualizado,
+    tokenize="unicode61 remove_diacritics 1"
+);
 ```
 
 ---

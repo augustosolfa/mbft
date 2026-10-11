@@ -54,6 +54,7 @@ site/
 ├── index.html                 # Portal principal com busca vetorial (RAG API)
 ├── lista.html                 # Tabela com todas as infrações e filtro avançado em JS
 ├── chat.html                  # Interface estática do chat conectada ao Ticketizador
+├── config.js                  # Configuração runtime neutra (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações extraídas (300 DPI)
 └── fichas/
     ├── 518-51.html            # Rota /fichas/518-51.html

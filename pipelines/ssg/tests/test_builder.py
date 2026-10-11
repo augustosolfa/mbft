@@ -83,3 +83,7 @@ def test_run_build_emite_logs_info_e_gera_artefatos(tmp_path: Path, caplog):
     assert (output_dir / "lista.html").exists()
     assert (output_dir / "index.html").exists()
     assert (output_dir / "chat.html").exists()
+    assert (output_dir / "config.js").exists()
+    assert 'apiBaseUrl: ""' in (output_dir / "config.js").read_text(encoding="utf-8")
+    assert "exemplo.com" not in (output_dir / "index.html").read_text(encoding="utf-8")
+    assert "exemplo.com" not in (output_dir / "chat.html").read_text(encoding="utf-8")

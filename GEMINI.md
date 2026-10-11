@@ -21,9 +21,11 @@ Este documento define os padrões de desenvolvimento, governança de dados, regr
 
 ```text
 mbft/
+├── src/
+│   └── mbft/                    # CLI unificada do monorepo (mbft pipeline, deploy, testes, dev)
 ├── data/
 │   ├── raw/                     # Dados brutos originais (mbft.pdf) - NUNCA ALTERAR
-│   └── processed/               # Artefatos gerados por etapa (extrator, enriquecedor, indexador, site)
+│   └── processed/               # Artefatos gerados por etapa (extrator, enriquecedor, indexador, site, deploy)
 ├── docs/                        # Propostas de Melhoria do Sistema (arquitetura geral RAG na PMS-001)
 ├── pipelines/                   # Pipelines batch (cada pacote possui README.md e PMS associada)
 │   ├── core/                    # Contratos canônicos Pydantic v2 compartilhados (mbft-core)
@@ -33,7 +35,8 @@ mbft/
 │   └── ssg/                     # Gerador do portal estático HTML/Jinja2 (mbft-ssg)
 ├── apps/
 │   └── api/                     # API Gateway, Ticketizador e Motor RAG (mbft-api)
-└── tests/                       # Testes transversais e auditoria de governança (test_governanca_docs.py)
+├── deploy/                      # Exportadores Cloudflare e automação de provisionamento/deploy (mbft-deploy)
+└── tests/                       # Testes transversais, CLI unificada e governança (test_governanca_docs.py)
 ```
 
 ---

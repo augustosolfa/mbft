@@ -1,7 +1,9 @@
 import sqlite3
 import os
-from fastapi import Request, Depends
+from fastapi import Request
 from typing import Any, Protocol
+from .dependencies import get_env_binding
+from .recuperador.cloudflare_adapters import _to_python
 
 # Durante o dev local, usaremos um arquivo SQLite.
 # Em produção (Cloudflare), usaremos request.scope["env"]["DB"] (binding D1)
@@ -67,17 +69,22 @@ class D1FilaRepository:
             RETURNING next_available;
         '''
         stmt = self.db.prepare(query).bind(segundos)
-        result = await stmt.first()
-        return result["next_available"] if result else ""
+        result = _to_python(await stmt.first())
+        if isinstance(result, dict):
+            return str(result.get("next_available") or "")
+        if result is not None and hasattr(result, "next_available"):
+            return str(getattr(result, "next_available") or "")
+        return ""
 
 def get_db(request: Request) -> FilaRepository:
     """
     Dependência FastAPI que retorna a conexão com o banco como FilaRepository.
     Injeta o D1 no Cloudflare ou o SQLite em ambiente local.
     """
-    env = request.scope.get("env", {})
-    if "DB" in env:
-        yield D1FilaRepository(env["DB"])
+    env = request.scope.get("env")
+    db_binding = get_env_binding(env, "DB")
+    if db_binding is not None:
+        yield D1FilaRepository(db_binding)
     else:
         init_local_db()
         conn = sqlite3.connect(LOCAL_DB_PATH, check_same_thread=False)
@@ -85,4 +92,3 @@ def get_db(request: Request) -> FilaRepository:
             yield SqliteFilaRepository(conn)
         finally:
             conn.close()
-

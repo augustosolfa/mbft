@@ -1,0 +1,251 @@
+import json
+import logging
+import os
+import re
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Dict, List, Optional
+
+from mbft_core.paths import RAIZ_REPO
+from .exporters import atualizar_config_js_site, validar_jsonl_producao
+
+logger = logging.getLogger(__name__)
+
+RE_UUID = re.compile(
+    r"\b([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b"
+)
+RE_KV_ID = re.compile(r'"id"\s*:\s*"([0-9a-fA-F]{32})"|id\s*=\s*"([0-9a-fA-F]{32})"')
+
+
+def resolver_binario_wrangler() -> List[str]:
+    """Localiza o executável `wrangler` no PATH (ou via `npx wrangler`)."""
+    if shutil.which("wrangler") is not None:
+        return ["wrangler"]
+    if shutil.which("npx") is not None:
+        return ["npx", "wrangler"]
+    raise RuntimeError(
+        "Executável 'wrangler' (ou 'npx') não encontrado no PATH. "
+        "Instale o Wrangler CLI (`npm i -g wrangler`) e autentique com `wrangler login`."
+    )
+
+
+def rodar_comando_wrangler(
+    comando: List[str],
+    description: str,
+    cwd: Optional[Path] = None,
+    dry_run: bool = False,
+) -> str:
+    """Executa um comando Wrangler (ou simula em modo `--dry-run`)."""
+    if comando and comando[0] == "wrangler" and not dry_run:
+        prefixo = resolver_binario_wrangler()
+        cmd_final = prefixo + comando[1:]
+    else:
+        cmd_final = list(comando)
+
+    logger.info("Executando deploy: %s", description)
+    logger.info("Comando: %s (cwd=%s)", " ".join(cmd_final), cwd or Path.cwd())
+
+    if dry_run:
+        logger.info("[DRY-RUN] Comando simulado sem execução real.")
+        return ""
+
+    try:
+        resultado = subprocess.run(
+            cmd_final,
+            cwd=str(cwd) if cwd else None,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        if resultado.stdout:
+            logger.info("Sucesso: %s", resultado.stdout.strip())
+        return resultado.stdout or ""
+    except subprocess.CalledProcessError as e:
+        logger.error("Erro ao executar wrangler: %s", e.stderr)
+        logger.error(
+            "Certifique-se de que o Node.js/Wrangler estão instalados e você está autenticado (wrangler login)."
+        )
+        raise RuntimeError(f"Falha ao executar wrangler: {e.stderr}") from e
+
+
+def fazer_deploy_vectorize(
+    jsonl_path: Path,
+    index_name: str = "mbft-embeddings",
+    dry_run: bool = False,
+) -> None:
+    """Envia o artefato NDJSON de embeddings para o Cloudflare Vectorize."""
+    validar_jsonl_producao(jsonl_path)
+    comando = [
+        "wrangler",
+        "vectorize",
+        "insert",
+        index_name,
+        "--file",
+        str(jsonl_path),
+    ]
+    rodar_comando_wrangler(
+        comando,
+        f"Upload JSONL para Vectorize ({index_name})",
+        dry_run=dry_run,
+    )
+
+
+def fazer_deploy_d1(
+    sql_script_path: Path,
+    db_name: str = "mbft-d1",
+    remote: bool = True,
+    cwd: Optional[Path] = None,
+    dry_run: bool = False,
+) -> None:
+    """Executa um script SQL no Cloudflare D1 (`--remote` ou `--local`)."""
+    if not sql_script_path.exists():
+        raise FileNotFoundError(f"Script SQL não encontrado em {sql_script_path}")
+
+    flag_alvo = "--remote" if remote else "--local"
+    comando = [
+        "wrangler",
+        "d1",
+        "execute",
+        db_name,
+        "--file",
+        str(sql_script_path),
+        flag_alvo,
+    ]
+    rodar_comando_wrangler(
+        comando,
+        f"Executar script SQL no D1 ({db_name}, {flag_alvo})",
+        cwd=cwd,
+        dry_run=dry_run,
+    )
+
+
+def atualizar_ids_wrangler_jsonc(
+    wrangler_path: Path,
+    database_id: Optional[str] = None,
+    kv_id: Optional[str] = None,
+) -> None:
+    """Atualiza `database_id` (D1) e `id` (KV_TICKETS) em `apps/api/wrangler.jsonc`."""
+    if not wrangler_path.exists():
+        raise FileNotFoundError(f"Arquivo wrangler.jsonc não encontrado em {wrangler_path}")
+
+    conteudo = wrangler_path.read_text(encoding="utf-8")
+    dados = json.loads(conteudo)
+
+    if database_id:
+        for db_entry in dados.get("d1_databases", []):
+            db_entry["database_id"] = database_id
+    if kv_id:
+        for kv_entry in dados.get("kv_namespaces", []):
+            kv_entry["id"] = kv_id
+
+    wrangler_path.write_text(
+        json.dumps(dados, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    logger.info("IDs atualizados em %s (D1=%s, KV=%s)", wrangler_path, database_id, kv_id)
+
+
+def provisionar_recursos_cloudflare(
+    wrangler_config_path: Optional[Path] = None,
+    db_name: str = "mbft-d1",
+    index_name: str = "mbft-embeddings",
+    kv_binding: str = "KV_TICKETS",
+    dry_run: bool = False,
+) -> Dict[str, Optional[str]]:
+    """
+    Provisiona D1, Vectorize (1024 dims, cosine) e KV na Cloudflare via Wrangler
+    e preenche os IDs retornados em `apps/api/wrangler.jsonc`.
+    """
+    if wrangler_config_path is None:
+        wrangler_config_path = RAIZ_REPO / "apps" / "api" / "wrangler.jsonc"
+
+    out_d1 = rodar_comando_wrangler(
+        ["wrangler", "d1", "create", db_name],
+        f"Provisionar banco D1 ({db_name})",
+        dry_run=dry_run,
+    )
+    rodar_comando_wrangler(
+        [
+            "wrangler",
+            "vectorize",
+            "create",
+            index_name,
+            "--dimensions=1024",
+            "--metric=cosine",
+        ],
+        f"Provisionar índice Vectorize ({index_name})",
+        dry_run=dry_run,
+    )
+    out_kv = rodar_comando_wrangler(
+        ["wrangler", "kv", "namespace", "create", kv_binding],
+        f"Provisionar namespace KV ({kv_binding})",
+        dry_run=dry_run,
+    )
+
+    m_d1 = RE_UUID.search(out_d1)
+    database_id = m_d1.group(1) if m_d1 else None
+
+    m_kv = RE_KV_ID.search(out_kv)
+    kv_id = (m_kv.group(1) or m_kv.group(2)) if m_kv else None
+
+    if not dry_run and (database_id or kv_id):
+        atualizar_ids_wrangler_jsonc(
+            wrangler_config_path,
+            database_id=database_id,
+            kv_id=kv_id,
+        )
+
+    return {"database_id": database_id, "kv_id": kv_id}
+
+
+def fazer_deploy_api(
+    api_dir: Optional[Path] = None,
+    dry_run: bool = False,
+) -> None:
+    """Publica o Worker da API (`apps/api`) no Cloudflare Workers."""
+    if api_dir is None:
+        api_dir = RAIZ_REPO / "apps" / "api"
+    if not (api_dir / "wrangler.jsonc").exists():
+        raise FileNotFoundError(f"wrangler.jsonc não encontrado em {api_dir}")
+
+    rodar_comando_wrangler(
+        ["wrangler", "deploy"],
+        "Publicar Worker mbft-api no Cloudflare Workers",
+        cwd=api_dir,
+        dry_run=dry_run,
+    )
+
+
+def fazer_deploy_site(
+    site_dir: Optional[Path] = None,
+    project_name: str = "mbft-site",
+    api_url: Optional[str] = None,
+    dry_run: bool = False,
+) -> None:
+    """
+    Atualiza `config.js` (se `api_url` ou `MBFT_API_URL` for informado) e publica
+    o diretório `data/processed/site` no Cloudflare Pages.
+    """
+    if site_dir is None:
+        site_dir = RAIZ_REPO / "data" / "processed" / "site"
+    if not site_dir.exists():
+        raise FileNotFoundError(
+            f"Diretório do site estático não encontrado em {site_dir}. Execute `uv run mbft-ssg` primeiro."
+        )
+
+    url_efetiva = api_url if api_url is not None else os.environ.get("MBFT_API_URL")
+    if url_efetiva is not None and not dry_run:
+        atualizar_config_js_site(site_dir, url_efetiva)
+
+    rodar_comando_wrangler(
+        [
+            "wrangler",
+            "pages",
+            "deploy",
+            str(site_dir),
+            f"--project-name={project_name}",
+        ],
+        f"Publicar site estático no Cloudflare Pages ({project_name})",
+        dry_run=dry_run,
+    )

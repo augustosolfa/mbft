@@ -17,7 +17,7 @@ No fluxo de extração e RAG do Manual Brasileiro de Fiscalização de Trânsito
 
 Para viabilizar este ciclo ágil de experimentação, foi criado o **Indexador**.
 
-Este pipeline *batch* atua exclusivamente sobre os dados estáticos previamente extraídos, aplicando as diretrizes de quebra semântica, gerando vetores densos via modelo de inteligência artificial na GPU local e exportando o formato final para carga na nuvem.
+Este pipeline *batch* atua exclusivamente sobre os dados estáticos previamente extraídos, aplicando as diretrizes de quebra semântica, gerando vetores densos via modelo de inteligência artificial na GPU local e serializando o artefato canônico em formato NDJSON (`embeddings_mbft.jsonl`) para consumo agnóstico pelas etapas posteriores.
 
 ---
 
@@ -27,13 +27,13 @@ Este pipeline *batch* atua exclusivamente sobre os dados estáticos previamente 
   * Desenvolver um pipeline de processamento *batch* (`mbft-indexador`) para ingerir as `fichas_enriquecidas.json`.
   * Aplicar **Segmentação Semântica Contextualizada (Chunking)**, fracionando as 404 fichas por seções temáticas autônomas e injetando prefixos curtos para ancoragem semântica.
   * Gerar vetores densos (1024 dimensões) localmente via modelo `BAAI/bge-m3` acelerado por hardware (CUDA).
-  * Serializar o artefato em formato NDJSON (JSONL) para promover a ingestão nativa no Cloudflare Vectorize e D1.
-  * Fornecer scripts de implantação (*deploy*) via CLI para sincronização dos dados com a nuvem (Wrangler).
+  * Serializar o artefato canônico em formato NDJSON (`embeddings_mbft.jsonl`) contendo o identificador, o vetor denso e os metadados estruturados de cada *chunk*.
 
 * **Não Objetivos (Non-Goals):**
   * Não é meta processar ou vetorizar a "Parte Geral" normativa nesta fase (isso aguardará a estruturação de regras globais pelo Enriquecedor).
   * Não é meta operar em tempo real nem expor rotas HTTP. O Indexador é estritamente um construtor de *assets* estáticos.
   * Não é meta implementar lógicas de Busca Híbrida ou LLM; estas pertencem ao Recuperador (PMS-005).
+  * Não é meta conter exportadores de banco de dados de nuvem (dumps SQL do D1) ou scripts de publicação via Wrangler; toda a camada de exportação para nuvem e deploy está desacoplada no pacote `mbft-deploy` (PMS-010).
 
 ---
 
@@ -61,7 +61,7 @@ Atributos administrativos (ex: `gravidade`, `infrator`, `competencia`) são excl
 
 ### 3.3. Contratos de Dados e Artefatos
 As 404 fichas geram aproximadamente 1.600 a 2.500 chunks. Considerando os vetores de ponto flutuante, o artefato consome ~15 MB.
-* **Formato de Saída (`embeddings_mbft.jsonl`)**: NDJSON. É o formato nativo e obrigatório exigido pelo CLI do Cloudflare Wrangler (`wrangler vectorize insert`).
+* **Formato de Saída (`embeddings_mbft.jsonl`)**: NDJSON canônico validado por `ChunkPayload` (`mbft-core`), consumido diretamente tanto pelos adaptadores locais da API quanto pelo módulo de publicação (`mbft-deploy`, PMS-010).
 * **Schema**:
   - `id` (`string`);
   - `values` (`array<float32>`);
@@ -72,9 +72,11 @@ As 404 fichas geram aproximadamente 1.600 a 2.500 chunks. Considerando os vetore
 ## 4. Alternativas Consideradas
 
 * **Apache Parquet para Armazenamento Local:**
-  * *Por que foi rejeitado:* Embora traga tipagem estrita e compressão, o Parquet demonstrou-se excessivo (*overengineering*) para os modestos ~15 MB do dataset. O JSONL atende perfeitamente à limitação de RAM local e integra-se nativamente e sem fricção à ferramenta da Cloudflare.
+  * *Por que foi rejeitado:* Embora traga tipagem estrita e compressão, o Parquet demonstrou-se excessivo (*overengineering*) para os modestos ~15 MB do dataset. O JSONL atende perfeitamente à limitação de RAM local e integra-se nativamente aos consumidores downstream.
 * **Prefixo Contextual Monolítico:**
   * *Por que foi rejeitado:* Injetar todo o cabedal burocrático (70-90 tokens listando valores, competências e infratores) no texto do *chunk* causava aproximação indevida dos vetores de uma mesma ficha, anulando as especificidades das infrações. A separação estrita resolve a atenção diluída.
+* **Embutir Exportadores e Scripts de Deploy Cloudflare dentro do `mbft-indexador`:**
+  * *Por que foi rejeitado:* Inicialmente cogitou-se acoplar chamadas ao Wrangler (`--deploy`) e geração de SQL do D1 na própria CLI do Indexador. Essa abordagem violava a responsabilidade única das pipelines *batch* (que devem apenas transformar e produzir o artefato canônico da sua etapa), razão pela qual a exportação e publicação na Cloudflare foram extraídas para o pacote dedicado `mbft-deploy` (PMS-010).
 
 ---
 

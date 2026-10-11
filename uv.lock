@@ -11,6 +11,7 @@ resolution-markers = [
 members = [
     "mbft-api",
     "mbft-core",
+    "mbft-deploy",
     "mbft-enriquecedor",
     "mbft-extrator",
     "mbft-indexador",
@@ -1115,6 +1116,17 @@ dependencies = [
 requires-dist = [{ name = "pydantic", specifier = ">=2.0" }]
 
 [[package]]
+name = "mbft-deploy"
+version = "0.1.0"
+source = { editable = "deploy" }
+dependencies = [
+    { name = "mbft-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "mbft-core", editable = "pipelines/core" }]
+
+[[package]]
 name = "mbft-enriquecedor"
 version = "0.1.0"
 source = { editable = "pipelines/enriquecedor" }
@@ -1201,10 +1213,11 @@ requires-dist = [
 [[package]]
 name = "mbft-workspace"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "mbft-api" },
     { name = "mbft-core" },
+    { name = "mbft-deploy" },
     { name = "mbft-enriquecedor" },
     { name = "mbft-extrator" },
     { name = "mbft-indexador" },
@@ -1224,6 +1237,7 @@ dev = [
 requires-dist = [
     { name = "mbft-api", editable = "apps/api" },
     { name = "mbft-core", editable = "pipelines/core" },
+    { name = "mbft-deploy", editable = "deploy" },
     { name = "mbft-enriquecedor", editable = "pipelines/enriquecedor" },
     { name = "mbft-extrator", editable = "pipelines/extrator" },
     { name = "mbft-indexador", editable = "pipelines/indexador" },

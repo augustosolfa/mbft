@@ -7,9 +7,22 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-from .interfaces import IVectorDB, IRelationalDB, IEmbedderClient
+from .interfaces import (
+    IVectorDB,
+    IRelationalDB,
+    IEmbedderClient,
+    RE_ROMANO,
+    FTS_RESERVED,
+    formatar_token_fts,
+    formatar_query_fts,
+)
 
 class LocalSqliteDB(IRelationalDB):
+    _RE_ROMANO = RE_ROMANO
+    _FTS_RESERVED = FTS_RESERVED
+    _formatar_token_fts = staticmethod(formatar_token_fts)
+    _formatar_query_fts = staticmethod(formatar_query_fts)
+
     def __init__(self, jsonl_path: Path):
         self.conn = sqlite3.connect(':memory:')
         self.conn.row_factory = sqlite3.Row
@@ -48,43 +61,18 @@ class LocalSqliteDB(IRelationalDB):
                 ))
         self.conn.commit()
 
-    _RE_ROMANO = re.compile(
-        r"^(?=[MDCLXVI]+$)M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})$",
-        re.IGNORECASE,
-    )
-    _FTS_RESERVED = {"AND", "OR", "NOT", "NEAR"}
-
-    @classmethod
-    def _formatar_token_fts(cls, token: str) -> str:
-        if not token:
-            return ""
-        if token.upper() in cls._FTS_RESERVED:
-            return f'"{token}"'
-        if (
-            len(token) >= 4
-            and not any(c.isdigit() for c in token)
-            and not cls._RE_ROMANO.fullmatch(token)
-        ):
-            return f"{token}*"
-        return token
-
     async def buscar_fts(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        # Normaliza símbolo de grau (°) após dígitos para indicador ordinal (º)
-        # e extrai tokens alfanuméricos sem sublinhados (alinhado ao unicode61 do FTS5).
-        query_norm = re.sub(r"(\d)\s*°", r"\1º", query)
-        tokens = re.findall(r"[^\W_]+", query_norm)
-        if not tokens:
+        if limit <= 0:
             return []
-            
-        fts_query = " ".join(
-            t_fmt for t in tokens if (t_fmt := self._formatar_token_fts(t))
-        )
+        fts_query = self._formatar_query_fts(query)
+        if not fts_query:
+            return []
         
         cursor = self.conn.cursor()
         # bm25() no FTS5 ordena automaticamente do menor pro maior se quisermos os melhores (mais negativos)
         # O FTS5 rank é negativo, onde menores valores são melhores.
         cursor.execute('''
-            SELECT id, codigo, artigo, texto_contextualizado, bm25(fts_chunks) as score
+            SELECT id, codigo, artigo, secao, texto_contextualizado, bm25(fts_chunks) as score
             FROM fts_chunks 
             WHERE fts_chunks MATCH ? 
             ORDER BY score ASC 
@@ -100,6 +88,7 @@ class LocalSqliteDB(IRelationalDB):
                 "metadata": {
                     "codigo": row["codigo"],
                     "artigo": row["artigo"],
+                    "secao": row["secao"],
                     "texto_contextualizado": row["texto_contextualizado"]
                 },
                 "score": abs(row["score"])
@@ -122,6 +111,8 @@ class NumpyVectorDB(IVectorDB):
                 self.chunks.append(data)
                 
     async def buscar_similares(self, vetor: List[float], limit: int = 5) -> List[Dict[str, Any]]:
+        if limit <= 0 or not vetor:
+            return []
         q_vec = self.np.array(vetor, dtype=self.np.float32)
         q_norm = self.np.linalg.norm(q_vec)
         if q_norm == 0:

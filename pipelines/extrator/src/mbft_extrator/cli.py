@@ -29,7 +29,7 @@ def cmd_tudo(args):
     cmd_geral(args)
     cmd_fichas(args)
 
-def main():
+def main(argv=None):
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -66,7 +66,7 @@ def main():
     p_tudo.add_argument("--force", action="store_true")
     p_tudo.add_argument("--workers", type=int, default=4, help="Número de workers paralelos (padrão: 4)")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.subcomando == "geral":
         cmd_geral(args)

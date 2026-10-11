@@ -21,9 +21,6 @@ uv run mbft-indexador --input data/processed/enriquecedor/fichas_enriquecidas.js
 
 # Modo debug/teste rápido sem carregar o modelo real de embeddings (salva em embeddings_debug.jsonl)
 uv run mbft-indexador --skip-embeddings
-
-# Sincronizar o artefato JSONL gerado com o Cloudflare Vectorize via Wrangler
-uv run mbft-indexador --deploy
 ```
 
 ### Avaliação Offline de Qualidade (Recall@K) e Testes
@@ -53,4 +50,3 @@ uv run python pipelines/indexador/scripts/avaliacao_aderencia.py --jsonl data/pr
 - **`cli.py`**: Ponto de entrada da CLI (`mbft-indexador`), validação de argumentos e orquestração do fluxo batch.
 - **`chunker.py`**: Fracionamento das fichas enriquecidas por seções temáticas (`EMENTA`, `QUANDO_AUTUAR`, `QUANDO_NAO_AUTUAR`, `DEFINICOES_PROCEDIMENTOS`, `EXEMPLOS_AIT`, `INFORMACOES_COMPLEMENTARES`) e montagem do prefixo contextual enxuto.
 - **`embedder.py`**: Integração com `sentence-transformers` e PyTorch CUDA para inferência em lotes do modelo `BAAI/bge-m3`.
-- **`deploy.py`**: Integração com o CLI do Cloudflare Wrangler para ingestão do arquivo `.jsonl` no índice remoto Vectorize.

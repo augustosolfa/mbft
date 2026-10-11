@@ -87,6 +87,13 @@ def run_build(
     out_chat = output_dir / "chat.html"
     out_chat.write_text(html_chat, encoding="utf-8")
 
+    # Gera arquivo de configuração neutro de runtime (pode ser sobrescrito no deploy sem re-rodar o SSG)
+    out_config = output_dir / "config.js"
+    out_config.write_text(
+        'window.MBFT_CONFIG = {\n  apiBaseUrl: ""\n};\n',
+        encoding="utf-8",
+    )
+
     logger.info(f"Build concluído com sucesso! {len(fichas)} fichas geradas em: {output_dir}")
 
 if __name__ == "__main__":

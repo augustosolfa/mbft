@@ -38,8 +38,7 @@ class BuscadorHibrido:
         # Ordena pelo score final do RRF
         resultados_finais = []
         for doc_id, score in sorted(rrf_scores.items(), key=lambda item: item[1], reverse=True):
-            doc = documentos_agrupados[doc_id]
-            doc["rrf_score"] = score
+            doc = {**documentos_agrupados[doc_id], "rrf_score": score}
             resultados_finais.append(doc)
             
         return resultados_finais

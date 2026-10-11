@@ -28,6 +28,7 @@ backup_extracao_v1/
 data/archive/
 data/processed/site/
 data/processed/indexador/
+data/processed/deploy/
 *.parquet
 fila.db
 repomix-output.xml

@@ -40,6 +40,7 @@ data/processed/site/
 ├── index.html                 # Portal principal com busca vetorial integrada à API (/busca)
 ├── lista.html                 # Tabela completa de infrações com filtro multi-critério em Vanilla JS
 ├── chat.html                  # Interface do Oráculo MBFT integrada ao Ticketizador (/ticket e /chat)
+├── config.js                  # Configuração neutra de runtime (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações e placas de sinalização (300 DPI)
 └── fichas/
     ├── 501-00.html            # Página individual da ficha (/fichas/{id}.html)

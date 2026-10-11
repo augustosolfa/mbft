@@ -17,14 +17,16 @@ Para garantir compatibilidade total com o bundler Pyodide do Cloudflare Workers 
 ```text
 apps/api/
 ├── pyproject.toml               # Produção: fastapi, pyjwt | Dev: uvicorn, google-genai, pytest
-├── wrangler.jsonc               # Bindings Cloudflare (D1, Vectorize, Workers AI, KV)
+├── wrangler.jsonc               # Bindings Cloudflare (D1, Vectorize, Workers AI, KV) e vars (CF_LLM_MODEL)
+├── schema.sql                   # Schema D1 idempotente (fila_global + tabela virtual fts_chunks)
 ├── scripts/
 │   └── testar_gerador.py        # Script de validação local do Gerador com Gemini
 ├── tests/
-│   ├── test_buscador.py         # Testes unitários RRF, diversificação e tokenização FTS5
+│   ├── test_buscador.py         # Testes unitários RRF, diversificação, FTS5, adaptadores CF e DI
 │   └── test_integracao.py       # Testes de integração da Busca Híbrida sobre embeddings_mbft.jsonl
 └── src/mbft_api/
-    ├── main.py                  # Entrypoint FastAPI, CORS e ciclo de vida (lifespan)
+    ├── main.py                  # Entrypoint FastAPI, WorkerEntrypoint (Pyodide), CORS e lifespan
+    ├── dependencies.py          # Depends() por requisição (get_buscador, get_gerador, get_env_binding)
     ├── database.py              # FilaRepository (Cloudflare D1 em prod / SQLite fila.db local)
     ├── security.py              # TicketService (JWT HS256 + anti-replay KV via jti)
     ├── routers/
@@ -33,13 +35,15 @@ apps/api/
     │   ├── ticket.py            # POST /ticket
     │   └── chat.py              # POST /chat
     ├── recuperador/             # Submódulo de Busca Híbrida (PMS-005)
-    │   ├── interfaces.py        # Protocols: IVectorDB, IRelationalDB, IEmbedderClient
+    │   ├── interfaces.py        # Protocols (IVectorDB, IRelationalDB, IEmbedderClient) e formatador FTS5
     │   ├── buscador.py          # BuscadorHibrido (Reciprocal Rank Fusion + diversificação)
+    │   ├── cloudflare_adapters.py # Adaptadores Cloudflare (D1RelationalDB, VectorizeDB, WorkersAIEmbedder)
     │   └── local_adapters.py    # Adaptadores locais (LocalSqliteDB FTS5, NumpyVectorDB, PyTorchEmbedder)
     └── gerador/                 # Submódulo de Geração Strict RAG (PMS-006)
         ├── interfaces.py        # Protocol: ILLMClient
         ├── orquestrador.py      # OrquestradorGeracao (Stateless, temp=0.0)
         ├── prompts.py           # SYSTEM_PROMPT_TEMPLATE (Zero-Hallucination)
+        ├── cloudflare_adapters.py # Adaptador Cloudflare (WorkersAILLMClient + limpeza de <think>)
         └── local_adapters.py    # Adaptador local (GeminiLLMClient via google-genai, lazy-loaded)
 ```
 
@@ -56,18 +60,22 @@ apps/api/
 
 ---
 
-## Variáveis de Ambiente
+## Variáveis de Ambiente e Bindings
 
-| Variável | Obrigatória | Descrição |
+| Variável / Binding | Obrigatória | Descrição |
 |---|---|---|
 | `JWT_SECRET` | Sim (em `/ticket` e `/chat`) | Segredo HMAC-SHA256 para assinar e validar Tickets JWT (não pode ser `MUDAR_EM_PRODUCAO`). |
 | `TOKEN_ADMIN` | Não | Token VIP para emissão de ticket sem espera na fila global. |
 | `TOKEN_TESTES` | Não | Token para emissão de ticket com espera reduzida (+10s). |
-| `GEMINI_API_KEY` | Apenas no modo local (LLM) | Chave da API Google Gemini utilizada por `GeminiLLMClient`. |
+| `CF_LLM_MODEL` | Não (padrão em `wrangler.jsonc`) | Modelo do Cloudflare Workers AI usado por `WorkersAILLMClient` (padrão: `@cf/meta/llama-3.1-8b-instruct-fp8-fast`). |
+| `CORS_ORIGINS` | Não | Lista de origens adicionais permitidas no CORS separadas por vírgula (ex.: `https://mbft-site.pages.dev`). Portas locais (`localhost:3000/5500/8080`) já são incluídas automaticamente. |
+| `LLM_PROVIDER` | Não | Override explícito do provedor de geração (`workers_ai`/`cloudflare` ou `gemini`). Sem override, detecta `env.AI` no Workers e faz fallback para `app.state.gerador` localmente. |
+| `GEMINI_API_KEY` | Apenas no modo local (`gemini`) | Chave da API Google Gemini utilizada por `GeminiLLMClient`. |
+| `DB`, `VECTORIZE`, `AI`, `KV_TICKETS` | Em produção (Workers) | Bindings declarados em `wrangler.jsonc` para Cloudflare D1, Vectorize, Workers AI e KV. |
 
 ---
 
-## Execução Local e Testes
+## Execução Local, Migração D1 e Testes
 
 A partir da raiz do monorepo:
 
@@ -81,7 +89,11 @@ uv run pytest apps/api/tests/test_buscador.py
 # 3. Executar suíte completa (inclui integração com BAAI/bge-m3 e embeddings_mbft.jsonl)
 uv run pytest apps/api/tests/
 
-# 4. Iniciar servidor FastAPI local
+# 4. Aplicar schema SQL no Cloudflare D1 (local ou remoto via Wrangler)
+npx wrangler d1 execute mbft-d1 --local --file=apps/api/schema.sql
+npx wrangler d1 execute mbft-d1 --remote --file=apps/api/schema.sql
+
+# 5. Iniciar servidor FastAPI local
 $env:JWT_SECRET="segredo-local-de-desenvolvimento"
 uv run uvicorn mbft_api.main:app --reload --port 8000
 ```

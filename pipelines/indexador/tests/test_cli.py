@@ -86,26 +86,9 @@ class TestIndexadorCli(unittest.TestCase):
                 main()
             self.assertNotEqual(cm.exception.code, 0)
 
-    def test_main_deploy_recusa_arquivo_debug(self):
-        with patch.object(sys, "argv", ["cli.py", "--deploy", "--output", "embeddings_debug.jsonl"]):
-            with self.assertRaises(SystemExit) as cm:
-                main()
-            self.assertNotEqual(cm.exception.code, 0)
-
-    def test_main_deploy_recusa_skip_embeddings(self):
-        with patch.object(sys, "argv", ["cli.py", "--deploy", "--skip-embeddings"]):
-            with self.assertRaises(SystemExit) as cm:
-                main()
-            self.assertNotEqual(cm.exception.code, 0)
-
     def test_main_caminhos_padrao_usam_processed_dir(self):
         import tempfile
         import json
-        from mbft_core.paths import PROCESSED_DIR
-        with patch.object(sys, "argv", ["cli.py", "--deploy"]):
-            with patch("mbft_indexador.deploy.fazer_deploy_vectorize") as mock_deploy:
-                main()
-                mock_deploy.assert_called_once_with(PROCESSED_DIR / "indexador" / "embeddings_mbft.jsonl")
 
         with tempfile.TemporaryDirectory() as tmpdir:
             fake_processed = Path(tmpdir)

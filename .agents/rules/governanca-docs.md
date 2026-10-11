@@ -12,7 +12,7 @@ A documentação do monorepo é dividida por finalidade para evitar duplicação
 | :--- | :--- | :--- | :--- | :--- |
 | **Apresentação Geral (`README.md`)** | `/README.md` | **Vitrine e Quickstart do Monorepo** | Visão geral do projeto, resumo das camadas e comandos rápidos de ponta a ponta (`uv sync` / `uv run`). | Flags exaustivas de CLI por pacote, árvore interna de `src/` ou racional de design (PMS). |
 | **Proposta de Melhoria do Sistema (PMS)** | `docs/PMS-NNN - *.md` | **Design Doc / RFC** (Por que e Como foi desenhado) | Estrutura definida em `docs/PMS-000 - Template de PMS.md`. | Receituários operacionais de execução (runbooks de CLI, instalação ou `pytest`), planos de rollback ou árvores de arquivos internas que mudam sem alterar a arquitetura (citar restrições de CLI/runtime como premissa de design é permitido). |
-| **Guia do Pacote (`README.md`)** | `pipelines/*/README.md` e `apps/*/README.md` | **Developer Guide / Runbook** (Como operar, testar e manter) | Comandos de execução (`uv run ...`), flags de CLI, execução de testes e benchmarks, variáveis de ambiente, entradas/saídas em `data/processed/` e estrutura atual de diretórios/módulos (`src/`). | Histórico de alternativas descartadas, justificativas teóricas longas de algoritmos ou duplicação de diagramas de concepção já registrados no PMS correspondente. |
+| **Guia do Pacote (`README.md`)** | `pipelines/*/README.md`, `apps/*/README.md` e `deploy/README.md` | **Developer Guide / Runbook** (Como operar, testar e manter) | Comandos de execução (`uv run ...`), flags de CLI, execução de testes e benchmarks, variáveis de ambiente, entradas/saídas em `data/processed/` e estrutura atual de diretórios/módulos (`src/`). | Histórico de alternativas descartadas, justificativas teóricas longas de algoritmos ou duplicação de diagramas de concepção já registrados no PMS correspondente. |
 
 ## Critério de Fronteira (Decisão vs. Operação)
 
@@ -26,7 +26,7 @@ A documentação do monorepo é dividida por finalidade para evitar duplicação
 
 ## Invariantes e Validação Automatizada (`pytest`)
 
-- Todo pacote membro do workspace em `pipelines/*` e `apps/*` DEVE possuir `README.md` declarado em seu `pyproject.toml` (`readme = "README.md"`) e referenciar no cabeçalho o(s) seu(s) respectivo(s) `PMS-NNN`.
+- Todo pacote membro do workspace em `pipelines/*`, `apps/*` e `deploy` DEVE possuir `README.md` declarado em seu `pyproject.toml` (`readme = "README.md"`) e referenciar no cabeçalho o(s) seu(s) respectivo(s) `PMS-NNN`.
 - Sempre que alterar documentos Markdown ou `pyproject.toml`, valide a conformidade estrutural executando:
   ```bash
   uv run pytest tests/test_governanca_docs.py

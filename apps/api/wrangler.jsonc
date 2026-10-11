@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "mbft-api",
   "main": "src/mbft_api/main.py",
-  "compatibility_date": "2026-10-08",
+  "compatibility_date": "2026-10-11",
   "compatibility_flags": [
     "nodejs_compat",
     "python_workers"
@@ -41,6 +41,8 @@
     }
   ],
   "vars": {
-    "ENVIRONMENT": "production"
+    "ENVIRONMENT": "production",
+    "CF_LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+    "CORS_ORIGINS": ""
   }
 }

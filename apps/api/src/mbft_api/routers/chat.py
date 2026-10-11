@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Request, HTTPException, Body, Depends
+from fastapi import APIRouter, HTTPException, Body, Depends
 from pydantic import BaseModel, Field
+from ..dependencies import get_buscador, get_gerador
+from ..gerador.orquestrador import OrquestradorGeracao
+from ..recuperador.buscador import BuscadorHibrido
 from ..security import ticket_valido
 
 router = APIRouter(prefix="/chat", tags=["Gerador LLM"])
@@ -9,16 +12,11 @@ class PerguntaPayload(BaseModel):
 
 @router.post("/")
 async def fazer_pergunta(
-    request: Request, 
     payload: PerguntaPayload = Body(...),
-    _ticket: str = Depends(ticket_valido)
+    buscador: BuscadorHibrido = Depends(get_buscador),
+    gerador: OrquestradorGeracao = Depends(get_gerador),
+    _ticket: str = Depends(ticket_valido),
 ):
-    buscador = getattr(request.app.state, "buscador", None)
-    gerador = getattr(request.app.state, "gerador", None)
-    
-    if not buscador or not gerador:
-        raise HTTPException(status_code=503, detail="Motor de Inteligência Indisponível.")
-        
     # Fase 1: RAG Híbrido
     contexto_bruto = await buscador.recuperar_contexto(payload.pergunta, limit=5)
     
@@ -35,3 +33,4 @@ async def fazer_pergunta(
         raise HTTPException(status_code=500, detail="Erro interno ao consultar o Oráculo de IA. Tente novamente mais tarde.")
         
     return {"resposta": resposta_llm}
+

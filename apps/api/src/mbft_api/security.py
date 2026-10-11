@@ -6,14 +6,18 @@ import secrets
 import os
 from typing import Optional, Any
 from fastapi import Request, Header, HTTPException, Depends
-from .database import get_db, FilaRepository
+from .database import FilaRepository
+from .dependencies import get_buscador, get_env_binding, get_gerador
+from .recuperador.cloudflare_adapters import _to_js, _to_python
+
+MIN_KV_EXPIRATION_TTL_SECONDS = 60
 
 class Settings:
-    def __init__(self, env: dict):
-        self.jwt_secret = env.get("JWT_SECRET")
-        self.token_admin = env.get("TOKEN_ADMIN")
-        self.token_testes = env.get("TOKEN_TESTES")
-        self.kv_tickets = env.get("KV_TICKETS")
+    def __init__(self, env: Any):
+        self.jwt_secret = get_env_binding(env, "JWT_SECRET") or os.environ.get("JWT_SECRET")
+        self.token_admin = get_env_binding(env, "TOKEN_ADMIN") or os.environ.get("TOKEN_ADMIN")
+        self.token_testes = get_env_binding(env, "TOKEN_TESTES") or os.environ.get("TOKEN_TESTES")
+        self.kv_tickets = get_env_binding(env, "KV_TICKETS")
 
         if not self.jwt_secret or self.jwt_secret == "MUDAR_EM_PRODUCAO":
             raise HTTPException(status_code=500, detail="JWT_SECRET não configurado ou inseguro.")
@@ -30,7 +34,7 @@ def seguro_compara_segredo(fornecido: Optional[str], esperado: Optional[str]) ->
     return secrets.compare_digest(hash_fornecido, hash_esperado)
 
 class TicketService:
-    def __init__(self, settings: Settings, repo: FilaRepository):
+    def __init__(self, settings: Settings, repo: Optional[FilaRepository] = None):
         self.settings = settings
         self.repo = repo
 
@@ -40,8 +44,12 @@ class TicketService:
         if seguro_compara_segredo(priority_token, self.settings.token_admin):
             next_available_str = agora.isoformat()
         elif seguro_compara_segredo(priority_token, self.settings.token_testes):
+            if self.repo is None:
+                raise HTTPException(status_code=503, detail="Repositório da fila indisponível.")
             next_available_str = await self.repo.avancar_fila_global(segundos=10)
         else:
+            if self.repo is None:
+                raise HTTPException(status_code=503, detail="Repositório da fila indisponível.")
             next_available_str = await self.repo.avancar_fila_global(segundos=60)
             
         if not next_available_str:
@@ -89,12 +97,19 @@ class TicketService:
                 
             jti = payload.get("jti")
             if self.settings.kv_tickets and jti:
-                ticket_usado = await self.settings.kv_tickets.get(jti)
+                ticket_usado = _to_python(await self.settings.kv_tickets.get(jti))
                 if ticket_usado:
                     raise HTTPException(status_code=409, detail="Ticket já consumido. Solicite um novo.")
                 ttl = int((datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc) - agora).total_seconds())
                 if ttl > 0:
-                    await self.settings.kv_tickets.put(jti, "1", expirationTtl=ttl)
+                    kv_ttl = max(ttl, MIN_KV_EXPIRATION_TTL_SECONDS)
+                    if hasattr(self.settings.kv_tickets, "to_py"):
+                        await self.settings.kv_tickets.put(jti, "1", _to_js({"expirationTtl": kv_ttl}))
+                    else:
+                        try:
+                            await self.settings.kv_tickets.put(jti, "1", expirationTtl=kv_ttl)
+                        except TypeError:
+                            await self.settings.kv_tickets.put(jti, "1", {"expirationTtl": kv_ttl})
                 
         except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail="Ticket expirado.")
@@ -104,8 +119,10 @@ class TicketService:
 async def ticket_valido(
     x_ticket: str = Header(...),
     settings: Settings = Depends(get_settings),
-    db: FilaRepository = Depends(get_db)
+    _buscador: Any = Depends(get_buscador),
+    _gerador: Any = Depends(get_gerador),
 ):
-    service = TicketService(settings, db)
+    service = TicketService(settings)
     await service.validar_e_consumir(x_ticket)
     return x_ticket
+

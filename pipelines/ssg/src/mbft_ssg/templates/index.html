@@ -48,10 +48,11 @@
         </section>
     </main>
 
+    <script src="config.js"></script>
     <script>
         const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
             ? "http://127.0.0.1:8000" 
-            : "https://api.mbft.exemplo.com"; 
+            : ((window.MBFT_CONFIG && window.MBFT_CONFIG.apiBaseUrl) || "").replace(/\/+$/, "");
 
         const form = document.getElementById('search-form');
         const input = document.getElementById('busca-input');

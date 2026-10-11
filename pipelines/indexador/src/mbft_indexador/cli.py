@@ -52,15 +52,14 @@ def processar_indexacao(
         ))
     return payloads
 
-def main():
-    parser = argparse.ArgumentParser(description="MBFT Indexador - Gera chunks e embeddings BAAI/bge-m3 para o Cloudflare Vectorize.")
+def main(argv: Optional[List[str]] = None):
+    parser = argparse.ArgumentParser(description="MBFT Indexador - Gera chunks semânticos e embeddings densos BAAI/bge-m3 em formato JSONL.")
     parser.add_argument("--input", "-i", type=str, default=str(PROCESSED_DIR / "enriquecedor" / "fichas_enriquecidas.json"), help="Caminho para o JSON das fichas enriquecidas.")
     parser.add_argument("--output", "-o", type=str, default=None, help="Caminho de saída para o JSONL de embeddings.")
     parser.add_argument("--batch-size", "-b", type=int, default=32, help="Tamanho do batch para inferência do modelo na GPU.")
     parser.add_argument("--skip-embeddings", action="store_true", help="Modo debug/teste sem modelo real de embeddings (salva em arquivo de debug).")
-    parser.add_argument("--deploy", action="store_true", help="Faz o upload do JSONL gerado para o Cloudflare Vectorize via wrangler.")
     
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     
     input_path = Path(args.input)
     
@@ -72,18 +71,6 @@ def main():
             output_path = PROCESSED_DIR / "indexador" / "embeddings_debug.jsonl"
         else:
             output_path = PROCESSED_DIR / "indexador" / "embeddings_mbft.jsonl"
-
-    if args.deploy:
-        if "debug" in output_path.name.lower() or args.skip_embeddings:
-            logger.error(f"Deploy recusado: arquivo {output_path} é um artefato de debug/teste (--skip-embeddings).")
-            sys.exit(1)
-        from mbft_indexador.deploy import fazer_deploy_vectorize
-        try:
-            fazer_deploy_vectorize(output_path)
-        except (RuntimeError, FileNotFoundError) as e:
-            logger.error(str(e))
-            sys.exit(1)
-        return
 
     if not input_path.exists():
         logger.error(f"Arquivo de entrada não encontrado: {input_path}")

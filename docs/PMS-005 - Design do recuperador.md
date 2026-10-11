@@ -45,7 +45,7 @@ O submódulo `mbft_api.recuperador` (`apps/api/src/mbft_api/recuperador/`) mater
   2. `IRelationalDB`: Contrato para busca esparsa/exata.
   3. `IEmbedderClient`: Contrato para a conversão vetorial da pergunta inicial.
   
-  Desta forma, durante **Testes Locais**, importam-se sob demanda os adaptadores de `mbft_api.recuperador.local_adapters` (`LocalSqliteDB`, `NumpyVectorDB`, `PyTorchEmbedder`). Em **Produção (Pyodide)**, injetam-se classes invólucro para os Bindings da Cloudflare sem nunca importar bibliotecas pesadas.
+  Desta forma, durante **Testes Locais**, importam-se sob demanda os adaptadores de `mbft_api.recuperador.local_adapters` (`LocalSqliteDB`, `NumpyVectorDB`, `PyTorchEmbedder`). Em **Produção (Pyodide)**, injetam-se os adaptadores de `mbft_api.recuperador.cloudflare_adapters` (`D1RelationalDB`, `VectorizeDB`, `WorkersAIEmbedder`) sobre os Bindings nativos da Cloudflare (`env.DB`, `env.VECTORIZE`, `env.AI`) sem nunca importar bibliotecas pesadas, compartilhando o formatador de query FTS5 (`formatar_query_fts` / `formatar_token_fts`) entre `LocalSqliteDB` e `D1RelationalDB`.
 
 * **Fluxo Coreográfico da Busca (RRF):**
   ```text
