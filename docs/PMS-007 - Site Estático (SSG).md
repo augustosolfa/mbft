@@ -15,7 +15,7 @@ Substitui: Nenhum
 
 Atualmente, o projeto possui as fichas do MBFT extraídas e enriquecidas em arquivos JSON brutos. Para que o usuário final possa consultar o manual sem onerar os limites de invocação (*requests/CPU*) do Cloudflare Workers, precisamos disponibilizar essas informações em um formato legível por humanos e indexável por motores de busca (SEO).
 
-Esta PMS descreve a criação de um módulo de geração de site estático (SSG - *Static Site Generator*) puramente em Python. Ele transformará os dados estruturados em páginas HTML pré-renderizadas, prontas para hospedagem estática (ex: Cloudflare Pages).
+Esta PMS descreve a criação de um módulo de geração de site estático (SSG - *Static Site Generator*) puramente em Python. Ele transformará os dados estruturados em páginas HTML pré-renderizadas, publicadas como *Static Assets* pelo Worker único `mbft` (PMS-010), que as serve na mesma origem da API FastAPI.
 
 ---
 
@@ -27,6 +27,7 @@ Esta PMS descreve a criação de um módulo de geração de site estático (SSG 
   * Utilizar `Jinja2` como motor de templates.
   * Embutir design minimalista e responsivo usando um framework classless via CDN (Pico.css), eliminando a necessidade de builds de Node.js.
   * Criar URLs previsíveis que poderão ser referenciadas posteriormente pela API de busca (ex: `/fichas/518-51.html`).
+  * Gerar uma página `404.html` consumida pelo roteamento `not_found_handling = "404-page"` do Worker único (PMS-010).
 
 * **Não Objetivos (Non-Goals):**
   * **Não é meta** desenhar a API de backend nem o front-end dinâmico de chat/busca neste momento (isso será abordado na PMS-008).
@@ -43,7 +44,7 @@ Como se trata de um processamento _batch_ e _offline_, ele se qualifica perfeita
 
 * **Dependências Principais:** `jinja2`, `mbft-core` (para tipagem das fichas).
 * **Entrada:** Arquivo consolidado `fichas_enriquecidas.json` (artefato do Enriquecedor).
-* **Saída:** Diretório de *build* (ex: `data/processed/site/`) contendo os artefatos finais a serem subidos para o Cloudflare Pages.
+* **Saída:** Diretório de *build* (ex: `data/processed/site/`) contendo os artefatos finais publicados como *Static Assets* pelo Worker `mbft` (PMS-010).
 
 ### 3.2. Estrutura de URLs (Roteamento Estático)
 
@@ -54,6 +55,7 @@ site/
 ├── index.html                 # Portal principal com busca vetorial (RAG API)
 ├── lista.html                 # Tabela com todas as infrações e filtro avançado em JS
 ├── chat.html                  # Interface estática do chat conectada ao Ticketizador
+├── 404.html                   # Página de erro consumida por assets.not_found_handling do Worker (PMS-010)
 ├── config.js                  # Configuração runtime neutra (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações extraídas (300 DPI)
 ├── parte-geral/               # Subdiretório modular da Parte Geral

@@ -1,6 +1,6 @@
 # Pipeline Gerador de Site Estático (`mbft-ssg`)
 
-Módulo de processamento em lote (*batch*) responsável pela compilação estática (*Static Site Generation* — SSG) das fichas de enquadramento, índice filtrável e interfaces de consulta do **Manual Brasileiro de Fiscalização de Trânsito (MBFT)** em páginas HTML pré-renderizadas, prontas para hospedagem estática (ex.: Cloudflare Pages).
+Módulo de processamento em lote (*batch*) responsável pela compilação estática (*Static Site Generation* — SSG) das fichas de enquadramento, índice filtrável e interfaces de consulta do **Manual Brasileiro de Fiscalização de Trânsito (MBFT)** em páginas HTML pré-renderizadas, publicadas como *Static Assets* pelo Worker único `mbft` (PMS-010).
 
 > **Nota de Arquitetura**: Este arquivo é um guia operacional e de desenvolvimento (*Developer Guide*).
 > Para a documentação completa de arquitetura, decisões de design e trade-offs, consulte a **PMS-007** em `docs/PMS-007 - Site Estático (SSG).md` e a **PMS-008** em `docs/PMS-008 - API e Ticketizador.md`.
@@ -45,6 +45,7 @@ data/processed/site/
 ├── index.html                 # Portal principal com busca vetorial integrada à API (/busca)
 ├── lista.html                 # Tabela completa de infrações com filtro multi-critério em Vanilla JS
 ├── chat.html                  # Interface do Oráculo MBFT integrada ao Ticketizador (/ticket e /chat)
+├── 404.html                   # Página de erro 404 consumida por assets.not_found_handling do Worker (PMS-010)
 ├── config.js                  # Configuração neutra de runtime (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações e placas de sinalização (300 DPI)
 ├── parte-geral/               # Subdiretório modular da Parte Geral
@@ -86,7 +87,7 @@ uv run python -m http.server 3000 -d data/processed/site
 Acesse `http://localhost:3000` (ou `http://127.0.0.1:3000`).
 
 > **Integração com a API em Ambiente Local**:
-> Os templates `index.html` e `chat.html` detectam automaticamente quando estão sendo servidos a partir de `localhost` ou `127.0.0.1` e direcionam as chamadas de `/busca`, `/ticket` e `/chat` para `http://127.0.0.1:8000`.
+> Os templates `index.html` e `chat.html` detectam automaticamente quando estão sendo servidos a partir de `localhost` ou `127.0.0.1` e direcionam as chamadas de `/busca` e `/chat` para `http://127.0.0.1:8000` (sem prefixo). Em produção, o frontend usa a mesma origem sob o prefixo externo `/api` (`/api/busca/`, `/api/chat/`), roteado para o Worker por `assets.run_worker_first` (PMS-010).
 > Enquanto a página `lista.html` e todas as páginas em `fichas/*.html` funcionam de maneira 100% offline, certifique-se de que o servidor da API (`apps/api`) esteja ativo na porta `8000` caso queira testar a busca semântica ou o chat localmente.
 
 ---

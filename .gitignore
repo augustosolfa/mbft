@@ -15,6 +15,7 @@ wheels/
 python_modules/
 .venv-workers/
 .wrangler/
+.wrangler.deploy.jsonc
 
 # Cache de extração intermediária
 .cache_extracao/

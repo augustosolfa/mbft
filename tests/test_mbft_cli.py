@@ -27,7 +27,8 @@ class TestMbftUnifiedCli(unittest.TestCase):
         help_text = stdout.getvalue()
         self.assertIn("export-d1", help_text)
         self.assertIn("provision", help_text)
-        self.assertIn("data -> api -> site", help_text)
+        self.assertIn("data -> api", help_text)
+        self.assertIn("MBFT_HOSTNAME", help_text)
         self.assertIn("não são globais", help_text)
         self.assertIn("mbft deploy <subcomando> --help", help_text)
 
@@ -43,10 +44,22 @@ class TestMbftUnifiedCli(unittest.TestCase):
     def test_pipeline_tudo_encadeia_quatro_etapas_na_ordem(self):
         ordem = []
         with (
-            patch("mbft_extrator.cli.main", side_effect=lambda *a, **kw: ordem.append("extrator")),
-            patch("mbft_enriquecedor.main.main", side_effect=lambda *a, **kw: ordem.append("enriquecedor")),
-            patch("mbft_indexador.cli.main", side_effect=lambda *a, **kw: ordem.append("indexador")),
-            patch("mbft_ssg.builder.run_build", side_effect=lambda *a, **kw: ordem.append("ssg")),
+            patch(
+                "mbft_extrator.cli.main",
+                side_effect=lambda *a, **kw: ordem.append("extrator"),
+            ),
+            patch(
+                "mbft_enriquecedor.main.main",
+                side_effect=lambda *a, **kw: ordem.append("enriquecedor"),
+            ),
+            patch(
+                "mbft_indexador.cli.main",
+                side_effect=lambda *a, **kw: ordem.append("indexador"),
+            ),
+            patch(
+                "mbft_ssg.builder.run_build",
+                side_effect=lambda *a, **kw: ordem.append("ssg"),
+            ),
         ):
             main(["pipeline", "tudo", "--skip-embeddings"])
         self.assertEqual(ordem, ["extrator", "enriquecedor", "indexador", "ssg"])
@@ -66,7 +79,12 @@ class TestMbftUnifiedCli(unittest.TestCase):
         with patch("pytest.main", return_value=0) as mock_pytest:
             main(["testes"])
             chamado = mock_pytest.call_args[0][0]
-            self.assertTrue(any("--ignore=" in item and "test_integracao.py" in item for item in chamado))
+            self.assertTrue(
+                any(
+                    "--ignore=" in item and "test_integracao.py" in item
+                    for item in chamado
+                )
+            )
 
     def test_testes_tudo_passa_raiz_repo_como_alvo(self):
         from mbft_core.paths import RAIZ_REPO
@@ -79,7 +97,6 @@ class TestMbftUnifiedCli(unittest.TestCase):
 
 
 class TestCarregamentoEnvLocal(unittest.TestCase):
-
     def test_carrega_env_da_raiz_sem_sobrescrever_o_shell(self):
         import tempfile
         from pathlib import Path
@@ -97,7 +114,11 @@ class TestCarregamentoEnvLocal(unittest.TestCase):
                 _carregar_env_local(env)
 
             self.assertEqual(env["GEMINI_API_KEY"], "chave-do-arquivo")
-            self.assertEqual(env["VAR_TESTE"], "do-shell", "O ambiente do shell deve ter precedência.")
+            self.assertEqual(
+                env["VAR_TESTE"],
+                "do-shell",
+                "O ambiente do shell deve ter precedência.",
+            )
 
     def test_carrega_env_ignora_ausencia_do_arquivo(self):
         import tempfile
@@ -117,7 +138,9 @@ class TestCarregamentoEnvLocal(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             raiz = Path(tmp)
-            (raiz / ".env").write_text("GEMINI_API_KEY=chave-do-arquivo\n", encoding="utf-8")
+            (raiz / ".env").write_text(
+                "GEMINI_API_KEY=chave-do-arquivo\n", encoding="utf-8"
+            )
             with (
                 patch("mbft.cli.RAIZ_REPO", raiz),
                 patch("mbft.cli.subprocess.run") as mock_run,
@@ -126,7 +149,11 @@ class TestCarregamentoEnvLocal(unittest.TestCase):
 
             env_passado = mock_run.call_args.kwargs["env"]
             self.assertEqual(env_passado["GEMINI_API_KEY"], "chave-do-arquivo")
-            self.assertNotIn("--reload", mock_run.call_args.args[0], "--no-reload deve suprimir o auto-reload.")
+            self.assertNotIn(
+                "--reload",
+                mock_run.call_args.args[0],
+                "--no-reload deve suprimir o auto-reload.",
+            )
 
 
 if __name__ == "__main__":

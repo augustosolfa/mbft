@@ -1,6 +1,6 @@
 # Exportadores e Automação de Deploy Cloudflare (`mbft-deploy`)
 
-Módulo responsável pela exportação de artefatos específicos para a nuvem (geração do dump SQL FTS5 `fts_chunks.sql` a partir dos chunks canônicos do indexador), provisionamento de recursos e automação de publicação na **Cloudflare** (D1, Vectorize, KV, Workers e Pages).
+Módulo responsável pela exportação de artefatos específicos para a nuvem (geração do dump SQL FTS5 `fts_chunks.sql` a partir dos chunks canônicos do indexador), provisionamento de recursos e automação de publicação na **Cloudflare** (D1, Vectorize e o Worker único `mbft` com Static Assets).
 
 > **Nota de Arquitetura**: Este arquivo é um guia operacional e de desenvolvimento (*Developer Guide*).
 > Para a documentação completa de arquitetura, motivação do desacoplamento das pipelines e trade-offs, consulte o Documento de Design **PMS-010** em `docs/PMS-010 - Exportacao e Deploy na Cloudflare.md`.
@@ -19,24 +19,28 @@ uv run python -m mbft_deploy export-d1
 # 2. Verificar o estado sem criar ou alterar recursos
 uv run python -m mbft_deploy provision --status
 
-# 3. Provisionar recursos na Cloudflare (D1, Vectorize e projeto Pages)
+# 3. Provisionar recursos na Cloudflare (D1 e Vectorize)
 #    e atualizar apps/api/wrangler.jsonc
 uv run python -m mbft_deploy provision
 
-# 4. Sincronizar dados (gera fts_chunks.sql, aplica schema.sql + fts_chunks.sql no D1 e envia JSONL ao Vectorize)
+# 4. Sincronizar dados (somente recursos alterados; primeira execução faz carga completa)
 uv run python -m mbft_deploy data
+
+# Forçar a sincronização completa de D1 e Vectorize
+uv run python -m mbft_deploy data --force
 
 # Sincronizar apenas no D1 local (Miniflare) para testes locais com Wrangler
 uv run python -m mbft_deploy data --local
 
-# 5. Publicar o Worker da API (apps/api) no Cloudflare Workers
+# 5. Publicar o Worker único `mbft` (FastAPI + assets de data/processed/site) no Cloudflare Workers.
+#    Requer o SSG já compilado (`uv run mbft pipeline ssg`).
 uv run python -m mbft_deploy api
 
-# 6. Publicar o site estático (data/processed/site) no Cloudflare Pages (injetando a URL da API em config.js)
-uv run python -m mbft_deploy site --api-url https://mbft-api.seu-subdominio.workers.dev
+# Configurar também o Custom Domain (precede MBFT_HOSTNAME do .env)
+uv run python -m mbft_deploy api --hostname mbft.seu-dominio.com
 
-# 7. Fluxo completo de publicação (data -> api -> site)
-uv run python -m mbft_deploy tudo --api-url https://mbft-api.seu-subdominio.workers.dev
+# 6. Fluxo completo de publicação (data -> api)
+uv run python -m mbft_deploy tudo
 
 # Simular qualquer comando sem executar chamadas reais ao Wrangler (--dry-run)
 uv run python -m mbft_deploy tudo --dry-run
@@ -47,11 +51,16 @@ uv run python -m mbft_deploy tudo --dry-run
 * As credenciais `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` são carregadas automaticamente do
   `.env` da raiz por qualquer subcomando (variáveis já exportadas no shell têm precedência), dispensando
   `wrangler login` interativo.
-* O subcomando `api` publica um **Python Worker** e exige as dependências já vendorizadas em
-  `apps/api/python_modules/` — o bundler do Workers não resolve o `pyproject.toml` durante o upload
+* `MBFT_HOSTNAME` (opcional, no mesmo `.env`) define o hostname de produção do Worker único. O deploy
+  resolve o alvo pela precedência `--hostname` > `MBFT_HOSTNAME` > nenhum. Havendo hostname, um
+  Custom Domain para `<hostname>` é declarado no manifesto do Wrangler e o `workers_dev` é
+  **desativado**; sem hostname, o Worker permanece acessível apenas em
+  `<worker>.<conta>.workers.dev`.
+* O subcomando `api` publica um **Python Worker** com Static Assets: exige as dependências já
+  vendorizadas em `apps/api/python_modules/` **e** o diretório `data/processed/site/` compilado
+  (`uv run mbft pipeline ssg`). O bundler do Workers não resolve o `pyproject.toml` durante o upload
   (instruções de vendorização em `apps/api/README.md`).
-* O projeto Cloudflare Pages é garantido pelo `provision` e também automaticamente na primeira execução de `site`/`tudo`.
-* O `provision --status` é somente leitura e verifica D1, Vectorize, projeto Pages e se o Worker possui deployment publicado.
+* O `provision --status` é somente leitura e verifica D1, Vectorize e se o Worker possui deployment publicado.
 * Quando `embeddings_mbft.jsonl` excede o teto de 100 MB por upload do Vectorize, o envio é fatiado
   automaticamente em `parte_NN.jsonl` com validação prévia dos limites por vetor.
 
@@ -68,32 +77,42 @@ uv run pytest deploy/tests
 - **Entradas**:
   - `data/processed/indexador/embeddings_mbft.jsonl`: Artefato NDJSON canônico validado contra `ChunkPayload` (`mbft-core`).
   - `apps/api/schema.sql` e `apps/api/wrangler.jsonc`: DDL base do Cloudflare D1 e manifesto do Worker.
+  - `deploy/migrations/deploy_manifest.sql`: Migração própria e idempotente da tabela de controle do deploy.
   - `data/processed/site/`: Diretório estático gerado pelo `mbft-ssg` (PMS-007).
 - **Saídas**:
   - `data/processed/deploy/fts_chunks.sql`: Script SQL idempotente (`DELETE FROM fts_chunks;` + `INSERT`s em lote) pronto para execução via `wrangler d1 execute`.
   - `data/processed/indexador/vectorize/parte_NN.jsonl`: Partes do NDJSON de embeddings, geradas apenas quando o arquivo excede o teto de 100 MB por upload do Cloudflare Vectorize.
-  - `data/processed/site/config.js`: Atualizado com `window.MBFT_CONFIG.apiBaseUrl` quando `--api-url` (ou `MBFT_API_URL`) é informado no deploy do site.
+  - Worker único `mbft` publicado com a API FastAPI e os assets de `data/processed/site/` (incluindo `404.html`); o `config.js` permanece neutro (`apiBaseUrl: ""`), pois o frontend passa a usar a mesma origem sob o prefixo `/api`.
 
 ---
 
 ## 3. Estrutura do Código-Fonte (`src/mbft_deploy/`)
 
-- **`__main__.py`** e **`cli.py`**: Ponto de entrada da CLI (`mbft-deploy` / `python -m mbft_deploy`) com os 6 subcomandos (`export-d1`, `provision`, `data`, `api`, `site`, `tudo`).
-- **`exporters.py`**: Validação de `ChunkPayload`, bloqueio de artefatos de debug, geração atômica de `fts_chunks.sql`, fatiamento do JSONL de vetores (teto de 100 MB do Vectorize) e injeção de `apiBaseUrl` em `site/config.js`.
-- **`wrangler.py`**: Invocação do Cloudflare Wrangler CLI, provisionamento de D1/Vectorize com atualização automática de IDs em `apps/api/wrangler.jsonc` e publicação de Workers/Pages.
+- **`__main__.py`** e **`cli.py`**: Ponto de entrada da CLI (`mbft-deploy` / `python -m mbft_deploy`) com os 5 subcomandos (`export-d1`, `provision`, `data`, `api`, `tudo`).
+- **`exporters.py`**: Validação de `ChunkPayload`, bloqueio de artefatos de debug, geração atômica de `fts_chunks.sql` e fatiamento do JSONL de vetores (teto de 100 MB do Vectorize).
+- **`wrangler.py`**: Invocação do Cloudflare Wrangler CLI, provisionamento de D1/Vectorize com atualização automática de IDs em `apps/api/wrangler.jsonc`, validação da configuração de assets, resolução de hostname (`--hostname` > `MBFT_HOSTNAME`) e publicação do Worker único `mbft` (API + Static Assets). Gera um manifesto efêmero (`apps/api/.wrangler.deploy.jsonc`, não versionado) por deploy para declarar o Custom Domain e ajustar `workers_dev` ao alvo resolvido, passando-o via `--config`.
 
 ---
+
+### Sincronização incremental
+
+O módulo `manifest.py` calcula fingerprints SHA-256 e consulta/atualiza o manifesto remoto por recurso (`d1_schema`, `d1_content` e `vectorize`).
+
+O `data` garante primeiro a tabela `deploy_manifest` no D1 por meio de uma migração própria. Na primeira execução, ou quando um registro estiver ausente, pendente, com falha ou com hash divergente, o recurso é sincronizado. Quando o hash local coincide com um registro `ready`, a operação é ignorada. O registro passa por `pending` e só é marcado como `ready` depois do sucesso; falhas ficam explícitas no manifesto para serem tentadas novamente.
+
+O hash do schema, do dump SQL e do JSONL de embeddings é calculado localmente. O manifesto não faz comparação linha a linha nem armazena os dados dos artefatos. Use `data --force` (ou `tudo --force`) para ignorar os hashes e repetir deliberadamente a carga.
 
 ## 4. Verificação Pós-Deploy e Diagnóstico
 
 ```powershell
-# API publicada: as tres rotas devem responder 200 (o /chat/ depende do indice)
-curl.exe -s https://mbft-api.<conta>.workers.dev/health/
-curl.exe -s "https://mbft-api.<conta>.workers.dev/busca/?q=pneu%20careca"
-curl.exe -s -X POST -H "Content-Type: application/json" --data "@pergunta.json" https://mbft-api.<conta>.workers.dev/chat/
+# Worker único `mbft` (workers.dev ou Custom Domain): assets servidos direto pelo edge
+curl.exe -s -o NUL -w "%{http_code}" https://mbft.seu-dominio.com/index.html
+curl.exe -s -o NUL -w "%{http_code}" https://mbft.seu-dominio.com/fichas/518-51.html
 
-# Site publicado (links internos usam *.html; o Pages responde 308 e resolve para a URL sem extensao)
-curl.exe -s -L -o NUL -w "%{http_code} %{url_effective}" https://mbft-site.pages.dev/chat.html
+# As três rotas de API devem responder 200 sob o prefixo /api (o /chat/ depende do índice)
+curl.exe -s https://mbft.seu-dominio.com/api/health/
+curl.exe -s "https://mbft.seu-dominio.com/api/busca/?q=pneu%20careca"
+curl.exe -s -X POST -H "Content-Type: application/json" --data "@pergunta.json" https://mbft.seu-dominio.com/api/chat/
 ```
 
 * **Contagem de dados no D1:** use `--json` com `--command` para receber as **linhas**; com `--file`, o

@@ -11,7 +11,7 @@ Monorepo para processamento, extração de dados estruturados, indexação híbr
   - **`extrator/`**: `fichas_mbft.json` (402 fichas de fiscalização), `mbft_parte_geral.md` e `imagens/` (300 DPI).
   - **`enriquecedor/`**: `fichas_enriquecidas.json` com metadados normativos e vocabulário expandido.
   - **`indexador/`**: `embeddings_mbft.jsonl` com chunks contextualizados e vetores densos (`BAAI/bge-m3`).
-  - **`site/`**: Páginas estáticas HTML geradas para consulta rápida (`/fichas/XXX.html`, `index.html`, `lista.html`, `chat.html`, `config.js`).
+  - **`site/`**: Páginas estáticas HTML geradas para consulta rápida (`/fichas/XXX.html`, `index.html`, `lista.html`, `chat.html`, `404.html`, `config.js`), publicadas como *Static Assets* pelo Worker único `mbft`.
   - **`deploy/`**: `fts_chunks.sql` exportado para carga na tabela virtual FTS5 do Cloudflare D1.
 - **`pipelines/`**:
   - **`core/` (`mbft-core`)**: Modelos de domínio e contratos Pydantic compartilhados entre os pipelines (PMS-009).
@@ -19,8 +19,8 @@ Monorepo para processamento, extração de dados estruturados, indexação híbr
   - **`enriquecedor/` (`mbft-enriquecedor`)**: Enriquecimento determinístico e semântico das fichas (PMS-003).
   - **`indexador/` (`mbft-indexador`)**: Geração de chunks e embeddings densos a partir das fichas enriquecidas (PMS-004).
   - **`ssg/` (`mbft-ssg`)**: Gerador de site estático HTML via Jinja2 (PMS-007).
-- **`apps/api/` (`mbft-api`)**: API Gateway FastAPI para Cloudflare Workers (Pyodide), consolidando o **Ticketizador** de fila global (PMS-008), o **Recuperador** de busca híbrida RRF (`mbft_api.recuperador`, PMS-005) e o **Gerador** Strict RAG (`mbft_api.gerador`, PMS-006).
-- **`deploy/` (`mbft-deploy`)**: Exportadores de dados para nuvem (`fts_chunks.sql`), provisionamento e automação de deploy na Cloudflare via Wrangler (PMS-010).
+- **`apps/api/` (`mbft-api`)**: Worker único `mbft` (Cloudflare Workers/Pyodide) que serve, na mesma origem, os assets estáticos do SSG e a API Gateway FastAPI, consolidando o **Ticketizador** de fila global (PMS-008), o **Recuperador** de busca híbrida RRF (`mbft_api.recuperador`, PMS-005) e o **Gerador** Strict RAG (`mbft_api.gerador`, PMS-006).
+- **`deploy/` (`mbft-deploy`)**: Exportadores de dados para nuvem (`fts_chunks.sql`), provisionamento e automação de deploy do Worker único (API + Static Assets) na Cloudflare via Wrangler (PMS-010).
 - **`docs/`**: Propostas de Melhoria do Sistema (PMS) documentando todas as decisões de arquitetura (visão geral do mecanismo RAG na `PMS-001` e template na `PMS-000`).
 
 ---
@@ -51,7 +51,8 @@ uv run mbft pipeline ssg
 
 O comando carrega automaticamente o arquivo `.env` da raiz do monorepo (quando presente),
 sem sobrescrever variáveis já exportadas no shell — é assim que `GEMINI_API_KEY` chega ao
-Gerador LLM local. Crie o `.env` na raiz (ele é ignorado pelo Git) antes de subir o ambiente.
+Gerador LLM local. Crie o `.env` na raiz (ele é ignorado pelo Git) tomando `.env.example`
+como referência; o mesmo arquivo pode definir `MBFT_HOSTNAME` para o deploy.
 
 ```bash
 # Subir API FastAPI (porta 8000) + Site Estático (porta 3000) simultaneamente
@@ -83,11 +84,14 @@ uv run mbft testes gerador
 ### 4. Exportação e Deploy na Cloudflare (`mbft deploy`)
 
 ```bash
-# Provisionar recursos na Cloudflare (D1, Vectorize e KV) e atualizar wrangler.jsonc
+# Provisionar recursos na Cloudflare (D1 e Vectorize) e atualizar wrangler.jsonc
 uv run mbft deploy provision
 
-# Exportar SQL FTS5 e publicar Dados (D1/Vectorize) + API (Workers) + Site (Pages)
-uv run mbft deploy tudo --api-url https://mbft-api.seu-subdominio.workers.dev
+# Exportar SQL FTS5 e publicar Dados (D1/Vectorize) + Worker único `mbft` (API + site estático)
+uv run mbft deploy tudo
+
+# Opcional: configurar um Custom Domain (ou definir MBFT_HOSTNAME no .env da raiz)
+uv run mbft deploy tudo --hostname mbft.seu-dominio.com
 ```
 
 Consulte [GEMINI.md](./GEMINI.md) e os guias operacionais de cada módulo ([core](./pipelines/core/README.md), [extrator](./pipelines/extrator/README.md), [enriquecedor](./pipelines/enriquecedor/README.md), [indexador](./pipelines/indexador/README.md), [ssg](./pipelines/ssg/README.md), [api](./apps/api/README.md) e [deploy](./deploy/README.md)) para detalhes técnicos e opções avançadas.

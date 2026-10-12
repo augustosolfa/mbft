@@ -58,9 +58,13 @@
 
     <script src="config.js"></script>
     <script>
-        const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
-            ? "http://127.0.0.1:8000" 
+        // Em dev local usa a porta 8000 (FastAPI direto, sem prefixo); em produção o Worker
+        // único expõe a API sob /api (assets.run_worker_first = ["/api/*"]).
+        const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const API_BASE = IS_LOCAL
+            ? "http://127.0.0.1:8000"
             : ((window.MBFT_CONFIG && window.MBFT_CONFIG.apiBaseUrl) || "").replace(/\/+$/, "");
+        const API_PREFIX = IS_LOCAL ? "" : "/api";
 
         const form = document.getElementById('search-form');
         const input = document.getElementById('busca-input');
@@ -78,7 +82,7 @@
             container.innerHTML = '';
 
             try {
-                const res = await fetch(`${API_BASE}/busca/?q=${encodeURIComponent(query)}`);
+                const res = await fetch(`${API_BASE}${API_PREFIX}/busca/?q=${encodeURIComponent(query)}`);
                 if (!res.ok) throw new Error("Erro na API de Busca");
                 
                 const data = await res.json();

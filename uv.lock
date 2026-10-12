@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -1116,12 +1116,14 @@ name = "mbft-deploy"
 version = "0.1.0"
 source = { editable = "deploy" }
 dependencies = [
+    { name = "mbft-api" },
     { name = "mbft-core" },
     { name = "python-dotenv" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "mbft-api", editable = "apps/api" },
     { name = "mbft-core", editable = "pipelines/core" },
     { name = "python-dotenv", specifier = ">=1.2.4" },
 ]

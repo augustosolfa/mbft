@@ -18,7 +18,7 @@ Para garantir compatibilidade total com o bundler Pyodide do Cloudflare Workers 
 apps/api/
 ├── pyproject.toml               # Produção: fastapi | Dev: uvicorn, google-genai, pytest
 ├── pylock.toml                  # Lockfile das dependências resolvidas para o alvo Pyodide (pylock)
-├── wrangler.jsonc               # Bindings Cloudflare (D1, Vectorize, Workers AI), vars e main=src/entry.py
+├── wrangler.jsonc               # Manifesto do Worker `mbft`: main, assets (Static Assets do SSG), bindings (D1, Vectorize, AI) e vars
 ├── python_modules/              # Vendor das dependências do Worker (gerado por `pywrangler sync`)
 ├── schema.sql                   # Schema D1 idempotente (tabelas fts_chunks e historico_consultas)
 ├── scripts/
@@ -29,9 +29,10 @@ apps/api/
 │   ├── test_integracao.py       # Testes de integração da Busca Híbrida sobre embeddings_mbft.jsonl
 │   └── test_seguranca_chat.py   # Testes de validação de prompt injection e short-circuit
 └── src/
-    ├── entry.py                 # Entrypoint do Worker: workers.asgi -> mbft_api.main:app
+    ├── entry.py                 # Entrypoint do Worker: workers.asgi + normalização do prefixo /api -> mbft_api.main:app
     └── mbft_api/
         ├── main.py              # App FastAPI (lifespan e CORS), servido pelo Worker e pelo uvicorn local
+        ├── asgi_prefix.py       # API_PREFIX ("/api") e middleware ASGI que remove o prefixo externo antes do FastAPI
         ├── database.py          # Adaptador D1 e SQLite para telemetria e cache exato (HistoricoRepository)
         ├── dependencies.py      # Depends() por requisição (get_buscador, get_gerador, get_historico_repo)
         ├── seguranca.py         # Validação heurística edge (teto de caracteres, anti-injection) e short-circuit
@@ -57,6 +58,14 @@ do Workers carrega o arquivo de `main` como módulo raiz, contexto em que import
 (`from .routers import ...`) não têm pacote-pai e reprovam a validação de deploy. O app FastAPI continua
 em `mbft_api.main`, servido pelo Worker (via `workers.asgi`) e pelo `uvicorn` no desenvolvimento local.
 
+O Worker único `mbft` publica, além da API, os assets estáticos do SSG (`assets.directory` →
+`../../data/processed/site`) com roteamento *assets-first* e `run_worker_first = ["/api/*"]`. O adapter
+ASGI em `mbft_api.asgi_prefix` remove o prefixo externo `/api` antes de entregar o `scope` ao FastAPI —
+assim `/api/busca/` chega ao router interno como `/busca/`, e `/busca/` sem prefixo continua funcionando.
+`API_PREFIX` é a fonte única do prefixo e alimenta também a regra `assets.run_worker_first` do manifesto
+(validada pelo `mbft-deploy`). O `workers_dev` não é fixado em `wrangler.jsonc`: o `mbft-deploy` gera um
+manifesto efêmero por deploy e o desativa automaticamente quando um hostname de produção é resolvido.
+
 ---
 
 ## Rotas Disponíveis
@@ -67,6 +76,9 @@ em `mbft_api.main`, servido pelo Worker (via `workers.asgi`) e pelo `uvicorn` no
 | `GET` | `/busca/?q=...&limit=5` | Executa Busca Híbrida (Denso + FTS5 via RRF) e retorna trechos normativos e links `/fichas/{codigo}.html`. |
 | `POST` | `/chat/` | Recebe `{"pergunta": "..."}`, executa o RAG completo e retorna a resposta fundamentada no MBFT. |
 
+No Worker único `mbft`, os routers acima são expostos externamente sob o prefixo `/api` (`/api/health/`,
+`/api/busca/` e `/api/chat/`); os caminhos sem prefixo continuam aceitos programaticamente.
+
 ---
 
 ## Variáveis de Ambiente e Bindings
@@ -74,7 +86,7 @@ em `mbft_api.main`, servido pelo Worker (via `workers.asgi`) e pelo `uvicorn` no
 | Variável / Binding | Obrigatória | Descrição |
 |---|---|---|
 | `CF_LLM_MODEL` | Não (padrão em `wrangler.jsonc`) | Modelo do Cloudflare Workers AI usado por `WorkersAILLMClient` (padrão: `@cf/meta/llama-3.3-70b-instruct-fp8-fast`). |
-| `CORS_ORIGINS` | Não | Lista de origens adicionais permitidas no CORS separadas por vírgula (ex.: `https://mbft-site.pages.dev`). Portas locais (`localhost:3000/5500/8080`) já são incluídas automaticamente. |
+| `CORS_ORIGINS` | Não | Lista de origens adicionais permitidas no CORS separadas por vírgula. Como o site e a API compartilham a mesma origem no Worker `mbft`, normalmente não é necessária; as portas locais (`localhost:3000/5500/8080`) já são incluídas automaticamente. |
 | `LLM_PROVIDER` | Não | Override explícito do provedor de geração (`workers_ai`/`cloudflare` ou `gemini`). Sem override, detecta `env.AI` no Workers e faz fallback para `app.state.gerador` localmente. |
 | `GEMINI_API_KEY` | Apenas no modo local (`gemini`) | Chave da API Google Gemini utilizada por `GeminiLLMClient` (também aceita `GOOGLE_API_KEY`). Carregada automaticamente do `.env` da raiz por `mbft dev`; sem ela, o chat fica indisponível (HTTP 503) e a API registra um aviso na inicialização. |
 | `DB`, `VECTORIZE`, `AI` | Em produção (Workers) | Bindings declarados em `wrangler.jsonc` para Cloudflare D1, Vectorize e Workers AI. |

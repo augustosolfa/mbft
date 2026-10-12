@@ -1,17 +1,18 @@
 import json
 import logging
 from pathlib import Path
+
 from mbft_core.models.enriquecimento import (
-    FichaEnriquecida,
-    GravidadeEnum,
-    PenalidadeEnum,
-    MedidaAdministrativaEnum,
-    InfratorEnum,
-    ConstatacaoInfracaoEnum,
     CompetenciaEnum,
     CompetenciaFonteEnum,
-    NaturezaRegraEnum,
+    ConstatacaoInfracaoEnum,
+    FichaEnriquecida,
+    GravidadeEnum,
+    InfratorEnum,
     ItemRegra,
+    MedidaAdministrativaEnum,
+    NaturezaRegraEnum,
+    PenalidadeEnum,
     ReferenciaCTB,
 )
 from mbft_core.models.extracao import CampoNormativo
@@ -47,7 +48,10 @@ def _criar_ficha_exemplo() -> FichaEnriquecida:
         constatacao_infracao=[ConstatacaoInfracaoEnum.COM_ABORDAGEM],
         artigos_ctb=[ReferenciaCTB(artigo="95")],
         quando_autuar_itens=[
-            ItemRegra(texto="Regra válida 1", natureza_regra=NaturezaRegraEnum.HIPOTESE_AUTUACAO),
+            ItemRegra(
+                texto="Regra válida 1",
+                natureza_regra=NaturezaRegraEnum.HIPOTESE_AUTUACAO,
+            ),
         ],
         quando_nao_autuar_itens=[],
         definicoes_procedimentos_itens=[],
@@ -83,10 +87,18 @@ def test_run_build_emite_logs_info_e_gera_artefatos(tmp_path: Path, caplog):
     assert (output_dir / "lista.html").exists()
     assert (output_dir / "index.html").exists()
     assert (output_dir / "chat.html").exists()
+    assert (output_dir / "404.html").exists()
     assert (output_dir / "config.js").exists()
     assert 'apiBaseUrl: ""' in (output_dir / "config.js").read_text(encoding="utf-8")
-    assert "exemplo.com" not in (output_dir / "index.html").read_text(encoding="utf-8")
-    assert "exemplo.com" not in (output_dir / "chat.html").read_text(encoding="utf-8")
+    index_html = (output_dir / "index.html").read_text(encoding="utf-8")
+    chat_html = (output_dir / "chat.html").read_text(encoding="utf-8")
+    assert "exemplo.com" not in index_html
+    assert "exemplo.com" not in chat_html
+    assert "servidor FastAPI" not in chat_html
+    assert "Uvicorn" not in chat_html
+    assert "CHAT_ERROR_MESSAGES" in chat_html
+    assert "Limite de consultas atingido." in chat_html
+    assert "Não foi possível comunicar com a API no momento." in chat_html
 
 
 def test_run_build_com_parte_geral_renderiza_pagina_e_ancoras_na_ficha(tmp_path: Path):
@@ -99,12 +111,16 @@ def test_run_build_com_parte_geral_renderiza_pagina_e_ancoras_na_ficha(tmp_path:
 
     ficha = _criar_ficha_exemplo()
     ficha.medidas_administrativas = [MedidaAdministrativaEnum.RETENCAO_VEICULO]
-    ficha.medida_administrativa_original = "Retenção do veículo (Vide a Parte Geral deste Manual)."
+    ficha.medida_administrativa_original = (
+        "Retenção do veículo (Vide a Parte Geral deste Manual)."
+    )
     ficha.enquadramentos_correlatos = ["751-02"]
 
     pg = ParteGeralEnriquecida(
         secoes_descartadas=2,
-        glossario=[ItemGlossario(sigla="AIT", significado="Auto de Infração de Trânsito")],
+        glossario=[
+            ItemGlossario(sigla="AIT", significado="Auto de Infração de Trânsito")
+        ],
         secoes=[
             SecaoParteGeral(
                 id="PG_8_1",
@@ -132,7 +148,9 @@ def test_run_build_com_parte_geral_renderiza_pagina_e_ancoras_na_ficha(tmp_path:
     )
 
     fichas_json = tmp_path / "fichas_enriquecidas.json"
-    fichas_json.write_text(json.dumps([ficha.model_dump(mode="json")]), encoding="utf-8")
+    fichas_json.write_text(
+        json.dumps([ficha.model_dump(mode="json")]), encoding="utf-8"
+    )
     pg_json = tmp_path / "parte_geral_enriquecida.json"
     pg_json.write_text(json.dumps(pg.model_dump(mode="json")), encoding="utf-8")
 
@@ -172,7 +190,6 @@ def test_run_build_com_parte_geral_renderiza_pagina_e_ancoras_na_ficha(tmp_path:
     assert 'href="pg_8_1.html"' in pg_secao2_html  # Seção anterior
 
     ficha_html = (output_dir / "fichas" / "751-01.html").read_text(encoding="utf-8")
-    assert '../parte-geral/pg_8_1.html' in ficha_html
-    assert '../parte-geral/index.html' in ficha_html
+    assert "../parte-geral/pg_8_1.html" in ficha_html
+    assert "../parte-geral/index.html" in ficha_html
     assert 'href="751-02.html"' in ficha_html
-

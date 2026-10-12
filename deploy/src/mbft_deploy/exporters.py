@@ -1,8 +1,6 @@
-import json
 import logging
 import os
 from pathlib import Path
-from typing import List
 
 from mbft_core.models.indexacao import ChunkPayload
 
@@ -41,7 +39,7 @@ def exportar_fts_chunks_sql(
     if batch_size <= 0:
         raise ValueError("batch_size deve ser maior que zero.")
 
-    payloads: List[ChunkPayload] = []
+    payloads: list[ChunkPayload] = []
     with open(jsonl_path, "r", encoding="utf-8") as f:
         for num_linha, line in enumerate(f, start=1):
             stripped = line.strip()
@@ -67,13 +65,7 @@ def exportar_fts_chunks_sql(
             for p in lote:
                 meta = p.metadata
                 tuplas.append(
-                    "('{}', '{}', '{}', '{}', '{}')".format(
-                        escapar_sql(p.id),
-                        escapar_sql(meta.codigo),
-                        escapar_sql(meta.artigo),
-                        escapar_sql(meta.secao),
-                        escapar_sql(meta.texto_contextualizado),
-                    )
+                    f"('{escapar_sql(p.id)}', '{escapar_sql(meta.codigo)}', '{escapar_sql(meta.artigo)}', '{escapar_sql(meta.secao)}', '{escapar_sql(meta.texto_contextualizado)}')"
                 )
             valores_sql = ",\n  ".join(tuplas)
             out.write(
@@ -98,7 +90,9 @@ def validar_linha_vectorize(linha: str, origem: Path, num_linha: int) -> None:
     try:
         payload = ChunkPayload.model_validate_json(linha)
     except Exception as exc:
-        raise ValueError(f"Falha de contrato ChunkPayload em '{origem}:{num_linha}': {exc}") from exc
+        raise ValueError(
+            f"Falha de contrato ChunkPayload em '{origem}:{num_linha}': {exc}"
+        ) from exc
 
     bytes_id = len(payload.id.encode("utf-8"))
     if bytes_id > MAX_ID_BYTES:
@@ -115,7 +109,7 @@ def validar_linha_vectorize(linha: str, origem: Path, num_linha: int) -> None:
         )
 
 
-def gravar_parte_vectorize(out_dir: Path, indice: int, lote: List[bytes]) -> Path:
+def gravar_parte_vectorize(out_dir: Path, indice: int, lote: list[bytes]) -> Path:
     """Grava um lote de linhas NDJSON como `<out_dir>/parte_NN.jsonl` sem tradução de newline."""
     destino = out_dir / f"parte_{indice:02d}.jsonl"
     destino.write_bytes(b"".join(lote))
@@ -126,7 +120,7 @@ def dividir_jsonl_vectorize(
     jsonl_path: Path,
     out_dir: Path,
     limite_bytes: int = LIMITE_UPLOAD_VECTORIZE_BYTES,
-) -> List[Path]:
+) -> list[Path]:
     """
     Fatia o NDJSON canônico em partes abaixo do teto de 100 MB por upload do Cloudflare Vectorize,
     sem nunca cortar uma linha ao meio e validando cada vetor contra os limites do serviço.
@@ -140,8 +134,8 @@ def dividir_jsonl_vectorize(
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    partes: List[Path] = []
-    lote: List[bytes] = []
+    partes: list[Path] = []
+    lote: list[bytes] = []
     bytes_lote = 0
 
     with open(jsonl_path, "rb") as arquivo:
@@ -158,21 +152,7 @@ def dividir_jsonl_vectorize(
     if lote:
         partes.append(gravar_parte_vectorize(out_dir, len(partes) + 1, lote))
 
-    logger.info("JSONL fatiado em %d parte(s) para o Vectorize em %s", len(partes), out_dir)
+    logger.info(
+        "JSONL fatiado em %d parte(s) para o Vectorize em %s", len(partes), out_dir
+    )
     return partes
-
-
-def atualizar_config_js_site(site_dir: Path, api_base_url: str) -> Path:
-    """
-    Atualiza `config.js` no diretório do site estático com a URL de produção da API,
-    mantendo a pipeline `mbft-ssg` desacoplada de ambientes de nuvem.
-    """
-    if not site_dir.exists():
-        raise FileNotFoundError(f"Diretório do site estático não encontrado em: {site_dir}")
-
-    url_limpa = (api_base_url or "").strip().rstrip("/")
-    config_path = site_dir / "config.js"
-    conteudo = f"window.MBFT_CONFIG = {{\n  apiBaseUrl: {json.dumps(url_limpa)}\n}};\n"
-    config_path.write_text(conteudo, encoding="utf-8")
-    logger.info("Arquivo %s atualizado com apiBaseUrl=%r", config_path, url_limpa)
-    return config_path

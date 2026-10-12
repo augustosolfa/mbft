@@ -24,8 +24,8 @@ exige etapas de adaptação e transporte que não pertencem a nenhum pipeline is
    compatível com as restrições transacionais da API HTTP do Cloudflare D1;
 2. Provisionamento automatizado de recursos na nuvem e sincronização de identificadores de binding em
    `apps/api/wrangler.jsonc`;
-3. Injeção de configuração de ambiente (`config.js`) no site estático e orquestração do deploy
-   transversal (dados + API Worker + portal Cloudflare Pages).
+3. Publicação do site estático junto do Worker único `mbft`, via Workers Static Assets, no deploy
+   transversal (dados + Worker que reúne a API FastAPI e os assets).
 
 Esta PMS especifica o pacote `mbft-deploy` (`deploy/`), isolando toda a responsabilidade de
 exportação para nuvem e automação do Wrangler fora das pipelines de processamento de dados e fora do
@@ -42,9 +42,9 @@ pacote Pyodide da API.
     valida cada linha contra o contrato `ChunkPayload` (`mbft-core`) e gera `data/processed/deploy/fts_chunks.sql`
     para popular a tabela virtual FTS5 `fts_chunks` no Cloudflare D1.
   * Automatizar via CLI (`mbft-deploy`) o ciclo completo de provisionamento (`provision`), carga de
-    dados (`data`), deploy do Worker FastAPI (`api`) e deploy do portal estático no Pages (`site`).
-  * Permitir a injeção da URL de produção da API em `data/processed/site/config.js` no momento do
-    deploy sem exigir nova execução da pipeline `mbft-ssg`.
+    dados (`data`) e deploy do Worker único `mbft` (`api`), que publica a API FastAPI e o portal estático.
+  * Resolver o hostname de produção por uma precedência explícita (`--hostname` > `MBFT_HOSTNAME` >
+    nenhum), declarando um Custom Domain para `<hostname>` sem exigir a repetição do domínio no comando.
 
 * **Não Objetivos (Non-Goals):**
   * Não é meta gerar embeddings, reprocessar fichas ou renderizar templates HTML dentro do
@@ -63,9 +63,14 @@ Cloudflare:
 ```text
 [ mbft-indexador ] ──> embeddings_mbft.jsonl ──┬──> [ mbft-deploy export-d1 ] ──> fts_chunks.sql ──> Cloudflare D1
                                                └──> [ mbft-deploy data ] ──────────────────────────> Cloudflare Vectorize
-[ mbft-ssg ]       ──> data/processed/site/  ─────> [ mbft-deploy site ] (+ config.js) ────────────> Cloudflare Pages
-[ mbft-api ]       ──> apps/api/             ─────> [ mbft-deploy api ]  ──────────────────────────> Cloudflare Workers
+[ mbft-ssg ]       ──> data/processed/site/  ──┐
+                                               ├──> [ mbft-deploy api ] ───────────────────────────> Worker único `mbft`
+[ mbft-api ]       ──> apps/api/  ─────────────┘                                                       (Static Assets + FastAPI)
 ```
+
+O subcomando `api` publica o Worker único `mbft`, que reúne o FastAPI (PMS-008) e os assets estáticos
+do SSG (PMS-007). O site deixa de ser um projeto Cloudflare Pages separado: o `wrangler deploy` do
+Worker também publica `data/processed/site/` como *Static Assets*.
 
 O subcomando `api` publica o Worker da `mbft-api` (PMS-008), que exige as dependências Python já
 vendorizadas em `apps/api/python_modules/` — o bundler do Workers não resolve o `pyproject.toml` no
@@ -99,14 +104,50 @@ no **WSL2** (ver Alternativa 3).
   isso `mbft-deploy data` publica os dois lados na mesma execução, e a verificação de pós-deploy compara
   a contagem de linhas de `fts_chunks` com a contagem de vetores do índice.
 
-### 3.3. Desacoplamento de Configuração Frontend (`config.js`) e CORS
+* **Manifesto incremental no D1:** O `mbft-deploy` mantém a tabela operacional `deploy_manifest` em uma
+  migração própria, separada do `apps/api/schema.sql`. Há um registro independente para `d1_schema`,
+  `d1_content` e `vectorize`, identificado por `(resource_type, resource_name)` e pelo SHA-256 do
+  artefato local. A migração usa `CREATE TABLE IF NOT EXISTS`; portanto, tabela ou registros ausentes
+  caracterizam bootstrap e fazem a carga necessária, sem erro.
+* **Estados e recarga explícita:** Um recurso só pode ser ignorado quando seu hash coincide e o estado é
+  `ready`. O fluxo grava `pending` antes de iniciar, `ready` após sucesso e `failed` com a mensagem do
+  erro quando uma operação falha. Como D1 e Vectorize não compartilham transação, cada recurso tem seu
+  próprio ciclo de confirmação. `data --force` e `tudo --force` ignoram os hashes e repetem a sincronização.
+
+### 3.3. Origem Única do Frontend (`config.js`) e CORS
 * A pipeline `mbft-ssg` (PMS-007) gera um arquivo neutro `data/processed/site/config.js` com
-  `window.MBFT_CONFIG = { apiBaseUrl: "" }`.
-* Quando acionado com `--api-url` (ou via variável `MBFT_API_URL`), o subcomando `mbft-deploy site`
-  sobrescreve apenas o `config.js` antes de invocar `wrangler pages deploy`, preservando a imutabilidade
-  do HTML gerado pela pipeline.
+  `window.MBFT_CONFIG = { apiBaseUrl: "" }`; o `mbft-deploy` não o sobrescreve mais.
+* Como o site e a API passam a ser servidos pelo mesmo Worker, o frontend opera em **origem única**:
+  em produção, `apiBaseUrl` vazio resolve para a própria origem e as chamadas usam o prefixo externo
+  `/api` (`/api/busca/`, `/api/chat/`). Em desenvolvimento local, o frontend continua apontando para
+  `http://127.0.0.1:8000` sem prefixo.
 * Na `mbft-api` (PMS-008), o middleware `EnvAwareCORSMiddleware` combina dinamicamente as portas
   locais de desenvolvimento com a variável `CORS_ORIGINS` declarada no ambiente ou em `wrangler.jsonc`.
+  A origem do antigo Pages (`https://mbft-site.pages.dev`) foi removida por ser obsoleta.
+
+### 3.4. Worker Único, Static Assets e Resolução de Hostname
+* O Worker `mbft` configura `assets.directory` apontando diretamente para `data/processed/site`
+  (relativo a `apps/api/wrangler.jsonc`), sem duplicar o artefato canônico do SSG em `apps/api/public/`.
+* O roteamento é *assets-first*: arquivos existentes são servidos diretamente e apenas caminhos sem
+  asset executam o FastAPI. `assets.run_worker_first = ["/api/*"]` garante que as chamadas de API sob
+  `/api` tenham prioridade sem obrigar toda navegação a atravessar o Worker.
+* `assets.not_found_handling = "404-page"` faz com que navegações sem asset recebam o `404.html` gerado
+  pelo SSG, evitando invocação desnecessária do Worker.
+* **Prefixo externo único:** `API_PREFIX = "/api"` é declarado no adapter ASGI
+  (`mbft_api.asgi_prefix`) e alimenta tanto a normalização das requisições quanto a regra
+  `assets.run_worker_first` do manifesto (`RUN_WORKER_FIRST_PATTERNS`). O `mbft-deploy` valida que o
+  manifesto espelha essa constante, impedindo divergência entre o edge e a aplicação. Os routers do
+  FastAPI permanecem declarados sem prefixo (`/busca/`, `/chat/`, `/health/`); o adapter remove apenas
+  o `/api` externo, preservando também os caminhos sem prefixo.
+* **Resolução de hostname:** a precedência é `--hostname` explícito > `MBFT_HOSTNAME` > nenhum
+  hostname. Havendo hostname, o deploy declara automaticamente um Custom Domain para `<hostname>` **e
+  desativa o `workers_dev`** (para não expor o Worker em `<worker>.<conta>.workers.dev`); sem hostname,
+  o `workers_dev` permanece habilitado como único endereço. Como o Wrangler não oferece flag de CLI
+  para alternar `workers_dev` — e a declaração do Custom Domain pertence ao arquivo de configuração —,
+  o `mbft-deploy` grava um manifesto efêmero ao lado de `wrangler.jsonc` (preservando o
+  `assets.directory` relativo) com o valor coerente com o alvo, o passa via `--config` e o remove em
+  seguida. O domínio nunca é versionado: o `.env` é ignorado pelo Git e o `.env.example` contém apenas
+  placeholders.
 
 ---
 
@@ -118,7 +159,7 @@ no **WSL2** (ver Alternativa 3).
     pipeline deve apenas produzir os dados canônicos da sua etapa.
 * **Alternativa 2: Alocar os scripts de deploy dentro de `apps/api/`.**
   * *Por que foi rejeitada:* O processo de deploy é transversal ao monorepo (envolve dados do
-    `indexador`, páginas estáticas do `ssg` para o Cloudflare Pages e o Worker da `api`). Colocar
+    `indexador`, os assets estáticos do `ssg` e o Worker da `api`). Colocar
     essa orquestração dentro de `apps/api` inverteria a hierarquia de responsabilidades e misturaria
     ferramentas locais de build/CLI com o diretório empacotado pelo Pyodide para o Cloudflare Workers.
 * **Alternativa 3: Vendorizar `python_modules/` nativamente no Windows, sem WSL2.**
@@ -128,12 +169,18 @@ no **WSL2** (ver Alternativa 3).
     tanto no `uv` 0.12.17 quanto no 0.13.0). Contornar fixando a plataforma (`--python-platform
     wasm32-pyodide2025`) também não serve: as wheels do alvo real (`pyemscripten_2026_0_wasm32`) não casam
     com as tags expostas pelo `uv`, o que deixa `pydantic-core` sem wheel e quebra a resolução. Restou
-    executar essa única etapa em ambiente POSIX (WSL2), mantendo o deploy do Worker e do Pages nativo.
+    executar essa única etapa em ambiente POSIX (WSL2), mantendo o deploy do Worker nativo no Windows.
 * **Alternativa 4: Servir o Worker sem FastAPI, reescrevendo a borda em JavaScript.**
   * *Por que foi rejeitada:* Duplicaria em outra linguagem a lógica já testada de RRF, normalização de
     tokens FTS5, diversificação por ficha e montagem de prompt (PMS-005 e PMS-006), criando duas fontes
     da verdade para o mesmo comportamento. Desde 28-Ago-2026 o FastAPI é suportado oficialmente em Python
     Workers via `workers.asgi`, então o custo de manter a borda em Python é um adaptador de poucas linhas.
+* **Alternativa 5: Manter o site em Cloudflare Pages separado e publicar apenas a API no Worker.**
+  * *Por que foi superada:* Dois projetos e dois domínios forçavam a injeção da URL da API em `config.js`
+    no deploy, o cadastro da origem do Pages em `CORS_ORIGINS` e a manutenção de dois fluxos de
+    publicação. Um Worker único com Workers Static Assets serve site e API na mesma origem, elimina a
+    injeção de configuração de ambiente e preserva o roteamento *assets-first* (o HTML continua sendo
+    servido pelo edge, sem custo de invocação do Worker).
 
 ---
 
@@ -149,14 +196,24 @@ no **WSL2** (ver Alternativa 3).
   e promovido via `os.replace`, evitando arquivos SQL truncados em caso de interrupção.
 * **Credenciais Não Interativas e Escopo Fechado:** Antes de despachar qualquer subcomando, a CLI carrega
   **apenas** as variáveis de deploy de um allow-list explícito (`CLOUDFLARE_API_TOKEN`,
-  `CLOUDFLARE_ACCOUNT_ID` e `MBFT_API_URL`) a partir do `.env` da raiz, dispensando `wrangler login` em
+  `CLOUDFLARE_ACCOUNT_ID` e `MBFT_HOSTNAME`) a partir do `.env` da raiz, dispensando `wrangler login` em
   execução automatizada; variáveis já definidas no shell têm precedência e nunca são sobrescritas. A lista
   é fechada de propósito: despejar o `.env` inteiro no processo vazaria segredos de outras etapas (por
   exemplo `GEMINI_API_KEY`) para o Wrangler e para todo subprocesso, e ainda tornaria o resultado de um
   teste dependente da ordem de execução de outro.
-* **Projeto Pages Idempotente:** O subcomando `site` garante a existência do projeto Cloudflare Pages
-  (criando-o com `--production-branch=main` quando ausente e tratando o erro `already exists` como
-  sucesso) antes de publicar os assets de `data/processed/site`.
+* **Roteamento Assets-First, 404 Estático e Prefixo Único:** O Worker prioriza os assets estáticos e só
+  invoca o FastAPI para caminhos declarados em `assets.run_worker_first` (`/api/*`) ou para requisições
+  programáticas sem asset correspondente; navegações sem asset recebem o `404.html` do SSG
+  (`not_found_handling = "404-page"`). O prefixo `/api` é uma constante de código consumida tanto pelo
+  adapter ASGI quanto pela geração/validação de `assets.run_worker_first`, e o `mbft-deploy` falha se o
+  manifesto divergir — evitando que edge e aplicação aceitem caminhos diferentes.
+* **Custom Domain fora do Versionamento e Remoção Manual:** O hostname de produção nunca é gravado no
+  manifesto versionado: a CLI o resolve por `--hostname` > `MBFT_HOSTNAME` (lendo apenas essa chave do
+  `.env`) e valida valores malformados. Durante o deploy, o manifesto efêmero declara o hostname como
+  Custom Domain (`routes[].custom_domain = true`) e desativa `workers_dev`, permitindo `--dry-run` para
+  inspecionar a configuração final. A migração não exclui
+  automaticamente o projeto Pages `mbft-site` nem o Worker `mbft-api`; essa limpeza é uma operação
+  manual, executada apenas após confirmar que o Worker único responde corretamente.
 * **Invocação do Wrangler no Windows:** `npx` é um script `.cmd`, que o `CreateProcess` não inicia
   diretamente (`WinError 2`). Quando o resolvedor encontra um `.cmd`/`.bat`, o comando é entregue como
   texto único ao `cmd.exe`, preservando as aspas dos caminhos com espaço. A saída do Wrangler é sempre

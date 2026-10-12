@@ -48,16 +48,60 @@
 
     <script src="config.js"></script>
     <script>
-        // Em dev local usa a porta 8000; fora de localhost usa window.MBFT_CONFIG.apiBaseUrl (ou mesma origem se vazio).
-        const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
-            ? "http://127.0.0.1:8000" 
+        // Em dev local usa a porta 8000 (FastAPI direto, sem prefixo); em produção o Worker
+        // único expõe a API sob /api (assets.run_worker_first = ["/api/*"]), com mesma origem
+        // quando window.MBFT_CONFIG.apiBaseUrl está vazio.
+        const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const API_BASE = IS_LOCAL
+            ? "http://127.0.0.1:8000"
             : ((window.MBFT_CONFIG && window.MBFT_CONFIG.apiBaseUrl) || "").replace(/\/+$/, "");
+        const API_PREFIX = IS_LOCAL ? "" : "/api";
 
         const form = document.getElementById('chat-form');
         const btnEnviar = document.getElementById('btn-enviar');
         const loadingEl = document.getElementById('loading');
         const respostaContainer = document.getElementById('resposta-container');
         const respostaTexto = document.getElementById('resposta-texto');
+
+        const CHAT_ERROR_MESSAGES = Object.freeze({
+            401: "A API não autorizou esta consulta. Tente novamente mais tarde.",
+            403: "A API não autorizou esta consulta. Tente novamente mais tarde.",
+            429: "Limite de consultas atingido. Aguarde alguns instantes antes de tentar novamente.",
+            500: "O serviço do Oráculo está temporariamente indisponível. Tente novamente mais tarde.",
+            502: "O serviço do Oráculo está temporariamente indisponível. Tente novamente mais tarde.",
+            503: "O serviço do Oráculo está temporariamente indisponível. Tente novamente mais tarde.",
+            504: "O serviço do Oráculo está temporariamente indisponível. Tente novamente mais tarde."
+        });
+
+        function obterMensagemErroHttp(status) {
+            if (CHAT_ERROR_MESSAGES[status]) {
+                return CHAT_ERROR_MESSAGES[status];
+            }
+            if (status >= 500) {
+                return "O serviço do Oráculo está temporariamente indisponível. Tente novamente mais tarde.";
+            }
+            return "A API não conseguiu processar a consulta. Verifique a pergunta e tente novamente.";
+        }
+
+        async function lerJsonSeguro(response) {
+            try {
+                return await response.json();
+            } catch {
+                return null;
+            }
+        }
+
+        function exibirErro(mensagem) {
+            respostaTexto.innerHTML = '';
+            const spanErr = document.createElement('span');
+            spanErr.style.color = 'red';
+            const strongErr = document.createElement('strong');
+            strongErr.textContent = 'Erro: ';
+            spanErr.appendChild(strongErr);
+            spanErr.appendChild(document.createTextNode(mensagem));
+            respostaTexto.appendChild(spanErr);
+            respostaContainer.style.display = 'block';
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -69,7 +113,7 @@
             loadingEl.style.display = 'block';
 
             try {
-                const chatRes = await fetch(`${API_BASE}/chat/`, {
+                const chatRes = await fetch(`${API_BASE}${API_PREFIX}/chat/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -77,36 +121,20 @@
                     body: JSON.stringify({ pergunta: pergunta })
                 });
 
-                if (chatRes.status === 429) {
-                    throw new Error("Limite de requisições atingido. Por favor, aguarde alguns instantes antes de tentar novamente.");
-                }
-
-                const chatData = await chatRes.json();
+                const chatData = await lerJsonSeguro(chatRes);
                 loadingEl.style.display = 'none';
 
-                if (chatRes.ok) {
+                if (chatRes.ok && chatData && typeof chatData.resposta === 'string') {
                     respostaTexto.innerText = chatData.resposta;
                     respostaContainer.style.display = 'block';
+                } else if (!chatRes.ok) {
+                    exibirErro(obterMensagemErroHttp(chatRes.status));
                 } else {
-                    respostaTexto.innerText = "Erro: " + (chatData.detail || "Falha na geração.");
-                    respostaContainer.style.display = 'block';
+                    exibirErro("A API retornou uma resposta inválida. Tente novamente mais tarde.");
                 }
             } catch (err) {
                 loadingEl.style.display = 'none';
-                let msg = err.message;
-                if (msg.includes("Failed to fetch")) {
-                    msg = "Não foi possível conectar à API. O servidor FastAPI (Uvicorn) está rodando na porta 8000?";
-                }
-
-                respostaTexto.innerHTML = '';
-                const spanErr = document.createElement('span');
-                spanErr.style.color = 'red';
-                const strongErr = document.createElement('strong');
-                strongErr.textContent = 'Erro: ';
-                spanErr.appendChild(strongErr);
-                spanErr.appendChild(document.createTextNode(msg));
-                respostaTexto.appendChild(spanErr);
-                respostaContainer.style.display = 'block';
+                exibirErro("Não foi possível comunicar com a API no momento. Tente novamente mais tarde.");
             } finally {
                 btnEnviar.disabled = false;
             }

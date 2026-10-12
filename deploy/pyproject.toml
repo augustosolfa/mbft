@@ -1,7 +1,7 @@
 [project]
 name = "mbft-deploy"
 version = "0.1.0"
-description = "Exportadores de dados para Cloudflare (D1 SQL) e automação de provisionamento e deploy (D1, Vectorize, KV, Workers e Pages)."
+description = "Exportadores de dados para Cloudflare (D1 SQL) e automação de provisionamento e deploy (D1, Vectorize e Workers)."
 readme = "README.md"
 authors = [
     { name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net" }
@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "mbft-core",
+    "mbft-api",
     "python-dotenv>=1.2.4",
 ]
 

@@ -1,12 +1,19 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mbft-api",
+  "name": "mbft",
   "main": "src/entry.py",
   "compatibility_date": "2026-10-11",
   "compatibility_flags": [
     "nodejs_compat",
     "python_workers"
   ],
+  "assets": {
+    "directory": "../../data/processed/site",
+    "run_worker_first": [
+      "/api/*"
+    ],
+    "not_found_handling": "404-page"
+  },
   "observability": {
     "enabled": true,
     "logs": {
@@ -36,7 +43,6 @@
   },
   "vars": {
     "ENVIRONMENT": "production",
-    "CF_LLM_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "CORS_ORIGINS": "https://mbft-site.pages.dev"
+    "CF_LLM_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
   }
 }
