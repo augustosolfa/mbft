@@ -73,7 +73,19 @@
             504: "O serviço do Oráculo está temporariamente indisponível. Tente novamente mais tarde."
         });
 
-        function obterMensagemErroHttp(status) {
+        function obterMensagemErroHttp(status, retryAfter) {
+            if (status === 429 && Number(retryAfter) > 0) {
+                const seg = Number(retryAfter);
+                let espera;
+                if (seg <= 120) {
+                    espera = `${Math.ceil(seg)} s`;
+                } else if (seg <= 7200) {
+                    espera = `${Math.ceil(seg / 60)} min`;
+                } else {
+                    espera = `${Math.ceil(seg / 3600)} h`;
+                }
+                return `Limite de consultas atingido. Tente novamente em ${espera}.`;
+            }
             if (CHAT_ERROR_MESSAGES[status]) {
                 return CHAT_ERROR_MESSAGES[status];
             }
@@ -128,7 +140,7 @@
                     respostaTexto.innerText = chatData.resposta;
                     respostaContainer.style.display = 'block';
                 } else if (!chatRes.ok) {
-                    exibirErro(obterMensagemErroHttp(chatRes.status));
+                    exibirErro(obterMensagemErroHttp(chatRes.status, chatRes.headers.get('Retry-After')));
                 } else {
                     exibirErro("A API retornou uma resposta inválida. Tente novamente mais tarde.");
                 }

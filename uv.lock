@@ -1081,6 +1081,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "cryptography" },
     { name = "google-genai" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -1093,6 +1094,7 @@ requires-dist = [{ name = "fastapi", specifier = ">=0.142.4" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "cryptography", specifier = ">=50.0.2" },
     { name = "google-genai", specifier = ">=2.28.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },

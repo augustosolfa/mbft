@@ -13,6 +13,8 @@ Substitui: Nenhum
 
 > **Decisão de Arquitetura (Descontinuação):** O mecanismo de fila serial via D1 (`fila_global`), invalidação por KV (`KV_TICKETS`) e emissão de ingressos JWT foi descontinuado e rejeitado. A mitigação de bots e contenção de concorrência foi delegada nativamente à infraestrutura de borda da Cloudflare (WAF Custom Rules, Rate Limiting e Bot Management), eliminando latência de I/O e custo computacional dentro do Worker Pyodide.
 
+> **Nota (PMS-011):** a contenção por usuário (intervalo e cota diária por IP ou e-mail do Cloudflare Access) passou a ser feita na aplicação sobre o D1, de forma complementar ao WAF; o Ticketizador permanece descontinuado.
+
 ## 1. Contexto e Escopo
 
 Com o sistema de Recuperação (RAG) e a Geração (LLM) desenhados, e com as páginas estáticas pré-processadas (PMS-007), o MBFT necessita de um ponto de entrada unificado: uma API hospedada no **Cloudflare Workers**. 

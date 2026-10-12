@@ -6,7 +6,8 @@ API Gateway e Motor **RAG Híbrido** (Recuperador + Gerador) do Manual Brasileir
 > Para a documentação completa de arquitetura, decisões de design e trade-offs dos subsistemas unificados neste serviço, consulte os Documentos de Design:
 > - **PMS-005** (`docs/PMS-005 - Design do recuperador.md`) — Motor de Busca Híbrida RRF (`mbft_api.recuperador`);
 > - **PMS-006** (`docs/PMS-006 - Design do gerador.md`) — Orquestrador Strict RAG e engenharia de prompt (`mbft_api.gerador`);
-> - **PMS-008** (`docs/PMS-008 - API e Ticketizador.md`) — API Gateway FastAPI (o controle de taxa de tickets na aplicação foi descontinuado e delegado ao WAF/Rate Limiting da Cloudflare).
+> - **PMS-008** (`docs/PMS-008 - API e Ticketizador.md`) — API Gateway FastAPI (o controle de taxa de tickets na aplicação foi descontinuado e delegado ao WAF/Rate Limiting da Cloudflare);
+> - **PMS-011** (`docs/PMS-011 - Rate Limit por Identidade.md`) — Rate limit por identidade (IP ou Cloudflare Access) sobre D1 (`mbft_api.rate_limit`, `mbft_api.access_jwt`).
 
 ---
 
@@ -16,25 +17,30 @@ Para garantir compatibilidade total com o bundler Pyodide do Cloudflare Workers 
 
 ```text
 apps/api/
-├── pyproject.toml               # Produção: fastapi | Dev: uvicorn, google-genai, pytest
+├── pyproject.toml               # Produção: fastapi | Dev: uvicorn, google-genai, pytest, cryptography
 ├── pylock.toml                  # Lockfile das dependências resolvidas para o alvo Pyodide (pylock)
 ├── wrangler.jsonc               # Manifesto do Worker `mbft`: main, assets (Static Assets do SSG), bindings (D1, Vectorize, AI) e vars
 ├── python_modules/              # Vendor das dependências do Worker (gerado por `pywrangler sync`)
-├── schema.sql                   # Schema D1 idempotente (tabelas fts_chunks e historico_consultas)
+├── schema.sql                   # Schema D1 idempotente (tabelas fts_chunks, historico_consultas e rate_limit_eventos)
 ├── scripts/
 │   └── testar_gerador.py        # Script de validação local do Gerador com Gemini
 ├── tests/
+│   ├── conftest.py              # Fixtures e isolamento do limitador real nos testes legados
+│   ├── test_access_jwt.py       # Testes unitários de validação do JWT RS256 do Cloudflare Access
 │   ├── test_buscador.py         # Testes unitários RRF, diversificação, FTS5, adaptadores CF e DI
 │   ├── test_cache_auditoria.py  # Testes de cache exato SHA-256 e auditoria/telemetria D1/SQLite
 │   ├── test_integracao.py       # Testes de integração da Busca Híbrida sobre embeddings_mbft.jsonl
+│   ├── test_rate_limit.py       # Testes de rate limit (intervalos, cota diária e headers 429)
 │   └── test_seguranca_chat.py   # Testes de validação de prompt injection e short-circuit
 └── src/
     ├── entry.py                 # Entrypoint do Worker: workers.asgi + normalização do prefixo /api -> mbft_api.main:app
     └── mbft_api/
         ├── main.py              # App FastAPI (lifespan e CORS), servido pelo Worker e pelo uvicorn local
+        ├── access_jwt.py        # Validador de JWT RS256 e cache de JWKS do Cloudflare Access (Python puro)
         ├── asgi_prefix.py       # API_PREFIX ("/api") e middleware ASGI que remove o prefixo externo antes do FastAPI
         ├── database.py          # Adaptador D1 e SQLite para telemetria e cache exato (HistoricoRepository)
         ├── dependencies.py      # Depends() por requisição (get_buscador, get_gerador, get_historico_repo)
+        ├── rate_limit.py        # Controle de taxa por IP/e-mail no D1/SQLite (LimitadorTaxa, RateLimitRepository)
         ├── seguranca.py         # Validação heurística edge (teto de caracteres, anti-injection) e short-circuit
         ├── routers/
         │   ├── health.py        # GET  /health
@@ -90,6 +96,30 @@ No Worker único `mbft`, os routers acima são expostos externamente sob o prefi
 | `LLM_PROVIDER` | Não | Override explícito do provedor de geração (`workers_ai`/`cloudflare` ou `gemini`). Sem override, detecta `env.AI` no Workers e faz fallback para `app.state.gerador` localmente. |
 | `GEMINI_API_KEY` | Apenas no modo local (`gemini`) | Chave da API Google Gemini utilizada por `GeminiLLMClient` (também aceita `GOOGLE_API_KEY`). Carregada automaticamente do `.env` da raiz por `mbft dev`; sem ela, o chat fica indisponível (HTTP 503) e a API registra um aviso na inicialização. |
 | `DB`, `VECTORIZE`, `AI` | Em produção (Workers) | Bindings declarados em `wrangler.jsonc` para Cloudflare D1, Vectorize e Workers AI. |
+| `ACCESS_TEAM_DOMAIN` | Não (vazio = ninguém reconhecido como logado) | Team domain do Access, ex.: `meutime.cloudflareaccess.com`. |
+| `ACCESS_AUD` | Não | Tag AUD do app no Access (várias, separadas por vírgula). |
+| `RATE_LIMIT_SALT` | **Sim em produção** (secret) | Sal do HMAC das identidades. Gerar: `uv run python -c "import secrets; print(secrets.token_hex(32))"` e gravar com `npx wrangler secret put RATE_LIMIT_SALT`. |
+
+---
+
+## Rate Limit
+
+A API aplica controle de taxa e cota diária por identidade sobre a tabela `rate_limit_eventos` no D1/SQLite (PMS-011):
+
+| Identidade | Recurso | Intervalo Mínimo | Cota Diária (24 h deslizante) |
+|---|---|---|---|
+| Anônimo (`ip`) | `/busca/` | 1 a cada 30 s | 15 por dia |
+| Anônimo (`ip`) | `/chat/` | 1 a cada 30 s | 1 por dia |
+| Logado (`email`) | `/busca/` | 1 a cada 10 s | 60 por dia |
+| Logado (`email`) | `/chat/` | 1 a cada 30 s | 5 por dia |
+
+- **Excedido (429):** Requisições que ultrapassam o intervalo ou a cota diária retornam HTTP `429 Too Many Requests` com o header `Retry-After` (segundos restantes) e mensagem explicativa em português.
+- **Cache HIT:** Consultas ao `/chat/` atendidas pelo cache exato respeitam o intervalo mínimo mas **não consomem** a cota diária.
+- **Resiliência (503):** Em caso de falha de I/O ou indisponibilidade do D1, o limitador falha fechado (bloqueia e retorna HTTP `503 Service Unavailable`).
+- **Execução dos testes:**
+  ```bash
+  uv run pytest apps/api/tests/test_rate_limit.py apps/api/tests/test_access_jwt.py
+  ```
 
 ---
 

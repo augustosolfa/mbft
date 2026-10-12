@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import shutil
 import subprocess
 from pathlib import Path
@@ -33,6 +34,27 @@ ERRO_WORKER_INEXISTENTE = "[code: 10007]"
 def escapar_sql(valor: str) -> str:
     """Escapa aspas simples para literais SQL enviados ao D1."""
     return valor.replace("'", "''")
+
+
+RE_COMENTARIOS_JSONC = re.compile(
+    r'("(?:\\.|[^"\\])*")|//.*?$|/\*.*?\*/',
+    re.MULTILINE | re.DOTALL,
+)
+
+
+def _remover_comentarios_jsonc(texto: str) -> str:
+    """Remove comentários // e /* */ de um texto JSONC preservando strings literais."""
+    return RE_COMENTARIOS_JSONC.sub(lambda m: m.group(1) if m.group(1) else "", texto)
+
+
+def _carregar_jsonc(caminho_ou_texto: str | Path) -> dict:
+    """Lê arquivo ou string no formato JSONC (suportando comentários do Wrangler)."""
+    texto = (
+        caminho_ou_texto.read_text(encoding="utf-8")
+        if isinstance(caminho_ou_texto, Path)
+        else caminho_ou_texto
+    )
+    return json.loads(_remover_comentarios_jsonc(texto))
 
 
 def _ler_json_wrangler(saida: str, descricao: str) -> object:
@@ -253,8 +275,7 @@ def atualizar_ids_wrangler_jsonc(
             f"Arquivo wrangler.jsonc não encontrado em {wrangler_path}"
         )
 
-    conteudo = wrangler_path.read_text(encoding="utf-8")
-    dados = json.loads(conteudo)
+    dados = _carregar_jsonc(wrangler_path)
 
     if database_id:
         for db_entry in dados.get("d1_databases", []):
@@ -404,7 +425,7 @@ def verificar_status_recursos_cloudflare(
             f"Arquivo wrangler.jsonc não encontrado em {wrangler_config_path}"
         )
 
-    config = json.loads(wrangler_config_path.read_text(encoding="utf-8"))
+    config = _carregar_jsonc(wrangler_config_path)
     worker_name = worker_name or config.get("name", "mbft")
     saidas = {
         "d1": _itens_wrangler(
@@ -506,7 +527,7 @@ def validar_assets_do_worker(wrangler_path: Path) -> None:
     (fonte única declarada pelo adapter ASGI), evitando divergência entre o roteamento do
     edge e a normalização de `/api` aplicada pelo FastAPI.
     """
-    dados = json.loads(wrangler_path.read_text(encoding="utf-8"))
+    dados = _carregar_jsonc(wrangler_path)
     assets = dados.get("assets") or {}
     esperado = list(RUN_WORKER_FIRST_PATTERNS)
     if assets.get("run_worker_first") != esperado:
@@ -530,7 +551,8 @@ def montar_manifest_deploy(config: dict, hostname: str | None) -> dict:
     Devolve uma cópia do manifesto com `workers_dev` coerente com o alvo do deploy:
     desabilitado quando há hostname (para não expor o Worker em `workers.dev`) e habilitado
     quando não há (único endereço disponível). Quando há hostname, também declara um
-    Custom Domain no formato aceito pelo Wrangler. A origem nunca é mutada.
+    Custom Domain no formato aceito pelo Wrangler. Injeta automaticamente um sal seguro
+    em `vars.RATE_LIMIT_SALT` para rate limit (PMS-011) quando ausente. A origem nunca é mutada.
     """
     dados = dict(config)
     dados["workers_dev"] = hostname is None
@@ -543,6 +565,19 @@ def montar_manifest_deploy(config: dict, hostname: str | None) -> dict:
         ]
         rotas.append({"pattern": hostname, "custom_domain": True})
         dados["routes"] = rotas
+
+    vars_atuais = dict(dados.get("vars") or {})
+    if not vars_atuais.get("RATE_LIMIT_SALT"):
+        sal_env = os.environ.get("RATE_LIMIT_SALT") or os.environ.get("MBFT_RATE_LIMIT_SALT")
+        vars_atuais["RATE_LIMIT_SALT"] = sal_env or secrets.token_hex(32)
+
+    for chave_access in ("ACCESS_TEAM_DOMAIN", "ACCESS_AUD"):
+        if not vars_atuais.get(chave_access):
+            val = os.environ.get(chave_access)
+            if val:
+                vars_atuais[chave_access] = str(val).strip()
+
+    dados["vars"] = vars_atuais
     return dados
 
 
@@ -551,7 +586,7 @@ def _escrever_manifest_deploy(wrangler_path: Path, hostname: str | None) -> Path
     Grava o manifesto efêmero ao lado do original (mesmo diretório, para preservar o
     `assets.directory` relativo) com `workers_dev` ajustado ao alvo resolvido.
     """
-    dados = json.loads(wrangler_path.read_text(encoding="utf-8"))
+    dados = _carregar_jsonc(wrangler_path)
     destino = wrangler_path.parent / NOME_CONFIG_DEPLOY
     destino.write_text(
         json.dumps(

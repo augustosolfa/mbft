@@ -290,14 +290,21 @@ def _executar_data(
         )
 
 
-VARIAVEIS_DE_DEPLOY = ("CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID", "MBFT_HOSTNAME")
+VARIAVEIS_DE_DEPLOY = (
+    "CLOUDFLARE_API_TOKEN",
+    "CLOUDFLARE_ACCOUNT_ID",
+    "MBFT_HOSTNAME",
+    "ACCESS_TEAM_DOMAIN",
+    "ACCESS_AUD",
+)
 
 
 def _carregar_env_de_deploy() -> None:
     """
-    Carrega do `.env` da raiz apenas as variáveis usadas pelo deploy (credenciais da Cloudflare e
-    `MBFT_HOSTNAME`), preservando variáveis já definidas no shell. A lista é fechada de propósito:
-    despejar o `.env` inteiro no processo vazaria segredos de outras etapas (ex.: `GEMINI_API_KEY`).
+    Carrega do `.env` da raiz apenas as variáveis usadas pelo deploy (credenciais da Cloudflare,
+    `MBFT_HOSTNAME` e credenciais opcionais do Cloudflare Access), preservando variáveis já
+    definidas no shell. A lista é fechada de propósito: despejar o `.env` inteiro no processo
+    vazaria segredos de outras etapas (ex.: `GEMINI_API_KEY`).
     """
     env_file = RAIZ_REPO / ".env"
     if not env_file.is_file():

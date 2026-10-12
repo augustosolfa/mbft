@@ -12,6 +12,7 @@ from ..database import HistoricoRepository
 from ..dependencies import get_buscador, get_gerador, get_historico_repo
 from ..gerador.orquestrador import OrquestradorGeracao
 from ..gerador.prompts import FRASE_CANONICA_RECUSA, SYSTEM_PROMPT_TEMPLATE
+from ..rate_limit import LimitadorTaxa, get_limitador
 from ..recuperador.buscador import BuscadorHibrido
 from ..seguranca import avaliar_relevancia_contexto, validar_pergunta
 
@@ -31,6 +32,7 @@ async def fazer_pergunta(
     buscador: BuscadorHibrido = Depends(get_buscador),
     gerador: OrquestradorGeracao = Depends(get_gerador),
     historico_repo: HistoricoRepository = Depends(get_historico_repo),
+    limitador: Optional[LimitadorTaxa] = Depends(get_limitador),
 ):
     # Fallback defensivo para chamadas diretas em testes sem injeção FastAPI
     if not isinstance(historico_repo, HistoricoRepository):
@@ -50,10 +52,18 @@ async def fazer_pergunta(
         logger.warning(f"Falha ao consultar cache de histórico: {exc}")
 
     if registro_cache and registro_cache.get("resposta"):
+        # HIT custa zero de LLM: respeita só o intervalo, não gasta a cota diária (PMS-011).
+        if isinstance(limitador, LimitadorTaxa):
+            await limitador.consumir("chat", conta_cota=False)
+
         if response is not None:
             response.headers["X-Cache"] = "HIT"
             response.headers["X-Cache-Hit"] = "true"
         return {"resposta": registro_cache["resposta"]}
+
+    # MISS: consome intervalo + cota diária antes de qualquer custo (Vectorize/Workers AI).
+    if isinstance(limitador, LimitadorTaxa):
+        await limitador.consumir("chat", conta_cota=True)
 
     # 3. Execução Normal (Miss): RAG Híbrido
     contexto_bruto = await buscador.recuperar_contexto(payload.pergunta, limit=5)

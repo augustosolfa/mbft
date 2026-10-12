@@ -56,6 +56,9 @@ uv run python -m mbft_deploy tudo --dry-run
   Custom Domain para `<hostname>` é declarado no manifesto do Wrangler e o `workers_dev` é
   **desativado**; sem hostname, o Worker permanece acessível apenas em
   `<worker>.<conta>.workers.dev`.
+* `ACCESS_TEAM_DOMAIN` e `ACCESS_AUD` (opcionais, no mesmo `.env`) configuram a validação de JWT do
+  Cloudflare Access (PMS-011) para o rate limit, sendo injetadas automaticamente no manifesto efêmero
+  durante o deploy da API sem expor credenciais em `wrangler.jsonc`.
 * O subcomando `api` publica um **Python Worker** com Static Assets: exige as dependências já
   vendorizadas em `apps/api/python_modules/` **e** o diretório `data/processed/site/` compilado
   (`uv run mbft pipeline ssg`). O bundler do Workers não resolve o `pyproject.toml` durante o upload
@@ -90,7 +93,7 @@ uv run pytest deploy/tests
 
 - **`__main__.py`** e **`cli.py`**: Ponto de entrada da CLI (`mbft-deploy` / `python -m mbft_deploy`) com os 5 subcomandos (`export-d1`, `provision`, `data`, `api`, `tudo`).
 - **`exporters.py`**: Validação de `ChunkPayload`, bloqueio de artefatos de debug, geração atômica de `fts_chunks.sql` e fatiamento do JSONL de vetores (teto de 100 MB do Vectorize).
-- **`wrangler.py`**: Invocação do Cloudflare Wrangler CLI, provisionamento de D1/Vectorize com atualização automática de IDs em `apps/api/wrangler.jsonc`, validação da configuração de assets, resolução de hostname (`--hostname` > `MBFT_HOSTNAME`) e publicação do Worker único `mbft` (API + Static Assets). Gera um manifesto efêmero (`apps/api/.wrangler.deploy.jsonc`, não versionado) por deploy para declarar o Custom Domain e ajustar `workers_dev` ao alvo resolvido, passando-o via `--config`.
+- **`wrangler.py`**: Invocação do Cloudflare Wrangler CLI, provisionamento de D1/Vectorize com atualização automática de IDs em `apps/api/wrangler.jsonc`, validação da configuração de assets, resolução de hostname (`--hostname` > `MBFT_HOSTNAME`) e publicação do Worker único `mbft` (API + Static Assets). Gera um manifesto efêmero (`apps/api/.wrangler.deploy.jsonc`, não versionado) por deploy para declarar o Custom Domain, ajustar `workers_dev` ao alvo resolvido e injetar `RATE_LIMIT_SALT` on-the-fly (PMS-011) quando ausente, passando-o via `--config`.
 
 ---
 

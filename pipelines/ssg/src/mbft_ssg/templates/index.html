@@ -83,6 +83,12 @@
 
             try {
                 const res = await fetch(`${API_BASE}${API_PREFIX}/busca/?q=${encodeURIComponent(query)}`);
+                if (res.status === 429) {
+                    const retry = res.headers.get('Retry-After');
+                    const seg = retry && Number(retry) > 0 ? Math.ceil(Number(retry)) : 30;
+                    container.innerHTML = `<p><em>Limite de buscas atingido. Tente novamente em ${seg} s.</em></p>`;
+                    return;
+                }
                 if (!res.ok) throw new Error("Erro na API de Busca");
                 
                 const data = await res.json();

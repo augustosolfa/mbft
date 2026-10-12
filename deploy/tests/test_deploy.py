@@ -21,6 +21,7 @@ from mbft_deploy.manifest import (
 from mbft_deploy.wrangler import (
     MBFT_HOSTNAME_ENV,
     NOME_CONFIG_DEPLOY,
+    _carregar_jsonc,
     fazer_deploy_api,
     fazer_deploy_d1,
     fazer_deploy_vectorize,
@@ -219,6 +220,47 @@ class TestMbftDeploy(unittest.TestCase):
         )
         self.assertNotIn("routes", base, "A origem não deve ser mutada.")
         self.assertNotIn("workers_dev", base, "A origem não deve ser mutada.")
+        self.assertNotIn("vars", base, "A origem não deve ser mutada.")
+        self.assertIn("RATE_LIMIT_SALT", com_hostname["vars"])
+        self.assertEqual(len(com_hostname["vars"]["RATE_LIMIT_SALT"]), 64)
+
+    def test_montar_manifest_deploy_preserva_rate_limit_salt_preexistente(self):
+        base = _config_wrangler_valido()
+        base["vars"] = {"RATE_LIMIT_SALT": "sal-fixo-preexistente"}
+        res = montar_manifest_deploy(base, None)
+        self.assertEqual(res["vars"]["RATE_LIMIT_SALT"], "sal-fixo-preexistente")
+
+    def test_montar_manifest_deploy_injeta_access_vars_do_ambiente(self):
+        base = _config_wrangler_valido()
+        with patch.dict(
+            os.environ,
+            {
+                "ACCESS_TEAM_DOMAIN": "meutime.cloudflareaccess.com",
+                "ACCESS_AUD": "aud-tag-teste",
+            },
+        ):
+            res = montar_manifest_deploy(base, None)
+            self.assertEqual(
+                res["vars"]["ACCESS_TEAM_DOMAIN"], "meutime.cloudflareaccess.com"
+            )
+            self.assertEqual(res["vars"]["ACCESS_AUD"], "aud-tag-teste")
+
+    def test_carregar_jsonc_ignora_comentarios_de_linha_e_bloco(self):
+        jsonc = """{
+            // Comentário de linha no início
+            "name": "mbft",
+            /* Comentário de bloco */
+            "vars": {
+                "URL": "https://meutime.cloudflareaccess.com//api", // comentário com barra
+                "ATIVO": true
+            }
+        }"""
+        dados = _carregar_jsonc(jsonc)
+        self.assertEqual(dados["name"], "mbft")
+        self.assertEqual(
+            dados["vars"]["URL"], "https://meutime.cloudflareaccess.com//api"
+        )
+        self.assertTrue(dados["vars"]["ATIVO"])
 
     def test_comandos_wrangler_vectorize_d1_e_api_com_custom_domain(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -655,6 +697,8 @@ class TestMbftDeploy(unittest.TestCase):
                 "CLOUDFLARE_API_TOKEN=token-do-arquivo\n"
                 "CLOUDFLARE_ACCOUNT_ID=conta-do-arquivo\n"
                 "MBFT_HOSTNAME=mbft.exemplo.com\n"
+                "ACCESS_TEAM_DOMAIN=meutime.cloudflareaccess.com\n"
+                "ACCESS_AUD=aud-tag-teste\n"
                 "GEMINI_API_KEY=segredo-de-outro-passo\n",
                 encoding="utf-8",
             )
@@ -670,6 +714,10 @@ class TestMbftDeploy(unittest.TestCase):
                 self.assertEqual(os.environ["CLOUDFLARE_API_TOKEN"], "token-do-arquivo")
                 self.assertEqual(os.environ["CLOUDFLARE_ACCOUNT_ID"], "conta-do-shell")
                 self.assertEqual(os.environ["MBFT_HOSTNAME"], "mbft.exemplo.com")
+                self.assertEqual(
+                    os.environ["ACCESS_TEAM_DOMAIN"], "meutime.cloudflareaccess.com"
+                )
+                self.assertEqual(os.environ["ACCESS_AUD"], "aud-tag-teste")
                 self.assertNotIn("GEMINI_API_KEY", os.environ)
 
     def test_invocacao_do_comando_delega_script_cmd_ao_shell(self):

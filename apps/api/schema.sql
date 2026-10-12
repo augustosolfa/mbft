@@ -31,3 +31,17 @@ CREATE TABLE IF NOT EXISTS historico_consultas (
 );
 
 CREATE INDEX IF NOT EXISTS idx_consultas_query_hash ON historico_consultas (query_hash);
+
+-- Eventos de rate limit por identidade (PMS-011). `identidade` guarda HMAC, nunca IP/e-mail em claro.
+CREATE TABLE IF NOT EXISTS rate_limit_eventos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    identidade TEXT NOT NULL,
+    recurso TEXT NOT NULL,
+    criado_em INTEGER NOT NULL,
+    conta_cota INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_rl_identidade_recurso_tempo
+    ON rate_limit_eventos (identidade, recurso, criado_em);
+CREATE INDEX IF NOT EXISTS idx_rl_criado_em ON rate_limit_eventos (criado_em);
+
