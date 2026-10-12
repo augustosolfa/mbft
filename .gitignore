@@ -38,6 +38,4 @@ data/processed/deploy/
 fila.db
 repomix-output.xml
 
-.github/
 .pytest_cache/
-.vscode/

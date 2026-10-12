@@ -1,0 +1,33 @@
+# Política padrão: força LF no repositório e no working tree (vence core.autocrlf)
+* text=auto eol=lf
+
+# Arquivos de código, marcação e configuração do projeto
+*.py text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.yaml text eol=lf
+*.sql text eol=lf
+*.lock text eol=lf
+py.typed text eol=lf
+.python-version text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Exceção necessária: interpretadores de script nativos do Windows exigem CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binários: desativa heurística de diff e conversão de fim de linha
+*.png binary
+*.pdf binary
+*.parquet binary
+*.sqlite binary
+*.db binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.ico binary
