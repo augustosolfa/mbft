@@ -1,10 +1,36 @@
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from unittest.mock import patch
 
 from mbft.cli import main
 
 
 class TestMbftUnifiedCli(unittest.TestCase):
+    def test_sem_argumentos_exibe_help_sem_erro(self):
+        stdout = StringIO()
+        stderr = StringIO()
+
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            main([])
+
+        self.assertIn("usage: mbft", stdout.getvalue())
+        self.assertEqual(stderr.getvalue(), "")
+
+    def test_deploy_help_lista_subcomandos_e_explica_escopo_das_opcoes(self):
+        stdout = StringIO()
+
+        with redirect_stdout(stdout), self.assertRaises(SystemExit) as contexto:
+            main(["deploy", "-h"])
+
+        self.assertEqual(contexto.exception.code, 0)
+        help_text = stdout.getvalue()
+        self.assertIn("export-d1", help_text)
+        self.assertIn("provision", help_text)
+        self.assertIn("data -> api -> site", help_text)
+        self.assertIn("não são globais", help_text)
+        self.assertIn("mbft deploy <subcomando> --help", help_text)
+
     def test_pipeline_extrator_delega_com_default_tudo(self):
         with patch("mbft_extrator.cli.main") as mock_ext:
             main(["pipeline", "extrator", "--workers", "2", "--force"])

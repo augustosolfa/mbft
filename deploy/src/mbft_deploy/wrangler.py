@@ -22,6 +22,24 @@ RE_UUID = re.compile(
 )
 
 
+def _ler_json_wrangler(saida: str, descricao: str) -> object:
+    try:
+        return json.loads(saida)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Saída inválida do Wrangler ao consultar {descricao}: {exc}") from exc
+
+
+def _itens_wrangler(dados: object) -> List[dict]:
+    if isinstance(dados, list):
+        return [item for item in dados if isinstance(item, dict)]
+    if isinstance(dados, dict):
+        for chave in ("result", "items", "projects", "indexes", "databases", "deployments"):
+            valor = dados.get(chave)
+            if isinstance(valor, list):
+                return [item for item in valor if isinstance(item, dict)]
+    return []
+
+
 def resolver_binario_wrangler() -> List[str]:
     """Localiza o executável `wrangler` no PATH (ou via `npx wrangler`)."""
     if shutil.which("wrangler") is not None:
@@ -187,6 +205,7 @@ def provisionar_recursos_cloudflare(
     wrangler_config_path: Optional[Path] = None,
     db_name: str = "mbft-d1",
     index_name: str = "mbft-embeddings",
+    project_name: str = "mbft-site",
     dry_run: bool = False,
 ) -> Dict[str, Optional[str]]:
     """
@@ -213,6 +232,7 @@ def provisionar_recursos_cloudflare(
         f"Provisionar índice Vectorize ({index_name})",
         dry_run=dry_run,
     )
+    garantir_projeto_pages(project_name, dry_run=dry_run)
 
     m_d1 = RE_UUID.search(out_d1)
     database_id = m_d1.group(1) if m_d1 else None
@@ -224,6 +244,102 @@ def provisionar_recursos_cloudflare(
         )
 
     return {"database_id": database_id}
+
+
+def verificar_status_recursos_cloudflare(
+    wrangler_config_path: Optional[Path] = None,
+    db_name: str = "mbft-d1",
+    index_name: str = "mbft-embeddings",
+    worker_name: Optional[str] = None,
+    project_name: str = "mbft-site",
+) -> Dict[str, object]:
+    """Consulta a infraestrutura Cloudflare sem criar, alterar ou publicar recursos."""
+    if wrangler_config_path is None:
+        wrangler_config_path = RAIZ_REPO / "apps" / "api" / "wrangler.jsonc"
+    if not wrangler_config_path.exists():
+        raise FileNotFoundError(f"Arquivo wrangler.jsonc não encontrado em {wrangler_config_path}")
+
+    config = json.loads(wrangler_config_path.read_text(encoding="utf-8"))
+    worker_name = worker_name or config.get("name", "mbft-api")
+    saidas = {
+        "d1": _itens_wrangler(
+            _ler_json_wrangler(
+                rodar_comando_wrangler(["wrangler", "d1", "list", "--json"], "Consultar bancos D1"),
+                "bancos D1",
+            )
+        ),
+        "vectorize": _itens_wrangler(
+            _ler_json_wrangler(
+                rodar_comando_wrangler(
+                    ["wrangler", "vectorize", "list", "--json"], "Consultar índices Vectorize"
+                ),
+                "índices Vectorize",
+            )
+        ),
+        "pages": _itens_wrangler(
+            _ler_json_wrangler(
+                rodar_comando_wrangler(
+                    ["wrangler", "pages", "project", "list", "--json"], "Consultar projetos Pages"
+                ),
+                "projetos Pages",
+            )
+        ),
+        "worker": _itens_wrangler(
+            _ler_json_wrangler(
+                rodar_comando_wrangler(
+                    ["wrangler", "deployments", "list", "--name", worker_name, "--json"],
+                    "Consultar deployments do Worker",
+                ),
+                "deployments do Worker",
+            )
+        ),
+    }
+
+    d1 = next(
+        (
+            item
+            for item in saidas["d1"]
+            if item.get("name") == db_name or item.get("database_name") == db_name
+        ),
+        None,
+    )
+    d1_config = next((item for item in config.get("d1_databases", []) if item.get("database_name") == db_name), {})
+    vectorize = next(
+        (
+            item
+            for item in saidas["vectorize"]
+            if item.get("name") == index_name or item.get("index_name") == index_name
+        ),
+        None,
+    )
+    pages = next(
+        (
+            item
+            for item in saidas["pages"]
+            if item.get("name") == project_name or item.get("Project Name") == project_name
+        ),
+        None,
+    )
+    worker = bool(saidas["worker"])
+    vectorize_config = vectorize.get("config", {}) if vectorize else {}
+    d1_id = d1.get("database_id") or d1.get("uuid") if d1 else None
+
+    checks = {
+        "d1": bool(d1) and d1_id == d1_config.get("database_id"),
+        "vectorize": bool(vectorize)
+        and (vectorize.get("dimensions") or vectorize_config.get("dimensions")) == 1024
+        and str(vectorize.get("metric") or vectorize_config.get("metric", "")).lower() == "cosine",
+        "pages": bool(pages),
+        "worker": worker,
+    }
+    return {
+        "ok": all(checks.values()),
+        "checks": checks,
+        "d1": d1,
+        "vectorize": vectorize,
+        "pages": pages,
+        "worker": worker,
+    }
 
 
 def fazer_deploy_api(

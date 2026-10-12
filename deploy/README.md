@@ -16,22 +16,26 @@ Execute os comandos a partir da raiz do monorepo via `uv run mbft-deploy` (ou `u
 # 1. Exportar apenas o dump SQL FTS5 para o D1 (gera data/processed/deploy/fts_chunks.sql)
 uv run python -m mbft_deploy export-d1
 
-# 2. Provisionar recursos na Cloudflare (D1, Vectorize 1024d cosine e KV) e atualizar apps/api/wrangler.jsonc
+# 2. Verificar o estado sem criar ou alterar recursos
+uv run python -m mbft_deploy provision --status
+
+# 3. Provisionar recursos na Cloudflare (D1, Vectorize e projeto Pages)
+#    e atualizar apps/api/wrangler.jsonc
 uv run python -m mbft_deploy provision
 
-# 3. Sincronizar dados (gera fts_chunks.sql, aplica schema.sql + fts_chunks.sql no D1 e envia JSONL ao Vectorize)
+# 4. Sincronizar dados (gera fts_chunks.sql, aplica schema.sql + fts_chunks.sql no D1 e envia JSONL ao Vectorize)
 uv run python -m mbft_deploy data
 
 # Sincronizar apenas no D1 local (Miniflare) para testes locais com Wrangler
 uv run python -m mbft_deploy data --local
 
-# 4. Publicar o Worker da API (apps/api) no Cloudflare Workers
+# 5. Publicar o Worker da API (apps/api) no Cloudflare Workers
 uv run python -m mbft_deploy api
 
-# 5. Publicar o site estático (data/processed/site) no Cloudflare Pages (injetando a URL da API em config.js)
+# 6. Publicar o site estático (data/processed/site) no Cloudflare Pages (injetando a URL da API em config.js)
 uv run python -m mbft_deploy site --api-url https://mbft-api.seu-subdominio.workers.dev
 
-# 6. Fluxo completo de publicação (data -> api -> site)
+# 7. Fluxo completo de publicação (data -> api -> site)
 uv run python -m mbft_deploy tudo --api-url https://mbft-api.seu-subdominio.workers.dev
 
 # Simular qualquer comando sem executar chamadas reais ao Wrangler (--dry-run)
@@ -46,7 +50,8 @@ uv run python -m mbft_deploy tudo --dry-run
 * O subcomando `api` publica um **Python Worker** e exige as dependências já vendorizadas em
   `apps/api/python_modules/` — o bundler do Workers não resolve o `pyproject.toml` durante o upload
   (instruções de vendorização em `apps/api/README.md`).
-* O projeto Cloudflare Pages é criado automaticamente na primeira execução de `site`/`tudo`.
+* O projeto Cloudflare Pages é garantido pelo `provision` e também automaticamente na primeira execução de `site`/`tudo`.
+* O `provision --status` é somente leitura e verifica D1, Vectorize, projeto Pages e se o Worker possui deployment publicado.
 * Quando `embeddings_mbft.jsonl` excede o teto de 100 MB por upload do Vectorize, o envio é fatiado
   automaticamente em `parte_NN.jsonl` com validação prévia dos limites por vetor.
 

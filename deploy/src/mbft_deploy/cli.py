@@ -13,6 +13,7 @@ from .wrangler import (
     fazer_deploy_site,
     fazer_deploy_vectorize,
     provisionar_recursos_cloudflare,
+    verificar_status_recursos_cloudflare,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -49,6 +50,8 @@ def construir_parser() -> argparse.ArgumentParser:
     p_prov.add_argument("--wrangler-config", type=Path, default=DEFAULT_API_DIR / "wrangler.jsonc")
     p_prov.add_argument("--db-name", default="mbft-d1")
     p_prov.add_argument("--index-name", default="mbft-embeddings")
+    p_prov.add_argument("--project-name", default="mbft-site")
+    p_prov.add_argument("--status", action="store_true", help="Consulta o estado sem criar ou alterar recursos.")
     p_prov.add_argument("--dry-run", action="store_true", help="Apenas exibe os comandos Wrangler sem executá-los.")
 
     # 3. data
@@ -159,12 +162,25 @@ def main(argv: Optional[List[str]] = None) -> None:
         if args.subcomando == "export-d1":
             exportar_fts_chunks_sql(args.input, args.output, batch_size=args.batch_size)
         elif args.subcomando == "provision":
-            provisionar_recursos_cloudflare(
-                wrangler_config_path=args.wrangler_config,
-                db_name=args.db_name,
-                index_name=args.index_name,
-                dry_run=args.dry_run,
-            )
+            if args.status:
+                status = verificar_status_recursos_cloudflare(
+                    wrangler_config_path=args.wrangler_config,
+                    db_name=args.db_name,
+                    index_name=args.index_name,
+                    project_name=args.project_name,
+                )
+                for recurso, ok in status["checks"].items():
+                    logger.info("%s: %s", recurso, "OK" if ok else "INCOMPLETO")
+                if not status["ok"]:
+                    sys.exit(1)
+            else:
+                provisionar_recursos_cloudflare(
+                    wrangler_config_path=args.wrangler_config,
+                    db_name=args.db_name,
+                    index_name=args.index_name,
+                    project_name=args.project_name,
+                    dry_run=args.dry_run,
+                )
         elif args.subcomando == "data":
             _executar_data(
                 input_jsonl=args.input,

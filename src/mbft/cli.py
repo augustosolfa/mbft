@@ -107,12 +107,34 @@ def _configurar_parser_pipeline(subparsers: argparse._SubParsersAction) -> None:
 def _configurar_parser_deploy(subparsers: argparse._SubParsersAction) -> None:
     p_dep = subparsers.add_parser(
         "deploy",
-        help="Exporta artefatos de nuvem (fts_chunks.sql), provisiona e publica na Cloudflare.",
+        help="Exporta artefatos de nuvem, provisiona e publica na Cloudflare.",
+        description="Exporta artefatos, provisiona recursos e publica o MBFT na Cloudflare.",
+        epilog="""\
+Subcomandos:
+  export-d1   Gera o dump SQL FTS5 a partir de embeddings_mbft.jsonl.
+  provision   Provisiona D1, Vectorize e Pages; --status apenas consulta o estado.
+  data        Gera/aplica o SQL e envia embeddings ao Vectorize.
+  api         Publica o Worker da API.
+  site        Publica o site estático.
+  tudo        Executa data -> api -> site.
+
+As opções pertencem ao subcomando correspondente; não são globais. Use:
+  mbft deploy <subcomando> --help
+
+Padrões principais:
+  data/tudo       usam o D1 remoto (--remote) e embeddings_mbft.jsonl padrão.
+  data            envia vetores ao Vectorize, salvo se --skip-vectorize.
+  site/tudo       usam data/processed/site e o projeto mbft-site.
+  provision       usa mbft-d1, mbft-embeddings e mbft-site.
+  --dry-run       simula operações nos subcomandos que suportam essa opção.
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p_dep.add_argument(
         "deploy_args",
         nargs=argparse.REMAINDER,
-        help="Subcomando e flags repassados ao mbft-deploy (export-d1, provision, data, api, site, tudo).",
+        metavar="SUBCOMANDO [OPÇÕES ...]",
+        help="Subcomando e opções repassados ao mbft-deploy; consulte a lista acima.",
     )
 
 
@@ -166,7 +188,7 @@ def construir_parser() -> argparse.ArgumentParser:
         prog="mbft",
         description="CLI centralizada do monorepo MBFT (pipeline, deploy, testes e dev).",
     )
-    subparsers = parser.add_subparsers(dest="grupo", required=True)
+    subparsers = parser.add_subparsers(dest="grupo")
     _configurar_parser_pipeline(subparsers)
     _configurar_parser_deploy(subparsers)
     _configurar_parser_testes(subparsers)
@@ -380,6 +402,10 @@ def _executar_dev(args: argparse.Namespace) -> None:
 def main(argv: Optional[List[str]] = None) -> None:
     parser = construir_parser()
     args = parser.parse_args(argv)
+
+    if args.grupo is None:
+        parser.print_help()
+        return
 
     if args.grupo == "pipeline":
         _executar_pipeline(args)

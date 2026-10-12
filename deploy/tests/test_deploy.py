@@ -22,6 +22,7 @@ from mbft_deploy.wrangler import (
     garantir_projeto_pages,
     invocacao_do_comando,
     provisionar_recursos_cloudflare,
+    verificar_status_recursos_cloudflare,
 )
 
 
@@ -177,6 +178,7 @@ class TestMbftDeploy(unittest.TestCase):
             saidas = [
                 'database_id = "12345678-1234-1234-1234-123456789abc"',
                 "Created index mbft-embeddings",
+                "",
             ]
             with patch("mbft_deploy.wrangler.rodar_comando_wrangler", side_effect=saidas):
                 ids = provisionar_recursos_cloudflare(wrangler_config_path=wrangler_file)
@@ -188,6 +190,93 @@ class TestMbftDeploy(unittest.TestCase):
                 atualizado["d1_databases"][0]["database_id"],
                 "12345678-1234-1234-1234-123456789abc",
             )
+
+    def test_status_verifica_recursos_sem_criar_nada(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wrangler_file = Path(tmpdir) / "wrangler.jsonc"
+            wrangler_file.write_text(
+                json.dumps(
+                    {
+                        "name": "mbft-api",
+                        "d1_databases": [
+                            {
+                                "binding": "DB",
+                                "database_name": "mbft-d1",
+                                "database_id": "12345678-1234-1234-1234-123456789abc",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            saidas = [
+                json.dumps([{"uuid": "12345678-1234-1234-1234-123456789abc", "name": "mbft-d1"}]),
+                json.dumps(
+                    [
+                        {
+                            "name": "mbft-embeddings",
+                            "config": {"dimensions": 1024, "metric": "cosine"},
+                        }
+                    ]
+                ),
+                json.dumps([{"Project Name": "mbft-site"}]),
+                json.dumps([{"id": "deployment-1"}]),
+            ]
+            with patch("mbft_deploy.wrangler.rodar_comando_wrangler", side_effect=saidas) as mock_cmd:
+                status = verificar_status_recursos_cloudflare(
+                    wrangler_config_path=wrangler_file,
+                )
+
+            self.assertTrue(status["ok"])
+            self.assertEqual(status["checks"], {"d1": True, "vectorize": True, "pages": True, "worker": True})
+            self.assertTrue(all("create" not in call.args[0] for call in mock_cmd.call_args_list))
+
+    def test_status_aceita_formatos_diretos_das_propriedades(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wrangler_file = Path(tmpdir) / "wrangler.jsonc"
+            wrangler_file.write_text(
+                json.dumps(
+                    {
+                        "name": "mbft-api",
+                        "d1_databases": [{"database_name": "mbft-d1", "database_id": "id-local"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            saidas = [
+                json.dumps([{"name": "mbft-d1", "database_id": "id-local"}]),
+                json.dumps([{"name": "mbft-embeddings", "dimensions": 1024, "metric": "cosine"}]),
+                json.dumps([{"name": "mbft-site"}]),
+                json.dumps([{"id": "deployment-1"}]),
+            ]
+            with patch("mbft_deploy.wrangler.rodar_comando_wrangler", side_effect=saidas):
+                status = verificar_status_recursos_cloudflare(wrangler_config_path=wrangler_file)
+
+            self.assertTrue(status["ok"])
+
+    def test_status_reprova_recurso_ausente_ou_configuracao_invalida(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            wrangler_file = Path(tmpdir) / "wrangler.jsonc"
+            wrangler_file.write_text(
+                json.dumps(
+                    {
+                        "name": "mbft-api",
+                        "d1_databases": [{"database_name": "mbft-d1", "database_id": "id-local"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            saidas = [
+                json.dumps([{"name": "mbft-d1", "database_id": "id-remoto"}]),
+                json.dumps([{"name": "mbft-embeddings", "dimensions": 768, "metric": "cosine"}]),
+                json.dumps([]),
+                json.dumps([]),
+            ]
+            with patch("mbft_deploy.wrangler.rodar_comando_wrangler", side_effect=saidas):
+                status = verificar_status_recursos_cloudflare(wrangler_config_path=wrangler_file)
+
+            self.assertFalse(status["ok"])
+            self.assertEqual(status["checks"], {"d1": False, "vectorize": False, "pages": False, "worker": False})
 
     def test_dividir_jsonl_vectorize_respeita_limite_sem_cortar_linhas(self):
         with tempfile.TemporaryDirectory() as tmpdir:
