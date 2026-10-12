@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import List, Optional
@@ -43,12 +44,11 @@ def construir_parser() -> argparse.ArgumentParser:
     # 2. provision
     p_prov = subparsers.add_parser(
         "provision",
-        help="Provisiona D1, Vectorize e KV na Cloudflare e atualiza IDs em apps/api/wrangler.jsonc.",
+        help="Provisiona D1 e Vectorize na Cloudflare e atualiza IDs em apps/api/wrangler.jsonc.",
     )
     p_prov.add_argument("--wrangler-config", type=Path, default=DEFAULT_API_DIR / "wrangler.jsonc")
     p_prov.add_argument("--db-name", default="mbft-d1")
     p_prov.add_argument("--index-name", default="mbft-embeddings")
-    p_prov.add_argument("--kv-binding", default="KV_TICKETS")
     p_prov.add_argument("--dry-run", action="store_true", help="Apenas exibe os comandos Wrangler sem executá-los.")
 
     # 3. data
@@ -125,9 +125,35 @@ def _executar_data(
         fazer_deploy_vectorize(input_jsonl, index_name=index_name, dry_run=dry_run)
 
 
+VARIAVEIS_DE_DEPLOY = ("CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID", "MBFT_API_URL")
+
+
+def _carregar_env_de_deploy() -> None:
+    """
+    Carrega do `.env` da raiz apenas as variáveis usadas pelo deploy (credenciais da Cloudflare e
+    `MBFT_API_URL`), preservando variáveis já definidas no shell. A lista é fechada de propósito:
+    despejar o `.env` inteiro no processo vazaria segredos de outras etapas (ex.: `GEMINI_API_KEY`).
+    """
+    env_file = RAIZ_REPO / ".env"
+    if not env_file.is_file():
+        return
+    try:
+        from dotenv import dotenv_values
+    except ImportError:
+        logger.warning("python-dotenv ausente: '.env' ignorado. Exporte as credenciais no shell.")
+        return
+
+    valores = dotenv_values(env_file)
+    for chave in VARIAVEIS_DE_DEPLOY:
+        valor = valores.get(chave)
+        if valor and chave not in os.environ:
+            os.environ[chave] = valor
+
+
 def main(argv: Optional[List[str]] = None) -> None:
     parser = construir_parser()
     args = parser.parse_args(argv)
+    _carregar_env_de_deploy()
 
     try:
         if args.subcomando == "export-d1":
@@ -137,7 +163,6 @@ def main(argv: Optional[List[str]] = None) -> None:
                 wrangler_config_path=args.wrangler_config,
                 db_name=args.db_name,
                 index_name=args.index_name,
-                kv_binding=args.kv_binding,
                 dry_run=args.dry_run,
             )
         elif args.subcomando == "data":

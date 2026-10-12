@@ -11,6 +11,11 @@ wheels/
 # Virtual environments
 .venv/
 
+# Artefatos gerados pelo Cloudflare Workers / pywrangler (mbft-api)
+python_modules/
+.venv-workers/
+.wrangler/
+
 # Cache de extração intermediária
 .cache_extracao/
 pipelines/*/.cache_extracao/
@@ -35,3 +40,4 @@ repomix-output.xml
 
 .github/
 .pytest_cache/
+.vscode/

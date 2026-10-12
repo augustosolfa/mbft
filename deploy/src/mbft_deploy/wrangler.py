@@ -5,17 +5,21 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
 from mbft_core.paths import RAIZ_REPO
-from .exporters import atualizar_config_js_site, validar_jsonl_producao
+from .exporters import (
+    LIMITE_UPLOAD_VECTORIZE_BYTES,
+    atualizar_config_js_site,
+    dividir_jsonl_vectorize,
+    validar_jsonl_producao,
+)
 
 logger = logging.getLogger(__name__)
 
 RE_UUID = re.compile(
     r"\b([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\b"
 )
-RE_KV_ID = re.compile(r'"id"\s*:\s*"([0-9a-fA-F]{32})"|id\s*=\s*"([0-9a-fA-F]{32})"')
 
 
 def resolver_binario_wrangler() -> List[str]:
@@ -28,6 +32,29 @@ def resolver_binario_wrangler() -> List[str]:
         "Executável 'wrangler' (ou 'npx') não encontrado no PATH. "
         "Instale o Wrangler CLI (`npm i -g wrangler`) e autentique com `wrangler login`."
     )
+
+
+def invocacao_do_comando(
+    comando: List[str],
+    windows: Optional[bool] = None,
+) -> Tuple[Union[List[str], str], bool]:
+    """
+    Prepara a invocação do comando, devolvendo `(argumentos, usar_shell)`.
+
+    No Windows, `npx` é um script `.cmd` e o `CreateProcess` não executa esse tipo de arquivo
+    diretamente (`WinError 2`). Nesse caso o comando é entregue como texto único ao `cmd.exe`
+    via `shell=True`, que é o interpretador capaz de executá-lo — e onde as aspas dos caminhos
+    com espaço sobrevivem à regra de parsing do `/c`.
+    """
+    if windows is None:
+        windows = os.name == "nt"
+    if not windows or not comando:
+        return list(comando), False
+
+    executavel = shutil.which(comando[0])
+    if executavel is not None and executavel.lower().endswith((".cmd", ".bat")):
+        return subprocess.list2cmdline([executavel, *comando[1:]]), True
+    return list(comando), False
 
 
 def rodar_comando_wrangler(
@@ -50,13 +77,16 @@ def rodar_comando_wrangler(
         logger.info("[DRY-RUN] Comando simulado sem execução real.")
         return ""
 
+    invocacao, usar_shell = invocacao_do_comando(cmd_final)
     try:
         resultado = subprocess.run(
-            cmd_final,
+            invocacao,
             cwd=str(cwd) if cwd else None,
             check=True,
-            text=True,
             capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            shell=usar_shell,
         )
         if resultado.stdout:
             logger.info("Sucesso: %s", resultado.stdout.strip())
@@ -73,22 +103,33 @@ def fazer_deploy_vectorize(
     jsonl_path: Path,
     index_name: str = "mbft-embeddings",
     dry_run: bool = False,
-) -> None:
-    """Envia o artefato NDJSON de embeddings para o Cloudflare Vectorize."""
+    out_dir: Optional[Path] = None,
+) -> List[Path]:
+    """
+    Envia o artefato NDJSON de embeddings para o Cloudflare Vectorize, fatiando-o em partes
+    que respeitem o teto de 100 MB por upload sempre que o arquivo não couber em uma chamada.
+    """
     validar_jsonl_producao(jsonl_path)
-    comando = [
-        "wrangler",
-        "vectorize",
-        "insert",
-        index_name,
-        "--file",
-        str(jsonl_path),
-    ]
-    rodar_comando_wrangler(
-        comando,
-        f"Upload JSONL para Vectorize ({index_name})",
-        dry_run=dry_run,
-    )
+
+    if jsonl_path.stat().st_size <= LIMITE_UPLOAD_VECTORIZE_BYTES:
+        arquivos = [jsonl_path]
+    else:
+        arquivos = dividir_jsonl_vectorize(jsonl_path, out_dir or jsonl_path.parent / "vectorize")
+
+    for arquivo in arquivos:
+        rodar_comando_wrangler(
+            [
+                "wrangler",
+                "vectorize",
+                "insert",
+                index_name,
+                "--file",
+                str(arquivo),
+            ],
+            f"Upload JSONL para Vectorize ({index_name}): {arquivo.name}",
+            dry_run=dry_run,
+        )
+    return arquivos
 
 
 def fazer_deploy_d1(
@@ -123,9 +164,8 @@ def fazer_deploy_d1(
 def atualizar_ids_wrangler_jsonc(
     wrangler_path: Path,
     database_id: Optional[str] = None,
-    kv_id: Optional[str] = None,
 ) -> None:
-    """Atualiza `database_id` (D1) e `id` (KV_TICKETS) em `apps/api/wrangler.jsonc`."""
+    """Atualiza `database_id` (D1) em `apps/api/wrangler.jsonc`."""
     if not wrangler_path.exists():
         raise FileNotFoundError(f"Arquivo wrangler.jsonc não encontrado em {wrangler_path}")
 
@@ -135,26 +175,22 @@ def atualizar_ids_wrangler_jsonc(
     if database_id:
         for db_entry in dados.get("d1_databases", []):
             db_entry["database_id"] = database_id
-    if kv_id:
-        for kv_entry in dados.get("kv_namespaces", []):
-            kv_entry["id"] = kv_id
 
     wrangler_path.write_text(
         json.dumps(dados, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    logger.info("IDs atualizados em %s (D1=%s, KV=%s)", wrangler_path, database_id, kv_id)
+    logger.info("IDs atualizados em %s (D1=%s)", wrangler_path, database_id)
 
 
 def provisionar_recursos_cloudflare(
     wrangler_config_path: Optional[Path] = None,
     db_name: str = "mbft-d1",
     index_name: str = "mbft-embeddings",
-    kv_binding: str = "KV_TICKETS",
     dry_run: bool = False,
 ) -> Dict[str, Optional[str]]:
     """
-    Provisiona D1, Vectorize (1024 dims, cosine) e KV na Cloudflare via Wrangler
+    Provisiona D1 e Vectorize (1024 dims, cosine) na Cloudflare via Wrangler
     e preenche os IDs retornados em `apps/api/wrangler.jsonc`.
     """
     if wrangler_config_path is None:
@@ -177,26 +213,17 @@ def provisionar_recursos_cloudflare(
         f"Provisionar índice Vectorize ({index_name})",
         dry_run=dry_run,
     )
-    out_kv = rodar_comando_wrangler(
-        ["wrangler", "kv", "namespace", "create", kv_binding],
-        f"Provisionar namespace KV ({kv_binding})",
-        dry_run=dry_run,
-    )
 
     m_d1 = RE_UUID.search(out_d1)
     database_id = m_d1.group(1) if m_d1 else None
 
-    m_kv = RE_KV_ID.search(out_kv)
-    kv_id = (m_kv.group(1) or m_kv.group(2)) if m_kv else None
-
-    if not dry_run and (database_id or kv_id):
+    if not dry_run and database_id:
         atualizar_ids_wrangler_jsonc(
             wrangler_config_path,
             database_id=database_id,
-            kv_id=kv_id,
         )
 
-    return {"database_id": database_id, "kv_id": kv_id}
+    return {"database_id": database_id}
 
 
 def fazer_deploy_api(
@@ -215,6 +242,33 @@ def fazer_deploy_api(
         cwd=api_dir,
         dry_run=dry_run,
     )
+
+
+ERRO_PROJETO_PAGES_EXISTENTE = "already exists"
+
+
+def garantir_projeto_pages(project_name: str, dry_run: bool = False) -> None:
+    """
+    Garante a existência do projeto Cloudflare Pages, que é pré-requisito de `pages deploy`.
+    O projeto é criado quando ausente e o erro de duplicidade é tratado como sucesso.
+    """
+    try:
+        rodar_comando_wrangler(
+            [
+                "wrangler",
+                "pages",
+                "project",
+                "create",
+                project_name,
+                "--production-branch=main",
+            ],
+            f"Garantir projeto Pages ({project_name})",
+            dry_run=dry_run,
+        )
+    except RuntimeError as exc:
+        if ERRO_PROJETO_PAGES_EXISTENTE not in str(exc).lower():
+            raise
+        logger.info("Projeto Pages '%s' já existe; reutilizando.", project_name)
 
 
 def fazer_deploy_site(
@@ -237,6 +291,8 @@ def fazer_deploy_site(
     url_efetiva = api_url if api_url is not None else os.environ.get("MBFT_API_URL")
     if url_efetiva is not None and not dry_run:
         atualizar_config_js_site(site_dir, url_efetiva)
+
+    garantir_projeto_pages(project_name, dry_run=dry_run)
 
     rodar_comando_wrangler(
         [

@@ -60,12 +60,16 @@ class ILLMClient(Protocol):
 ```
 
 Desta forma, os adaptadores ficam estritamente isolados conforme o ambiente:
-* **Ambiente de Borda (`mbft_api.gerador.cloudflare_adapters.WorkersAILLMClient`):** Consumo via binding nativo (`env.AI.run(...)`) do Cloudflare Workers AI, parametrizado pela variável `CF_LLM_MODEL` em `wrangler.jsonc` (com padrão `@cf/meta/llama-3.1-8b-instruct-fp8-fast`) e higienização automática de eventuais blocos `<think>...</think>` caso um modelo de raciocínio (como DeepSeek R1) seja configurado.
+* **Ambiente de Borda (`mbft_api.gerador.cloudflare_adapters.WorkersAILLMClient`):** Consumo via binding nativo (`env.AI.run(...)`) do Cloudflare Workers AI, parametrizado pela variável `CF_LLM_MODEL` em `wrangler.jsonc` (com padrão `@cf/meta/llama-3.3-70b-instruct-fp8-fast`) e higienização automática de eventuais blocos `<think>...</think>` caso um modelo de raciocínio (como DeepSeek R1) seja configurado.
 * **Ambiente Local (`mbft_api.gerador.local_adapters.GeminiLLMClient`):** Utiliza o SDK `google-genai` (declarado apenas no grupo `[dependency-groups] dev` de `apps/api/pyproject.toml`) e é importado exclusivamente sob demanda (`lazy import`) fora do runtime `emscripten`, evitando contaminar o bundle de produção do Worker. O provedor ativo pode ser sobrescrito via variável de ambiente `LLM_PROVIDER`.
 
 ### 3.2. Estratégia de "Strict RAG" e Prevenção de Alucinação
 
-O modelo operará sob regras draconianas para prevenir desvios do Manual Brasileiro de Fiscalização de Trânsito (MBFT). Como modelos menores disponíveis na borda sofrem consideravelmente com instruções negativas complexas em português (ignorando recusas padronizadas, confundindo termos parecidos e adivinhando com base no pré-treino do CTB), a arquitetura parametriza o modelo via `CF_LLM_MODEL` na Cloudflare (padrão `@cf/meta/llama-3.1-8b-instruct-fp8-fast`, suportando troca transparente para modelos como DeepSeek R1 com limpeza de `<think>...</think>`) e **Gemini Flash-Lite** em desenvolvimento local.
+O modelo operará sob regras draconianas para prevenir desvios do Manual Brasileiro de Fiscalização de Trânsito (MBFT). Como modelos menores disponíveis na borda sofrem consideravelmente com instruções negativas complexas em português (ignorando recusas padronizadas, confundindo termos parecidos e adivinhando com base no pré-treino do CTB), a arquitetura parametriza o modelo via `CF_LLM_MODEL` na Cloudflare (padrão `@cf/meta/llama-3.3-70b-instruct-fp8-fast`, suportando troca transparente para modelos como DeepSeek R1 com limpeza de `<think>...</think>`) e **Gemini Flash-Lite** em desenvolvimento local.
+
+> **Evidência (validação empírica do padrão):** a preocupação acima se confirmou em produção. Com `@cf/meta/llama-3.1-8b-instruct-fp8`, o modelo respondeu com a frase canônica de recusa mesmo recebendo um contexto que continha literalmente a resposta; com `@cf/meta/llama-3.3-70b-instruct-fp8-fast`, o mesmo prompt devolveu a resposta ancorada no contexto. Por isso o 70b é o padrão prescrito, e não o 8b.
+
+Como o cache exato é indexado apenas pelo hash da pergunta, sem registrar a versão do modelo (PMS-008 § 3.5), trocar `CF_LLM_MODEL` torna as entradas existentes semanticamente inválidas — inclusive recusas — e exige a purga de `historico_consultas` no deploy do novo modelo.
 
 **Regras do System Prompt:**
 1. O LLM atua apenas como um sumarizador e tradutor de linguagem natural, nunca como legislador ou juiz.

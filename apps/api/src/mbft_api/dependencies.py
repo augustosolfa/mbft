@@ -4,6 +4,7 @@ from typing import Any
 
 from fastapi import HTTPException, Request
 
+from .database import HistoricoRepository
 from .gerador.cloudflare_adapters import DEFAULT_CF_LLM_MODEL, WorkersAILLMClient
 from .gerador.orquestrador import OrquestradorGeracao
 from .recuperador.buscador import BuscadorHibrido
@@ -137,3 +138,31 @@ def get_gerador(request: Request) -> OrquestradorGeracao:
         return gerador
 
     raise HTTPException(status_code=503, detail="Motor de Inteligência Indisponível.")
+
+
+def get_historico_repo(request: Request) -> HistoricoRepository:
+    """
+    Dependência FastAPI por requisição para o repositório de histórico e cache:
+    1. Se houver binding 'DB' em request.scope['env'] (Cloudflare Workers / Miniflare),
+       utiliza D1.
+    2. Se houver 'historico_repo' em request.app.state, utiliza-o.
+    3. Caso contrário, inicializa um repositório SQLite em memória local e armazena
+       em request.app.state para persistência durante o ciclo da aplicação.
+    """
+    env = request.scope.get("env")
+    db_binding = get_env_binding(env, "DB")
+    if db_binding is not None:
+        return HistoricoRepository(db_binding)
+
+    app = getattr(request, "app", None)
+    state = getattr(app, "state", None)
+    if state is not None:
+        repo = getattr(state, "historico_repo", None)
+        if repo is not None:
+            return repo
+
+        novo_repo = HistoricoRepository()
+        setattr(state, "historico_repo", novo_repo)
+        return novo_repo
+
+    return HistoricoRepository()

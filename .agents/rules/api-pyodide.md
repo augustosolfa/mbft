@@ -9,7 +9,7 @@ description: "Restrições de runtime Pyodide / Cloudflare Workers para o pacote
 O pacote `apps/api` é executado na borda sobre o runtime Python do **Cloudflare Workers (Pyodide)** (consulte `PMS-005`, `PMS-006` e `PMS-008`):
 
 1. **Dependências Estritas de Produção**:
-   - O bloco `[project].dependencies` em `apps/api/pyproject.toml` deve conter **apenas `fastapi` e `pyjwt`**.
+   - O bloco `[project].dependencies` em `apps/api/pyproject.toml` deve conter **apenas `fastapi`**.
    - **Nunca adicione** dependências de outros pacotes do workspace (`mbft-core`, etc.) nem bibliotecas com extensões nativas C/Rust não suportadas pelo bundler Pyodide nas dependências de produção.
 2. **Dependências de Desenvolvimento e Testes Locais**:
    - Pacotes usados apenas para execução local, testes ou scripts de validação (como `uvicorn`, `pytest`, `google-genai`) devem ficar estritamente em `[dependency-groups].dev`.

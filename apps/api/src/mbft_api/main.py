@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import health, busca, ticket, chat
+from .routers import health, busca, chat
 
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
         print("Ambiente Pyodide (Cloudflare Workers) detectado. Pulando adaptadores locais pesados (PyTorch/SQLite).")
         app.state.buscador = None
         app.state.gerador = None
+        app.state.historico_repo = None
         yield
         return
         
@@ -48,11 +49,15 @@ async def lifespan(app: FastAPI):
                 app.state.gerador = None
         else:
             app.state.gerador = None
+
+        from .database import HistoricoRepository
+        app.state.historico_repo = HistoricoRepository()
             
     except ImportError:
         print("Aviso: Adaptadores locais (PyTorch) não instalados. Pulando...")
         app.state.buscador = None
         app.state.gerador = None
+        app.state.historico_repo = None
         
     yield
     print("Encerrando recursos...")
@@ -102,7 +107,7 @@ class EnvAwareCORSMiddleware(CORSMiddleware):
 
 app = FastAPI(
     title="MBFT API",
-    description="API Gateway e Ticketizador do Manual Brasileiro de Fiscalização de Trânsito",
+    description="API Gateway e RAG do Manual Brasileiro de Fiscalização de Trânsito",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -118,17 +123,6 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(busca.router)
-app.include_router(ticket.router)
 app.include_router(chat.router)
 
-try:
-    import asgi  # type: ignore[import-not-found]
-    from workers import WorkerEntrypoint  # type: ignore[import-not-found]
-
-    class Default(WorkerEntrypoint):
-        async def fetch(self, request):
-            js_req = getattr(request, "js_object", request)
-            return await asgi.fetch(app, js_req, self.env)
-except ImportError:
-    pass
 

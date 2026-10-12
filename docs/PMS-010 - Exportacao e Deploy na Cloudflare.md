@@ -18,8 +18,8 @@ Os pipelines de dados do monorepo MBFT (`mbft-extrator`, `mbft-enriquecedor`, `m
 (*batch*), lendo contratos de entrada validados pelo `mbft-core` (PMS-009) e gravando os artefatos
 canônicos da sua respectiva etapa em `data/processed/<etapa>/`.
 
-A publicação do sistema na infraestrutura de borda da **Cloudflare** (Workers, Pages, D1, Vectorize e
-KV) exige etapas de adaptação e transporte que não pertencem a nenhum pipeline isolado:
+A publicação do sistema na infraestrutura de borda da **Cloudflare** (Workers, Pages, D1 e Vectorize)
+exige etapas de adaptação e transporte que não pertencem a nenhum pipeline isolado:
 1. Conversão do artefato canônico `embeddings_mbft.jsonl` em um dump relacional SQL (`fts_chunks.sql`)
    compatível com as restrições transacionais da API HTTP do Cloudflare D1;
 2. Provisionamento automatizado de recursos na nuvem e sincronização de identificadores de binding em
@@ -67,6 +67,17 @@ Cloudflare:
 [ mbft-api ]       ──> apps/api/             ─────> [ mbft-deploy api ]  ──────────────────────────> Cloudflare Workers
 ```
 
+O subcomando `api` publica o Worker da `mbft-api` (PMS-008), que exige as dependências Python já
+vendorizadas em `apps/api/python_modules/` — o bundler do Workers não resolve o `pyproject.toml` no
+momento do upload, e a Cloudflare valida executando o módulo de entrada e seus imports.
+
+Essa vendorização é a única etapa do fluxo que **não** roda em qualquer ambiente de desenvolvimento: o
+`uv` precisa consultar o interpretador Pyodide para resolver as wheels do alvo, e o `pywrangler` requer
+Node no `PATH` (o launcher do Pyodide é executado sob Node). Como o sistema de arquivos virtual do
+Pyodide não resolve caminhos no estilo `C:/...`, o `uv` do Windows falha ao consultar o interpretador e
+o `python_modules/` não pode ser gerado nativamente nesse sistema operacional — no Windows, a etapa roda
+no **WSL2** (ver Alternativa 3).
+
 ### 3.2. Exportador SQL FTS5 para Cloudflare D1 (`exporters.py`)
 * **Validação de Contrato e Proteção contra Debug:** Antes de exportar ou enviar dados, o módulo
   verifica o nome do arquivo de entrada, rejeitando imediatamente artefatos gerados com
@@ -76,6 +87,17 @@ Cloudflare:
   `data/processed/deploy/fts_chunks.sql` inicia com `DELETE FROM fts_chunks;` seguido de instruções
   `INSERT INTO fts_chunks (id, codigo, artigo, secao, texto_contextualizado) VALUES ...;` agrupadas
   em lotes configuráveis (padrão: 100 tuplas por `INSERT`) com escape estrito de aspas simples.
+* **Fatiamento do Upload Vetorial (Teto de 100 MB do Cloudflare Vectorize):** O Vectorize recusa uploads
+  acima de 100 MB por chamada. Quando `embeddings_mbft.jsonl` excede esse teto, `dividir_jsonl_vectorize`
+  o fatia em `parte_NN.jsonl` (ao lado do artefato de origem), sem cortar linhas ao meio e validando por
+  vetor os limites de 64 bytes do `id` e 10 KiB de metadata antes de iniciar o envio. A contagem é feita
+  em bytes físicos (leitura e escrita binárias), para não sofrer tradução de newline no Windows.
+* **Coerência do Índice Híbrido (D1 + Vectorize):** `embeddings_mbft.jsonl` é a fonte única dos **dois**
+  lados da busca: o dump SQL do D1 (FTS5) e os vetores do Vectorize. Um lado vazio não impede a
+  publicação — a API responde com o que existir —, mas degrada a recuperação, porque o RRF funde dois
+  rankings e, com apenas um deles, a relevância cai e o gerador passa a recusar perguntas legítimas. Por
+  isso `mbft-deploy data` publica os dois lados na mesma execução, e a verificação de pós-deploy compara
+  a contagem de linhas de `fts_chunks` com a contagem de vetores do índice.
 
 ### 3.3. Desacoplamento de Configuração Frontend (`config.js`) e CORS
 * A pipeline `mbft-ssg` (PMS-007) gera um arquivo neutro `data/processed/site/config.js` com
@@ -99,6 +121,19 @@ Cloudflare:
     `indexador`, páginas estáticas do `ssg` para o Cloudflare Pages e o Worker da `api`). Colocar
     essa orquestração dentro de `apps/api` inverteria a hierarquia de responsabilidades e misturaria
     ferramentas locais de build/CLI com o diretório empacotado pelo Pyodide para o Cloudflare Workers.
+* **Alternativa 3: Vendorizar `python_modules/` nativamente no Windows, sem WSL2.**
+  * *Por que foi rejeitada:* O `uv` do Windows não consegue consultar o interpretador Pyodide: o launcher
+    executa sob Node e o sistema de arquivos virtual do Pyodide não resolve o caminho `C://...` que o
+    `uv` injeta no `sys.path`, resultando em `ModuleNotFoundError: No module named 'python'` (reproduzido
+    tanto no `uv` 0.12.17 quanto no 0.13.0). Contornar fixando a plataforma (`--python-platform
+    wasm32-pyodide2025`) também não serve: as wheels do alvo real (`pyemscripten_2026_0_wasm32`) não casam
+    com as tags expostas pelo `uv`, o que deixa `pydantic-core` sem wheel e quebra a resolução. Restou
+    executar essa única etapa em ambiente POSIX (WSL2), mantendo o deploy do Worker e do Pages nativo.
+* **Alternativa 4: Servir o Worker sem FastAPI, reescrevendo a borda em JavaScript.**
+  * *Por que foi rejeitada:* Duplicaria em outra linguagem a lógica já testada de RRF, normalização de
+    tokens FTS5, diversificação por ficha e montagem de prompt (PMS-005 e PMS-006), criando duas fontes
+    da verdade para o mesmo comportamento. Desde 28-Ago-2026 o FastAPI é suportado oficialmente em Python
+    Workers via `workers.asgi`, então o custo de manter a borda em Python é um adaptador de poucas linhas.
 
 ---
 
@@ -112,3 +147,18 @@ Cloudflare:
   conta Cloudflare.
 * **Escrita Atômica de Artefatos:** O dump `fts_chunks.sql` é gravado em arquivo temporário (`.tmp`)
   e promovido via `os.replace`, evitando arquivos SQL truncados em caso de interrupção.
+* **Credenciais Não Interativas e Escopo Fechado:** Antes de despachar qualquer subcomando, a CLI carrega
+  **apenas** as variáveis de deploy de um allow-list explícito (`CLOUDFLARE_API_TOKEN`,
+  `CLOUDFLARE_ACCOUNT_ID` e `MBFT_API_URL`) a partir do `.env` da raiz, dispensando `wrangler login` em
+  execução automatizada; variáveis já definidas no shell têm precedência e nunca são sobrescritas. A lista
+  é fechada de propósito: despejar o `.env` inteiro no processo vazaria segredos de outras etapas (por
+  exemplo `GEMINI_API_KEY`) para o Wrangler e para todo subprocesso, e ainda tornaria o resultado de um
+  teste dependente da ordem de execução de outro.
+* **Projeto Pages Idempotente:** O subcomando `site` garante a existência do projeto Cloudflare Pages
+  (criando-o com `--production-branch=main` quando ausente e tratando o erro `already exists` como
+  sucesso) antes de publicar os assets de `data/processed/site`.
+* **Invocação do Wrangler no Windows:** `npx` é um script `.cmd`, que o `CreateProcess` não inicia
+  diretamente (`WinError 2`). Quando o resolvedor encontra um `.cmd`/`.bat`, o comando é entregue como
+  texto único ao `cmd.exe`, preservando as aspas dos caminhos com espaço. A saída do Wrangler é sempre
+  lida como UTF-8 (com substituição de caracteres inválidos), evitando `UnicodeDecodeError` no console
+  de código legado do Windows.

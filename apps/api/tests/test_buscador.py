@@ -185,6 +185,12 @@ class _SqliteBackedD1PreparedStatement:
         cols = [d[0] for d in cur.description] if cur.description else []
         return _FakeJsProxy(dict(zip(cols, row)))
 
+    async def run(self):
+        cur = self._conn.cursor()
+        cur.execute(self._sql, self._params)
+        self._conn.commit()
+        return _FakeJsProxy({"success": True, "results": []})
+
 
 class _SqliteBackedD1Database:
     """Emula o binding env.DB (D1Database) sobre sqlite3 em memória."""
@@ -202,7 +208,6 @@ class _SqliteBackedD1Database:
 async def test_schema_sql_e_d1_adapters_compartilham_contrato_fts5():
     import sqlite3
     from pathlib import Path
-    from mbft_api.database import D1FilaRepository
     from mbft_api.recuperador.cloudflare_adapters import D1RelationalDB
     from mbft_api.recuperador.local_adapters import LocalSqliteDB
 
@@ -233,12 +238,7 @@ async def test_schema_sql_e_d1_adapters_compartilham_contrato_fts5():
 
     fake_d1 = _SqliteBackedD1Database(conn)
 
-    # 1. Testa D1FilaRepository sobre a tabela fila_global criada pelo schema.sql
-    fila_repo = D1FilaRepository(fake_d1)
-    next_avail = await fila_repo.avancar_fila_global(segundos=30)
-    assert next_avail != ""
-
-    # 2. Testa D1RelationalDB sobre a tabela virtual fts_chunks criada pelo schema.sql
+    # Testa D1RelationalDB sobre a tabela virtual fts_chunks criada pelo schema.sql
     d1_rel = D1RelationalDB(fake_d1)
     res = await d1_rel.buscar_fts("Art. 244, § 2°", limit=5)
     assert len(res) == 1
@@ -440,7 +440,6 @@ async def test_injecao_dependencia_por_requisicao_workers_fallback_local_e_overr
 
     res_chat_w = await fazer_pergunta(
         payload=PerguntaPayload(pergunta="Qual a penalidade para falta de cinto?"),
-        _ticket="ticket-ok",
         buscador=buscador_w,
         gerador=gerador_w,
     )
@@ -542,13 +541,11 @@ async def test_workers_ai_embedder_resiliencia_memoryview_jsnull_e_excecao_fallb
 
 
 @pytest.mark.asyncio
-async def test_fluxo_asgi_completo_ticket_busca_chat_e_protecao_kv_contra_queima_em_503():
-    import datetime
+async def test_fluxo_asgi_completo_busca_chat_e_cors():
     import sqlite3
     from pathlib import Path
     from types import SimpleNamespace
     import httpx
-    import jwt
     from mbft_api.main import app
 
     schema_path = Path(__file__).resolve().parents[1] / "schema.sql"
@@ -561,22 +558,6 @@ async def test_fluxo_asgi_completo_ticket_busca_chat_e_protecao_kv_contra_queima
     conn.commit()
 
     fake_d1 = _SqliteBackedD1Database(conn)
-
-    class FakeKV:
-        def __init__(self):
-            self.store: dict[str, tuple[str, Any]] = {}
-
-        def to_py(self):
-            return self
-
-        async def get(self, key: str):
-            if key not in self.store:
-                # Emula retorno de JsProxy envolvendo None (como no FFI Pyodide)
-                return _FakeJsProxy(None)
-            return _FakeJsProxy(self.store[key][0])
-
-        async def put(self, key: str, value: str, options: Any = None):
-            self.store[key] = (value, _FakeJsProxy(options).to_py() if hasattr(options, "to_py") else options)
 
     class FakeVectorize:
         async def query(self, vetor, options):
@@ -603,14 +584,10 @@ async def test_fluxo_asgi_completo_ticket_busca_chat_e_protecao_kv_contra_queima
                 return _FakeJsProxy({"data": [[0.1, 0.2, 0.3]]})
             return _FakeJsProxy({"response": "<think>raciocínio</think>Autuar no código 518-51."})
 
-    fake_kv = FakeKV()
     env_state = {
         "DB": fake_d1,
         "VECTORIZE": FakeVectorize(),
         "AI": FakeAI(),
-        "KV_TICKETS": fake_kv,
-        "JWT_SECRET": "segredo-super-forte-de-teste-1234567890",
-        "TOKEN_ADMIN": "admin-vip-secret",
         "CF_LLM_MODEL": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
     }
 
@@ -626,58 +603,22 @@ async def test_fluxo_asgi_completo_ticket_busca_chat_e_protecao_kv_contra_queima
 
     transport = httpx.ASGITransport(app=EnvAsgiWrapper(app))
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-        # 1. Emite ticket VIP via POST /ticket/ usando D1FilaRepository
-        resp_ticket = await client.post("/ticket/", headers={"priority-token": "admin-vip-secret"})
-        assert resp_ticket.status_code == 200
-        ticket_jwt = resp_ticket.json()["ticket"]
-
-        # 2. Se LLM_PROVIDER estiver inválido (503), o ticket NÃO deve ser queimado no KV_TICKETS
+        # 1. Se LLM_PROVIDER estiver inválido, rota /chat/ deve retornar 503
         env_state["LLM_PROVIDER"] = "provedor_invalido"
         resp_503 = await client.post(
             "/chat/",
-            headers={"x-ticket": ticket_jwt},
             json={"pergunta": "Quando autuar falta de cinto de segurança?"},
         )
         assert resp_503.status_code == 503
-        assert len(fake_kv.store) == 0, "Ticket jti não deve ser consumido no KV quando get_gerador falha com 503"
 
-        # 3. Corrige LLM_PROVIDER e reenvia o MESMO ticket -> deve funcionar (200) e gravar no KV
+        # 2. Corrige LLM_PROVIDER e envia pergunta direta para /chat/ -> deve funcionar (200)
         env_state["LLM_PROVIDER"] = "workers_ai"
         resp_ok = await client.post(
             "/chat/",
-            headers={"x-ticket": ticket_jwt},
             json={"pergunta": "Quando autuar falta de cinto de segurança?"},
         )
         assert resp_ok.status_code == 200
         assert resp_ok.json() == {"resposta": "Autuar no código 518-51."}
-        assert len(fake_kv.store) == 1
-
-        # 4. Reuso do mesmo ticket deve ser bloqueado com 409 Conflict
-        resp_replay = await client.post(
-            "/chat/",
-            headers={"x-ticket": ticket_jwt},
-            json={"pergunta": "Quando autuar falta de cinto de segurança?"},
-        )
-        assert resp_replay.status_code == 409
-
-        # 5. Ticket com menos de 60s restantes até exp ainda deve gravar expirationTtl >= 60 no KV da Cloudflare
-        agora = datetime.datetime.now(datetime.timezone.utc)
-        ticket_curto = jwt.encode(
-            {
-                "valid_after": (agora - datetime.timedelta(seconds=5)).isoformat(),
-                "exp": (agora + datetime.timedelta(seconds=20)).timestamp(),
-                "jti": "jti-curto-20s",
-            },
-            env_state["JWT_SECRET"],
-            algorithm="HS256",
-        )
-        resp_curto = await client.post(
-            "/chat/",
-            headers={"x-ticket": ticket_curto},
-            json={"pergunta": "Quando autuar falta de cinto de segurança?"},
-        )
-        assert resp_curto.status_code == 200
-        assert fake_kv.store["jti-curto-20s"][1]["expirationTtl"] >= 60
 
         # 6. Rota GET /busca/ via ASGI com bindings Cloudflare
         resp_busca = await client.get("/busca/", params={"q": "cinto", "limit": 3})

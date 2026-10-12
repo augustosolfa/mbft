@@ -1,7 +1,7 @@
 [project]
 name = "mbft-api"
 version = "0.1.0"
-description = "API Gateway, Ticketizador e Motor RAG (Recuperador + Gerador) do MBFT para Cloudflare Workers."
+description = "API Gateway e Motor RAG (Recuperador + Gerador) do MBFT para Cloudflare Workers."
 readme = "README.md"
 authors = [
     { name = "José Augusto Solfa Campos Oliveira", email = "augusto@solfa.net" }
@@ -9,7 +9,6 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.142.4",
-    "pyjwt>=2.15.1",
 ]
 
 [build-system]

@@ -8,6 +8,10 @@ from mbft_core.models.indexacao import ChunkPayload
 
 logger = logging.getLogger(__name__)
 
+LIMITE_UPLOAD_VECTORIZE_BYTES = 100 * 1024 * 1024
+MAX_ID_BYTES = 64
+MAX_METADATA_BYTES = 10 * 1024
+
 
 def validar_jsonl_producao(jsonl_path: Path) -> None:
     """Garante que o arquivo JSONL existe e não é um artefato de debug (--skip-embeddings)."""
@@ -84,6 +88,78 @@ def exportar_fts_chunks_sql(
         len(payloads),
     )
     return len(payloads)
+
+
+def validar_linha_vectorize(linha: str, origem: Path, num_linha: int) -> None:
+    """
+    Valida os limites por vetor exigidos pelo Cloudflare Vectorize (`id` <= 64 bytes,
+    metadata <= 10 KiB) antes de iniciar um upload que pode levar minutos.
+    """
+    try:
+        payload = ChunkPayload.model_validate_json(linha)
+    except Exception as exc:
+        raise ValueError(f"Falha de contrato ChunkPayload em '{origem}:{num_linha}': {exc}") from exc
+
+    bytes_id = len(payload.id.encode("utf-8"))
+    if bytes_id > MAX_ID_BYTES:
+        raise ValueError(
+            f"id de {bytes_id} bytes excede o limite de {MAX_ID_BYTES} bytes do Vectorize "
+            f"em '{origem}:{num_linha}'."
+        )
+
+    bytes_metadata = len(payload.metadata.model_dump_json().encode("utf-8"))
+    if bytes_metadata > MAX_METADATA_BYTES:
+        raise ValueError(
+            f"metadata de {bytes_metadata} bytes excede o limite de {MAX_METADATA_BYTES} bytes "
+            f"do Vectorize em '{origem}:{num_linha}'."
+        )
+
+
+def gravar_parte_vectorize(out_dir: Path, indice: int, lote: List[bytes]) -> Path:
+    """Grava um lote de linhas NDJSON como `<out_dir>/parte_NN.jsonl` sem tradução de newline."""
+    destino = out_dir / f"parte_{indice:02d}.jsonl"
+    destino.write_bytes(b"".join(lote))
+    return destino
+
+
+def dividir_jsonl_vectorize(
+    jsonl_path: Path,
+    out_dir: Path,
+    limite_bytes: int = LIMITE_UPLOAD_VECTORIZE_BYTES,
+) -> List[Path]:
+    """
+    Fatia o NDJSON canônico em partes abaixo do teto de 100 MB por upload do Cloudflare Vectorize,
+    sem nunca cortar uma linha ao meio e validando cada vetor contra os limites do serviço.
+
+    A leitura e a escrita são binárias de propósito: o teto do Vectorize é medido em bytes físicos,
+    então a contagem não pode sofrer tradução de newline (CRLF no Windows).
+    """
+    validar_jsonl_producao(jsonl_path)
+    if limite_bytes <= 0:
+        raise ValueError("limite_bytes deve ser maior que zero.")
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    partes: List[Path] = []
+    lote: List[bytes] = []
+    bytes_lote = 0
+
+    with open(jsonl_path, "rb") as arquivo:
+        for num_linha, linha in enumerate(arquivo, start=1):
+            if not linha.strip():
+                continue
+            validar_linha_vectorize(linha.decode("utf-8"), jsonl_path, num_linha)
+            if lote and bytes_lote + len(linha) > limite_bytes:
+                partes.append(gravar_parte_vectorize(out_dir, len(partes) + 1, lote))
+                lote, bytes_lote = [], 0
+            lote.append(linha)
+            bytes_lote += len(linha)
+
+    if lote:
+        partes.append(gravar_parte_vectorize(out_dir, len(partes) + 1, lote))
+
+    logger.info("JSONL fatiado em %d parte(s) para o Vectorize em %s", len(partes), out_dir)
+    return partes
 
 
 def atualizar_config_js_site(site_dir: Path, api_base_url: str) -> Path:

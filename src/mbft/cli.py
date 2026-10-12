@@ -310,8 +310,6 @@ def _carregar_env_local(env: Dict[str, str]) -> None:
 def _executar_dev(args: argparse.Namespace) -> None:
     env = os.environ.copy()
     _carregar_env_local(env)
-    if not env.get("JWT_SECRET") or env.get("JWT_SECRET") == "MUDAR_EM_PRODUCAO":
-        env["JWT_SECRET"] = "segredo-local-de-desenvolvimento-mbft"
 
     cmd_api = [
         sys.executable,

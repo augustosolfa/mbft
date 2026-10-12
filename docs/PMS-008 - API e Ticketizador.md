@@ -2,7 +2,7 @@
 PMS: 008
 Título: API Gateway (FastAPI) e Gerenciamento de Fila Global (Ticketizador)
 Autor: José Augusto Solfa Campos Oliveira <augusto@solfa.net>
-Status: Rascunho
+Status: Rejeitado
 Tipo: Trilha de Arquitetura e Engenharia (Engineering Track)
 Criado: 08-Out-2026
 Requer: PMS-005, PMS-006, PMS-007
@@ -10,6 +10,8 @@ Substitui: Nenhum
 ---
 
 # PMS-008: API Gateway e Gerenciamento de Fila Global (Ticketizador)
+
+> **Decisão de Arquitetura (Descontinuação):** O mecanismo de fila serial via D1 (`fila_global`), invalidação por KV (`KV_TICKETS`) e emissão de ingressos JWT foi descontinuado e rejeitado. A mitigação de bots e contenção de concorrência foi delegada nativamente à infraestrutura de borda da Cloudflare (WAF Custom Rules, Rate Limiting e Bot Management), eliminando latência de I/O e custo computacional dentro do Worker Pyodide.
 
 ## 1. Contexto e Escopo
 
@@ -39,7 +41,10 @@ Esta PMS formaliza o uso do **FastAPI** rodando sobre o Pyodide (Python no Cloud
 ## 3. Design da Solução
 
 ### 3.1. Framework, Runtime e Topologia de Monólito Modular
-* O *entrypoint* do Cloudflare Workers (`apps/api`) utiliza **FastAPI**, servido nativamente no runtime Python (Pyodide) do Workers.
+* O *entrypoint* do Cloudflare Workers (`apps/api`) utiliza **FastAPI**, servido no runtime Python (Pyodide) do Workers pelo servidor ASGI embutido no SDK do runtime (`from workers import asgi`). O adaptador vive em `apps/api/src/entry.py` (`Default = asgi.entrypoint(app)`) e o `main` do `wrangler.jsonc` aponta para ele.
+* O adaptador é um módulo de topo, separado do pacote, porque o bundler do Workers carrega o arquivo de `main` como módulo raiz: imports relativos (`from .routers import ...`) não possuem pacote-pai nesse contexto e falham na validação de deploy. O app FastAPI permanece em `mbft_api.main` para uso local via `uvicorn`.
+* O bundler **não** resolve as dependências do `pyproject.toml` no momento do upload. As dependências precisam estar vendorizadas em `apps/api/python_modules/`, produzidas por `pywrangler sync` (pacote `workers-py`) a partir do lockfile `apps/api/pylock.toml`. O upload é validado pela Cloudflare, que executa o módulo de entrada e seus imports — um import ausente reprova o deploy com erro `10021`.
+* A `compatibility_date` de `apps/api/wrangler.jsonc` é o que fixa o runtime: datas a partir de 08-Set-2026 ativam o **Python 3.14** por padrão (flag `python_workers_314`), o que mantém o `requires-python = ">=3.14"` de `apps/api/pyproject.toml` coerente com o Worker — ele não deve ser ajustado para baixo como forma de contornar falhas de bundling.
 * Ganhamos documentação automática `/docs` (Swagger) e validação de payload com Pydantic de forma fluida.
 * Para compatibilidade total com o bundler do Cloudflare Workers (que exige dependências PyPI puras em `[project].dependencies` sem pacotes locais de workspace), o pacote `mbft-api` consolida toda a inteligência de borda em uma topologia interna unificada:
   * `mbft_api.routers`: Rotas HTTP (`/health`, `/busca`, `/ticket`, `/chat`).
@@ -77,15 +82,9 @@ As senhas de privilégio serão configuradas via **Segredos de Ambiente** no pai
 
 ### 3.5. Estrutura do Banco (Migração D1 Necessária)
 
-O schema consolidado em `apps/api/schema.sql` declara tanto a tabela transacional da fila global (`D1FilaRepository`) quanto a tabela virtual FTS5 de busca textual (`D1RelationalDB`):
+O schema consolidado em `apps/api/schema.sql` declara a tabela virtual FTS5 de busca textual (`D1RelationalDB`) e a tabela de histórico e cache exato (`HistoricoRepository`):
 
 ```sql
-CREATE TABLE IF NOT EXISTS fila_global (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    next_available DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-INSERT OR IGNORE INTO fila_global (id) VALUES (1);
-
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_chunks USING fts5(
     id UNINDEXED,
     codigo,
@@ -94,12 +93,27 @@ CREATE VIRTUAL TABLE IF NOT EXISTS fts_chunks USING fts5(
     texto_contextualizado,
     tokenize="unicode61 remove_diacritics 1"
 );
+
+CREATE TABLE IF NOT EXISTS historico_consultas (
+    id TEXT PRIMARY KEY,
+    query_hash TEXT NOT NULL,
+    pergunta TEXT NOT NULL,
+    busca_resultados_json TEXT NOT NULL,
+    prompt_completo TEXT NOT NULL,
+    resposta TEXT NOT NULL,
+    from_cache INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_consultas_query_hash ON historico_consultas (query_hash);
 ```
 
 ---
 
 ## 4. Alternativas Consideradas
 
+* **Fila Indiana Global na Aplicação (D1 `fila_global` + KV `KV_TICKETS` + JWT):**
+  * *Por que foi rejeitada:* O mecanismo de fila serial via D1 (`fila_global`), invalidação por KV (`KV_TICKETS`) e emissão de ingressos JWT foi descontinuado e rejeitado. A mitigação de bots e contenção de concorrência foi delegada nativamente à infraestrutura de borda da Cloudflare (WAF Custom Rules, Rate Limiting e Bot Management), eliminando latência de I/O e custo computacional dentro do Worker Pyodide.
 * **Rate Limiting por Token Bucket tradicional (por IP/usuário):**
   * *Por que foi rejeitada:* Limites por IP não impedem que picos simultâneos de usuários legítimos disparem dezenas de chamadas concorrentes ao LLM no mesmo minuto. A Fila Indiana Global garante matematicamente o teto máximo de 1 requisição pública por minuto, tornando o custo financeiro previsível.
 * **Validação Stateful do Ticket no Banco D1 a cada chamada `/chat`:**

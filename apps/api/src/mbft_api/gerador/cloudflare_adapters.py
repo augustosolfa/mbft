@@ -4,7 +4,7 @@ from typing import Any, Dict
 from ..recuperador.cloudflare_adapters import _to_js, _to_python
 from .interfaces import ILLMClient
 
-DEFAULT_CF_LLM_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8-fast"
+DEFAULT_CF_LLM_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 
 _RE_THINK_BLOCK = re.compile(r"<think>.*?</think>", flags=re.DOTALL | re.IGNORECASE)
 _RE_THINK_UNOPENED = re.compile(r"^.*?</think>", flags=re.DOTALL | re.IGNORECASE)
@@ -27,7 +27,7 @@ def limpar_bloco_think(texto: str) -> str:
 class WorkersAILLMClient(ILLMClient):
     """
     Implementação de produção do `ILLMClient` sobre o binding `env.AI` do Cloudflare Workers AI.
-    Parametrizável via `CF_LLM_MODEL` (padrão: `@cf/meta/llama-3.1-8b-instruct-fp8-fast`).
+    Parametrizável via `CF_LLM_MODEL` (padrão: `@cf/meta/llama-3.3-70b-instruct-fp8-fast`).
     """
 
     def __init__(self, ai_binding: Any, model: str = DEFAULT_CF_LLM_MODEL):

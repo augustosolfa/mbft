@@ -42,6 +42,12 @@ class GeminiLLMClient(ILLMClient):
             "temperature": temperature,
             # Documentação aponta que o tier mais barato na v2.5/SDK é 'flex' ou via config
             # Passamos string fixa 'flex' se o sdk aceitar como param extra, ou pelo kwargs do config.
+            #
+            # O Strict RAG não usa function calling (PMS-006), mas o SDK habilita AFC por padrão
+            # quando esta config está ausente: ele desvia para o loop de AFC e emite o warning
+            # "Direct use of automatic function calling (AFC) in AsyncModels.generate_content".
+            # O opt-out explícito chama _generate_content direto, sem o loop e sem o ruído.
+            "automatic_function_calling": types.AutomaticFunctionCallingConfig(disable=True),
         }
         
         if max_tokens is not None:

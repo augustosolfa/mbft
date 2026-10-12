@@ -1,6 +1,23 @@
 from typing import List, Dict, Any
 from .interfaces import IVectorDB, IRelationalDB, IEmbedderClient
 
+class ContextoResultado(list):
+    """
+    Subclasse de list para carregar metadados agregados da recuperação híbrida
+    (se houve match textual no FTS5 e a maior similaridade vetorial global),
+    mantendo compatibilidade 100% transparente com qualquer consumidor de List[Dict].
+    """
+    def __init__(
+        self,
+        items: List[Dict[str, Any]],
+        tem_match_fts: bool = False,
+        max_similaridade_vetorial: float = 0.0,
+    ):
+        super().__init__(items)
+        self.tem_match_fts = tem_match_fts
+        self.max_similaridade_vetorial = max_similaridade_vetorial
+
+
 class BuscadorHibrido:
     """
     Core engine do pipeline de recuperação RAG. 
@@ -10,7 +27,7 @@ class BuscadorHibrido:
         self.vector_db = vector_db
         self.relational_db = relational_db
         self.ai_client = ai_client
-        
+
     def _aplicar_rrf(self, dense_results: List[Dict[str, Any]], sparse_results: List[Dict[str, Any]], k: int = 60) -> List[Dict[str, Any]]:
         """
         Aplica Reciprocal Rank Fusion para mesclar resultados densos e esparsos.
@@ -18,6 +35,8 @@ class BuscadorHibrido:
         """
         rrf_scores = {}
         documentos_agrupados = {}
+        dense_scores = {doc["id"]: float(doc.get("score", 0.0) or 0.0) for doc in dense_results}
+        sparse_ids = {doc["id"] for doc in sparse_results}
         
         # Rankeia densos
         for rank_idx, doc in enumerate(dense_results):
@@ -38,7 +57,12 @@ class BuscadorHibrido:
         # Ordena pelo score final do RRF
         resultados_finais = []
         for doc_id, score in sorted(rrf_scores.items(), key=lambda item: item[1], reverse=True):
-            doc = {**documentos_agrupados[doc_id], "rrf_score": score}
+            doc = {
+                **documentos_agrupados[doc_id],
+                "rrf_score": score,
+                "score_vetorial": dense_scores.get(doc_id),
+                "match_fts": doc_id in sparse_ids,
+            }
             resultados_finais.append(doc)
             
         return resultados_finais
@@ -92,4 +116,10 @@ class BuscadorHibrido:
         # 3. Mescla via RRF e diversifica por ficha
         rrf_results = self._aplicar_rrf(dense_results, sparse_results)
         
-        return self._diversificar_por_ficha(rrf_results, limit)
+        selecionados = self._diversificar_por_ficha(rrf_results, limit)
+        max_dense = max((float(doc.get("score", 0.0) or 0.0) for doc in dense_results), default=0.0)
+        return ContextoResultado(
+            selecionados,
+            tem_match_fts=bool(sparse_results),
+            max_similaridade_vetorial=max_dense,
+        )

@@ -1,4 +1,5 @@
 import json
+import os
 import sqlite3
 import tempfile
 import unittest
@@ -7,13 +8,19 @@ from unittest.mock import patch
 
 from mbft_core.models.indexacao import ChunkMetadados, ChunkPayload
 from mbft_core.paths import RAIZ_REPO
-from mbft_deploy.cli import main
-from mbft_deploy.exporters import atualizar_config_js_site, exportar_fts_chunks_sql
+from mbft_deploy.cli import _carregar_env_de_deploy, main
+from mbft_deploy.exporters import (
+    atualizar_config_js_site,
+    dividir_jsonl_vectorize,
+    exportar_fts_chunks_sql,
+)
 from mbft_deploy.wrangler import (
     fazer_deploy_api,
     fazer_deploy_d1,
     fazer_deploy_site,
     fazer_deploy_vectorize,
+    garantir_projeto_pages,
+    invocacao_do_comando,
     provisionar_recursos_cloudflare,
 )
 
@@ -136,6 +143,17 @@ class TestMbftDeploy(unittest.TestCase):
                 )
                 self.assertEqual(
                     mock_cmd.call_args_list[4][0][0],
+                    [
+                        "wrangler",
+                        "pages",
+                        "project",
+                        "create",
+                        "mbft-site",
+                        "--production-branch=main",
+                    ],
+                )
+                self.assertEqual(
+                    mock_cmd.call_args_list[5][0][0],
                     ["wrangler", "pages", "deploy", str(site_dir), "--project-name=mbft-site"],
                 )
                 self.assertIn(
@@ -151,7 +169,6 @@ class TestMbftDeploy(unittest.TestCase):
                     {
                         "name": "mbft-api",
                         "d1_databases": [{"binding": "DB", "database_name": "mbft-d1", "database_id": "0000"}],
-                        "kv_namespaces": [{"binding": "KV_TICKETS", "id": "0000"}],
                     }
                 ),
                 encoding="utf-8",
@@ -160,23 +177,107 @@ class TestMbftDeploy(unittest.TestCase):
             saidas = [
                 'database_id = "12345678-1234-1234-1234-123456789abc"',
                 "Created index mbft-embeddings",
-                '{ "binding": "KV_TICKETS", "id": "abcdef0123456789abcdef0123456789" }',
             ]
             with patch("mbft_deploy.wrangler.rodar_comando_wrangler", side_effect=saidas):
                 ids = provisionar_recursos_cloudflare(wrangler_config_path=wrangler_file)
 
             self.assertEqual(ids["database_id"], "12345678-1234-1234-1234-123456789abc")
-            self.assertEqual(ids["kv_id"], "abcdef0123456789abcdef0123456789")
 
             atualizado = json.loads(wrangler_file.read_text(encoding="utf-8"))
             self.assertEqual(
                 atualizado["d1_databases"][0]["database_id"],
                 "12345678-1234-1234-1234-123456789abc",
             )
+
+    def test_dividir_jsonl_vectorize_respeita_limite_sem_cortar_linhas(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            jsonl_file = tmp / "embeddings_mbft.jsonl"
+            linhas = [
+                _criar_payload_exemplo(f"751-01_CHUNK_{indice}").model_dump_json()
+                for indice in range(5)
+            ]
+            jsonl_file.write_bytes(b"\n".join(linha.encode("utf-8") for linha in linhas) + b"\n")
+
+            limite = (len(linhas[0].encode("utf-8")) + 1) * 2
+            partes = dividir_jsonl_vectorize(jsonl_file, tmp / "vectorize", limite_bytes=limite)
+
+            self.assertEqual([p.name for p in partes], ["parte_01.jsonl", "parte_02.jsonl", "parte_03.jsonl"])
+            for parte in partes:
+                self.assertLessEqual(parte.stat().st_size, limite)
+                for linha in parte.read_text(encoding="utf-8").splitlines():
+                    ChunkPayload.model_validate_json(linha)
             self.assertEqual(
-                atualizado["kv_namespaces"][0]["id"],
-                "abcdef0123456789abcdef0123456789",
+                sum(len(p.read_text(encoding="utf-8").splitlines()) for p in partes),
+                len(linhas),
             )
+
+    def test_dividir_jsonl_vectorize_recusa_id_acima_do_limite_do_vectorize(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            jsonl_file = tmp / "embeddings_mbft.jsonl"
+            jsonl_file.write_text(
+                _criar_payload_exemplo("x" * 65).model_dump_json() + "\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(ValueError):
+                dividir_jsonl_vectorize(jsonl_file, tmp / "vectorize")
+
+    def test_garantir_projeto_pages_tolera_apenas_projeto_existente(self):
+        with patch(
+            "mbft_deploy.wrangler.rodar_comando_wrangler",
+            side_effect=RuntimeError(
+                "A request to the Cloudflare API failed: A project with this name already exists. [code: 8000002]"
+            ),
+        ):
+            garantir_projeto_pages("mbft-site")
+
+        with patch(
+            "mbft_deploy.wrangler.rodar_comando_wrangler",
+            side_effect=RuntimeError("Authentication error [code: 10000]"),
+        ):
+            with self.assertRaises(RuntimeError):
+                garantir_projeto_pages("mbft-site")
+
+    def test_carregar_env_de_deploy_limita_variaveis_e_preserva_o_shell(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            raiz = Path(tmpdir)
+            (raiz / ".env").write_text(
+                "CLOUDFLARE_API_TOKEN=token-do-arquivo\n"
+                "CLOUDFLARE_ACCOUNT_ID=conta-do-arquivo\n"
+                "GEMINI_API_KEY=segredo-de-outro-passo\n",
+                encoding="utf-8",
+            )
+
+            with patch("mbft_deploy.cli.RAIZ_REPO", raiz), patch.dict(
+                os.environ, {"CLOUDFLARE_ACCOUNT_ID": "conta-do-shell"}, clear=True
+            ):
+                _carregar_env_de_deploy()
+
+                self.assertEqual(os.environ["CLOUDFLARE_API_TOKEN"], "token-do-arquivo")
+                self.assertEqual(os.environ["CLOUDFLARE_ACCOUNT_ID"], "conta-do-shell")
+                self.assertNotIn("GEMINI_API_KEY", os.environ)
+
+    def test_invocacao_do_comando_delega_script_cmd_ao_shell(self):
+        with patch(
+            "mbft_deploy.wrangler.shutil.which",
+            return_value=r"C:\Program Files\nodejs\npx.cmd",
+        ):
+            invocacao, usar_shell = invocacao_do_comando(
+                ["npx", "wrangler", "d1", "execute", "D:/pasta com espaco/schema.sql"],
+                windows=True,
+            )
+
+        self.assertTrue(usar_shell)
+        self.assertEqual(
+            invocacao,
+            r'"C:\Program Files\nodejs\npx.cmd" wrangler d1 execute "D:/pasta com espaco/schema.sql"',
+        )
+        self.assertEqual(
+            invocacao_do_comando(["npx", "wrangler"], windows=False),
+            (["npx", "wrangler"], False),
+        )
 
     def test_cli_tudo_dry_run_executa_fluxo_completo(self):
         with tempfile.TemporaryDirectory() as tmpdir:

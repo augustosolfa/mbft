@@ -63,15 +63,15 @@ class TestCarregamentoEnvLocal(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             raiz = Path(tmp)
             (raiz / ".env").write_text(
-                "GEMINI_API_KEY=chave-do-arquivo\n# comentário\nJWT_SECRET=do-arquivo\n",
+                "GEMINI_API_KEY=chave-do-arquivo\n# comentário\nVAR_TESTE=do-arquivo\n",
                 encoding="utf-8",
             )
-            env = {"JWT_SECRET": "do-shell"}
+            env = {"VAR_TESTE": "do-shell"}
             with patch("mbft.cli.RAIZ_REPO", raiz):
                 _carregar_env_local(env)
 
             self.assertEqual(env["GEMINI_API_KEY"], "chave-do-arquivo")
-            self.assertEqual(env["JWT_SECRET"], "do-shell", "O ambiente do shell deve ter precedência.")
+            self.assertEqual(env["VAR_TESTE"], "do-shell", "O ambiente do shell deve ter precedência.")
 
     def test_carrega_env_ignora_ausencia_do_arquivo(self):
         import tempfile
@@ -100,7 +100,6 @@ class TestCarregamentoEnvLocal(unittest.TestCase):
 
             env_passado = mock_run.call_args.kwargs["env"]
             self.assertEqual(env_passado["GEMINI_API_KEY"], "chave-do-arquivo")
-            self.assertTrue(env_passado.get("JWT_SECRET"), "JWT_SECRET de dev deve ser injetado.")
             self.assertNotIn("--reload", mock_run.call_args.args[0], "--no-reload deve suprimir o auto-reload.")
 
 
