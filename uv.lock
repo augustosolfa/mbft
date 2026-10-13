@@ -1073,7 +1073,7 @@ wheels = [
 
 [[package]]
 name = "mbft-api"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "apps/api" }
 dependencies = [
     { name = "fastapi" },
@@ -1104,7 +1104,7 @@ dev = [
 
 [[package]]
 name = "mbft-core"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "pipelines/core" }
 dependencies = [
     { name = "pydantic" },
@@ -1115,7 +1115,7 @@ requires-dist = [{ name = "pydantic", specifier = ">=2.0" }]
 
 [[package]]
 name = "mbft-deploy"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "deploy" }
 dependencies = [
     { name = "mbft-api" },
@@ -1132,7 +1132,7 @@ requires-dist = [
 
 [[package]]
 name = "mbft-enriquecedor"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "pipelines/enriquecedor" }
 dependencies = [
     { name = "mbft-core" },
@@ -1151,7 +1151,7 @@ requires-dist = [
 
 [[package]]
 name = "mbft-extrator"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "pipelines/extrator" }
 dependencies = [
     { name = "docling" },
@@ -1180,7 +1180,7 @@ dev = [{ name = "pytest", specifier = ">=9.1.1" }]
 
 [[package]]
 name = "mbft-indexador"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "pipelines/indexador" }
 dependencies = [
     { name = "mbft-core" },
@@ -1201,7 +1201,7 @@ requires-dist = [
 
 [[package]]
 name = "mbft-ssg"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "pipelines/ssg" }
 dependencies = [
     { name = "jinja2" },
@@ -1216,7 +1216,7 @@ requires-dist = [
 
 [[package]]
 name = "mbft-workspace"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "mbft-api" },

@@ -1,6 +1,6 @@
 [project]
 name = "mbft-api"
-version = "0.1.0"
+version = "0.3.0"
 description = "API Gateway e Motor RAG (Recuperador + Gerador) do MBFT para Cloudflare Workers."
 readme = "README.md"
 authors = [

@@ -1,6 +1,6 @@
 [project]
 name = "mbft-workspace"
-version = "0.1.0"
+version = "0.3.0"
 description = "Monorepo para extração, processamento e aplicações do Manual Brasileiro de Fiscalização de Trânsito (MBFT)"
 readme = "README.md"
 authors = [
@@ -54,4 +54,3 @@ dev = [
     "workers-py>=1.1.3",
     "workers-runtime-sdk",
 ]
-

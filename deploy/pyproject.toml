@@ -1,6 +1,6 @@
 [project]
 name = "mbft-deploy"
-version = "0.1.0"
+version = "0.3.0"
 description = "Exportadores de dados para Cloudflare (D1 SQL) e automação de provisionamento e deploy (D1, Vectorize e Workers)."
 readme = "README.md"
 authors = [

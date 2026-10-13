@@ -1,6 +1,6 @@
 [project]
 name = "mbft-extrator"
-version = "0.1.0"
+version = "0.3.0"
 description = "Extrator estruturado de dados do Manual Brasileiro de Fiscalização de Trânsito (MBFT)"
 readme = "README.md"
 authors = [
