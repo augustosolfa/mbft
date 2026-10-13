@@ -93,7 +93,7 @@ uv run pytest deploy/tests
 
 - **`__main__.py`** e **`cli.py`**: Ponto de entrada da CLI (`mbft-deploy` / `python -m mbft_deploy`) com os 5 subcomandos (`export-d1`, `provision`, `data`, `api`, `tudo`).
 - **`exporters.py`**: Validação de `ChunkPayload`, bloqueio de artefatos de debug, geração atômica de `fts_chunks.sql` e fatiamento do JSONL de vetores (teto de 100 MB do Vectorize).
-- **`wrangler.py`**: Invocação do Cloudflare Wrangler CLI, provisionamento de D1/Vectorize com atualização automática de IDs em `apps/api/wrangler.jsonc`, validação da configuração de assets, resolução de hostname (`--hostname` > `MBFT_HOSTNAME`) e publicação do Worker único `mbft` (API + Static Assets). Gera um manifesto efêmero (`apps/api/.wrangler.deploy.jsonc`, não versionado) por deploy para declarar o Custom Domain, ajustar `workers_dev` ao alvo resolvido e injetar `RATE_LIMIT_SALT` on-the-fly (PMS-011) quando ausente, passando-o via `--config`.
+- **`wrangler.py`**: Invocação do Cloudflare Wrangler CLI, provisionamento de D1/Vectorize com atualização automática de IDs em `apps/api/wrangler.jsonc`, validação da configuração de assets, resolução de hostname (`--hostname` > `MBFT_HOSTNAME`) e publicação do Worker único `mbft` (API + Static Assets). Gera um manifesto efêmero (`apps/api/.wrangler.deploy.jsonc`, não versionado) por deploy para declarar o Custom Domain, ajustar `workers_dev` ao alvo resolvido e injetar `ADMIN_EMAIL`, credenciais do Cloudflare Access e `RATE_LIMIT_SALT` on-the-fly (PMS-010, PMS-011) quando ausente, passando-o via `--config`.
 
 ---
 

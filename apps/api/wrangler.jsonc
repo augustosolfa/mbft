@@ -45,6 +45,7 @@
     "ENVIRONMENT": "production",
     "CF_LLM_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": ""
+    "ACCESS_AUD": "",
+    "ADMIN_EMAIL": ""
   }
 }

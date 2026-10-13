@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração do Banco - MBFT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .header-title {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .table-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .table-select-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 280px;
+        }
+        .table-select-group select {
+            margin-bottom: 0;
+        }
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        .pagination-bar button {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.85rem;
+            margin-bottom: 0;
+            width: auto;
+        }
+        .page-input-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .page-input-group input {
+            width: 70px;
+            padding: 0.25rem 0.5rem;
+            text-align: center;
+            margin-bottom: 0;
+            display: inline-block;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 70vh;
+            border: 1px solid var(--pico-muted-border-color);
+            border-radius: var(--pico-border-radius);
+            margin-top: 1rem;
+            background: var(--pico-card-background-color);
+        }
+        table {
+            margin-bottom: 0;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background: var(--pico-table-row-stripped-background-color, #2b313a);
+            z-index: 2;
+            padding: 0.6rem 0.8rem;
+            font-weight: 600;
+        }
+        td {
+            padding: 0.5rem 0.8rem;
+            max-width: 320px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        td.cell-expandable {
+            cursor: pointer;
+        }
+        td.cell-expandable:hover {
+            text-decoration: underline;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .badge-info {
+            background-color: var(--pico-primary-background);
+            color: var(--pico-primary-inverse);
+        }
+        .badge-count {
+            background: var(--pico-secondary-background);
+            color: var(--pico-secondary-inverse);
+        }
+        #modal-detalhes dialog {
+            max-width: 800px;
+        }
+        pre.json-view {
+            max-height: 400px;
+            overflow: auto;
+            background: var(--pico-code-background-color);
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <main class="admin-container">
+        <header class="header-bar">
+            <div>
+                <h2 class="header-title">
+                    <span>Banco D1 / SQLite</span>
+                    <span class="badge badge-info">Painel do Administrador</span>
+                </h2>
+                <small id="auth-status">Acesso restrito ao administrador configurado.</small>
+            </div>
+            <div>
+                <a href="../index.html" role="button" class="outline secondary" style="margin-bottom: 0;">← Voltar ao Início</a>
+            </div>
+        </header>
+
+        <!-- Mensagens de Alerta / Erro -->
+        <div id="alerta-erro" style="display: none;">
+            <article style="border-left: 4px solid var(--pico-form-element-invalid-border-color);">
+                <header><strong>Acesso Não Autorizado ou Indisponível</strong></header>
+                <p id="alerta-mensagem">Você não possui autorização para acessar esta página.</p>
+                <small>Certifique-se de que está autenticado com a conta administrativa do Cloudflare Access.</small>
+            </article>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <section id="admin-conteudo">
+            <article>
+                <div class="table-controls">
+                    <div class="table-select-group">
+                        <label for="seletor-tabelas" style="margin-bottom: 0; font-weight: bold;">Tabela:</label>
+                        <select id="seletor-tabelas" aria-label="Selecione a tabela">
+                            <option value="">Carregando tabelas...</option>
+                        </select>
+                    </div>
+
+                    <div id="info-tabela" style="display: none;">
+                        <span class="badge badge-count" id="badge-total-linhas">0 registros</span>
+                    </div>
+
+                    <button id="btn-atualizar" class="outline" style="width: auto; margin-bottom: 0;" title="Recarregar dados">Atualizar</button>
+                </div>
+
+                <!-- Barra de Paginação -->
+                <div class="pagination-bar" id="barra-paginacao" style="display: none;">
+                    <button id="btn-primeira" class="secondary outline" title="Primeira página">« Primeira</button>
+                    <button id="btn-anterior" class="secondary outline" title="Página anterior">‹ Anterior</button>
+
+                    <div class="page-input-group">
+                        <span>Página</span>
+                        <input type="number" id="input-pagina" min="1" value="1" aria-label="Número da página">
+                        <span>de <strong id="total-paginas">1</strong></span>
+                    </div>
+
+                    <button id="btn-proxima" class="secondary outline" title="Próxima página">Próxima ›</button>
+                    <button id="btn-ultima" class="secondary outline" title="Última página">Última »</button>
+                </div>
+
+                <!-- Tabela de Dados -->
+                <div id="loading" aria-busy="true" style="text-align: center; padding: 2rem 0; display: none;">
+                    Carregando dados da tabela...
+                </div>
+
+                <div class="table-wrapper" id="container-tabela" style="display: none;">
+                    <table class="striped" id="tabela-dados">
+                        <thead id="thead-dados"></thead>
+                        <tbody id="tbody-dados"></tbody>
+                    </table>
+                </div>
+
+                <div id="vazio-mensagem" style="text-align: center; padding: 2rem 0; display: none;">
+                    <em>Esta tabela está vazia.</em>
+                </div>
+
+                <div id="erro-tabela-mensagem" style="text-align: center; padding: 2rem 0; color: var(--pico-form-element-invalid-border-color); display: none;">
+                    <strong>Erro ao consultar tabela:</strong> <span id="texto-erro-tabela"></span>
+                </div>
+            </article>
+        </section>
+
+        <!-- Modal para visualização completa de valores longos -->
+        <dialog id="modal-detalhes">
+            <article>
+                <header>
+                    <button aria-label="Fechar" rel="prev" id="btn-fechar-modal"></button>
+                    <h4 id="modal-titulo" style="margin: 0;">Detalhes do Campo</h4>
+                </header>
+                <pre class="json-view" id="modal-conteudo"></pre>
+            </article>
+        </dialog>
+    </main>
+
+    <script src="../config.js"></script>
+    <script>
+        // Resolve a base da API para dev local vs produção
+        const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        const API_BASE = IS_LOCAL
+            ? "http://127.0.0.1:8000"
+            : ((window.MBFT_CONFIG && window.MBFT_CONFIG.apiBaseUrl) || "").replace(/\/+$/, "");
+        const API_PREFIX = IS_LOCAL ? "" : "/api";
+        const ADMIN_API_BASE = `${API_BASE}${API_PREFIX}/admin`;
+
+        let estado = {
+            tabelaAtual: "",
+            paginaAtual: 1,
+            totalPaginas: 1,
+            totalLinhas: 0,
+            pageSize: 100,
+            carregando: false
+        };
+
+        const dom = {
+            seletorTabelas: document.getElementById("seletor-tabelas"),
+            infoTabela: document.getElementById("info-tabela"),
+            badgeTotalLinhas: document.getElementById("badge-total-linhas"),
+            barraPaginacao: document.getElementById("barra-paginacao"),
+            btnPrimeira: document.getElementById("btn-primeira"),
+            btnAnterior: document.getElementById("btn-anterior"),
+            btnProxima: document.getElementById("btn-proxima"),
+            btnUltima: document.getElementById("btn-ultima"),
+            inputPagina: document.getElementById("input-pagina"),
+            totalPaginas: document.getElementById("total-paginas"),
+            loading: document.getElementById("loading"),
+            containerTabela: document.getElementById("container-tabela"),
+            theadDados: document.getElementById("thead-dados"),
+            tbodyDados: document.getElementById("tbody-dados"),
+            vazioMensagem: document.getElementById("vazio-mensagem"),
+            erroTabelaMensagem: document.getElementById("erro-tabela-mensagem"),
+            textoErroTabela: document.getElementById("texto-erro-tabela"),
+            alertaErro: document.getElementById("alerta-erro"),
+            alertaMensagem: document.getElementById("alerta-mensagem"),
+            adminConteudo: document.getElementById("admin-conteudo"),
+            btnAtualizar: document.getElementById("btn-atualizar"),
+            modalDetalhes: document.getElementById("modal-detalhes"),
+            btnFecharModal: document.getElementById("btn-fechar-modal"),
+            modalTitulo: document.getElementById("modal-titulo"),
+            modalConteudo: document.getElementById("modal-conteudo"),
+        };
+
+        function exibirErro(msg) {
+            dom.alertaMensagem.textContent = msg;
+            dom.alertaErro.style.display = "block";
+            dom.adminConteudo.style.display = "none";
+        }
+
+        async function fetchAdmin(endpoint) {
+            const resp = await fetch(`${ADMIN_API_BASE}${endpoint}`, {
+                credentials: "include"
+            });
+            if (resp.status === 401 || resp.status === 403) {
+                const dados = await resp.json().catch(() => ({}));
+                throw new Error(dados.detail || "Acesso negado: você não possui privilégios de administrador.");
+            }
+            if (!resp.ok) {
+                const dados = await resp.json().catch(() => ({}));
+                throw new Error(dados.detail || `Erro HTTP ${resp.status} ao comunicar com o servidor.`);
+            }
+            return await resp.json();
+        }
+
+        async function carregarCatalogoTabelas() {
+            try {
+                const dados = await fetchAdmin("/tables");
+                const tabelas = dados.tables || [];
+                dom.seletorTabelas.innerHTML = "";
+
+                if (tabelas.length === 0) {
+                    dom.seletorTabelas.innerHTML = '<option value="">Nenhuma tabela encontrada</option>';
+                    return;
+                }
+
+                tabelas.forEach(t => {
+                    const opt = document.createElement("option");
+                    opt.value = t.name;
+                    opt.textContent = `${t.name} (${t.type})`;
+                    dom.seletorTabelas.appendChild(opt);
+                });
+
+                estado.tabelaAtual = tabelas[0].name;
+                carregarDadosTabela(estado.tabelaAtual, 1);
+            } catch (err) {
+                exibirErro(err.message);
+            }
+        }
+
+        async function carregarDadosTabela(nomeTabela, pagina) {
+            if (!nomeTabela) return;
+            estado.carregando = true;
+            dom.loading.style.display = "block";
+            dom.containerTabela.style.display = "none";
+            dom.vazioMensagem.style.display = "none";
+            dom.erroTabelaMensagem.style.display = "none";
+
+            try {
+                const dados = await fetchAdmin(`/tables/${encodeURIComponent(nomeTabela)}?page=${pagina}&page_size=${estado.pageSize}`);
+                estado.paginaAtual = dados.page;
+                estado.totalPaginas = dados.total_pages;
+                estado.totalLinhas = dados.total_rows;
+
+                atualizarControlesPaginacao();
+                renderizarTabela(dados.columns, dados.rows);
+            } catch (err) {
+                dom.textoErroTabela.textContent = err.message;
+                dom.erroTabelaMensagem.style.display = "block";
+                dom.barraPaginacao.style.display = "none";
+                dom.infoTabela.style.display = "none";
+            } finally {
+                estado.carregando = false;
+                dom.loading.style.display = "none";
+            }
+        }
+
+        function atualizarControlesPaginacao() {
+            dom.infoTabela.style.display = "inline-block";
+            dom.badgeTotalLinhas.textContent = `${estado.totalLinhas.toLocaleString("pt-BR")} registro(s)`;
+
+            dom.barraPaginacao.style.display = "flex";
+            dom.totalPaginas.textContent = estado.totalPaginas;
+            dom.inputPagina.value = estado.paginaAtual;
+            dom.inputPagina.max = estado.totalPaginas;
+
+            dom.btnPrimeira.disabled = estado.paginaAtual <= 1;
+            dom.btnAnterior.disabled = estado.paginaAtual <= 1;
+            dom.btnProxima.disabled = estado.paginaAtual >= estado.totalPaginas;
+            dom.btnUltima.disabled = estado.paginaAtual >= estado.totalPaginas;
+        }
+
+        function renderizarTabela(colunas, linhas) {
+            dom.theadDados.innerHTML = "";
+            dom.tbodyDados.innerHTML = "";
+
+            if (!colunas || colunas.length === 0) {
+                dom.containerTabela.style.display = "none";
+                dom.vazioMensagem.style.display = "block";
+                return;
+            }
+
+            // Cabeçalho
+            const trHead = document.createElement("tr");
+            colunas.forEach(col => {
+                const th = document.createElement("th");
+                th.textContent = col;
+                trHead.appendChild(th);
+            });
+            dom.theadDados.appendChild(trHead);
+
+            if (!linhas || linhas.length === 0) {
+                dom.containerTabela.style.display = "block";
+                dom.vazioMensagem.style.display = "block";
+                return;
+            }
+
+            // Linhas
+            linhas.forEach(linha => {
+                const tr = document.createElement("tr");
+                colunas.forEach(col => {
+                    const td = document.createElement("td");
+                    const val = linha[col];
+                    const texto = val === null || val === undefined ? "—" : String(val);
+                    td.textContent = texto;
+
+                    if (texto.length > 50 || (typeof val === "string" && (texto.startsWith("{") || texto.startsWith("[")))) {
+                        td.classList.add("cell-expandable");
+                        td.title = "Clique para inspecionar valor completo";
+                        td.addEventListener("click", () => abrirModal(col, val));
+                    }
+                    tr.appendChild(td);
+                });
+                dom.tbodyDados.appendChild(tr);
+            });
+
+            dom.containerTabela.style.display = "block";
+            dom.vazioMensagem.style.display = "none";
+        }
+
+        function abrirModal(coluna, valor) {
+            dom.modalTitulo.textContent = `Coluna: ${coluna}`;
+            let formatado = valor;
+            try {
+                if (typeof valor === "string" && (valor.startsWith("{") || valor.startsWith("["))) {
+                    formatado = JSON.stringify(JSON.parse(valor), null, 2);
+                }
+            } catch {}
+            dom.modalConteudo.textContent = formatado;
+            dom.modalDetalhes.showModal();
+        }
+
+        dom.btnFecharModal.addEventListener("click", () => {
+            dom.modalDetalhes.close();
+        });
+
+        dom.modalDetalhes.addEventListener("click", (e) => {
+            if (e.target === dom.modalDetalhes) dom.modalDetalhes.close();
+        });
+
+        // Eventos dos Controles
+        dom.seletorTabelas.addEventListener("change", (e) => {
+            estado.tabelaAtual = e.target.value;
+            estado.paginaAtual = 1;
+            carregarDadosTabela(estado.tabelaAtual, 1);
+        });
+
+        dom.btnAtualizar.addEventListener("click", () => {
+            carregarDadosTabela(estado.tabelaAtual, estado.paginaAtual);
+        });
+
+        dom.btnPrimeira.addEventListener("click", () => {
+            if (estado.paginaAtual > 1) carregarDadosTabela(estado.tabelaAtual, 1);
+        });
+
+        dom.btnAnterior.addEventListener("click", () => {
+            if (estado.paginaAtual > 1) carregarDadosTabela(estado.tabelaAtual, estado.paginaAtual - 1);
+        });
+
+        dom.btnProxima.addEventListener("click", () => {
+            if (estado.paginaAtual < estado.totalPaginas) carregarDadosTabela(estado.tabelaAtual, estado.paginaAtual + 1);
+        });
+
+        dom.btnUltima.addEventListener("click", () => {
+            if (estado.paginaAtual < estado.totalPaginas) carregarDadosTabela(estado.tabelaAtual, estado.totalPaginas);
+        });
+
+        dom.inputPagina.addEventListener("change", (e) => {
+            let p = parseInt(e.target.value, 10);
+            if (isNaN(p) || p < 1) p = 1;
+            if (p > estado.totalPaginas) p = estado.totalPaginas;
+            carregarDadosTabela(estado.tabelaAtual, p);
+        });
+
+        // Inicialização
+        carregarCatalogoTabelas();
+    </script>
+</body>
+</html>

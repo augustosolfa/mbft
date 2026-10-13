@@ -46,6 +46,9 @@ data/processed/site/
 ├── lista.html                 # Tabela completa de infrações com filtro multi-critério em Vanilla JS
 ├── chat.html                  # Interface do Oráculo MBFT integrada ao Ticketizador (/ticket e /chat)
 ├── 404.html                   # Página de erro 404 consumida por assets.not_found_handling do Worker (PMS-010)
+├── admin.html                 # Alias do painel administrativo
+├── admin/
+│   └── index.html             # Painel administrativo de inspeção do banco D1/SQLite (/admin)
 ├── config.js                  # Configuração neutra de runtime (window.MBFT_CONFIG.apiBaseUrl)
 ├── imagens/                   # Cópia das ilustrações e placas de sinalização (300 DPI)
 ├── parte-geral/               # Subdiretório modular da Parte Geral

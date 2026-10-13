@@ -245,6 +245,17 @@ class TestMbftDeploy(unittest.TestCase):
             )
             self.assertEqual(res["vars"]["ACCESS_AUD"], "aud-tag-teste")
 
+    def test_montar_manifest_deploy_injeta_admin_email_do_ambiente(self):
+        base = _config_wrangler_valido()
+        with patch.dict(
+            os.environ,
+            {
+                "ADMIN_EMAIL": "  Admin.Chefe@Exemplo.COM  ",
+            },
+        ):
+            res = montar_manifest_deploy(base, None)
+            self.assertEqual(res["vars"]["ADMIN_EMAIL"], "admin.chefe@exemplo.com")
+
     def test_carregar_jsonc_ignora_comentarios_de_linha_e_bloco(self):
         jsonc = """{
             // Comentário de linha no início

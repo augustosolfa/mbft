@@ -88,6 +88,11 @@ def test_run_build_emite_logs_info_e_gera_artefatos(tmp_path: Path, caplog):
     assert (output_dir / "index.html").exists()
     assert (output_dir / "chat.html").exists()
     assert (output_dir / "404.html").exists()
+    assert (output_dir / "admin.html").exists()
+    assert (output_dir / "admin" / "index.html").exists()
+    admin_html = (output_dir / "admin" / "index.html").read_text(encoding="utf-8")
+    assert "Painel do Administrador" in admin_html
+    assert "seletor-tabelas" in admin_html
     assert (output_dir / "config.js").exists()
     assert 'apiBaseUrl: ""' in (output_dir / "config.js").read_text(encoding="utf-8")
     index_html = (output_dir / "index.html").read_text(encoding="utf-8")

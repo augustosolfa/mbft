@@ -145,9 +145,10 @@ no **WSL2** (ver Alternativa 3).
   o `workers_dev` permanece habilitado como único endereço. Como o Wrangler não oferece flag de CLI
   para alternar `workers_dev` — e a declaração do Custom Domain pertence ao arquivo de configuração —,
   o `mbft-deploy` grava um manifesto efêmero ao lado de `wrangler.jsonc` (preservando o
-  `assets.directory` relativo) com o valor coerente com o alvo, o passa via `--config` e o remove em
-  seguida. O domínio nunca é versionado: o `.env` é ignorado pelo Git e o `.env.example` contém apenas
-  placeholders.
+  `assets.directory` relativo) com o valor coerente com o alvo, injeta automaticamente as variáveis
+  seguras de ambiente (`ADMIN_EMAIL`, `RATE_LIMIT_SALT` e credenciais do Cloudflare Access), o passa via
+  `--config` e o remove em seguida. O domínio e o e-mail de admin nunca são versionados: o `.env` é ignorado
+  pelo Git e o `.env.example` contém apenas placeholders.
 
 ---
 

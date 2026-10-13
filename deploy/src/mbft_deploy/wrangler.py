@@ -577,6 +577,10 @@ def montar_manifest_deploy(config: dict, hostname: str | None) -> dict:
             if val:
                 vars_atuais[chave_access] = str(val).strip()
 
+    admin_email_env = os.environ.get("ADMIN_EMAIL")
+    if admin_email_env:
+        vars_atuais["ADMIN_EMAIL"] = str(admin_email_env).strip().lower()
+
     dados["vars"] = vars_atuais
     return dados
 

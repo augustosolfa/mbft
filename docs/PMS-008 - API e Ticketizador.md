@@ -81,6 +81,8 @@ As senhas de privilégio serão configuradas via **Segredos de Ambiente** no pai
 | `GET` | `/busca` | Executa RAG Híbrido. Retorna JSON com excertos e os `links` para os HTMLs estáticos (`/fichas/XXX.html`) gerados no PMS-007. | `mbft_api.recuperador` e Cloudflare D1/Vectorize |
 | `POST`| `/ticket` | Insere o usuário na Fila Global e devolve um Ticket JWT com um "timestamp de embarque". Aceita `priority_token`. | D1 (`fila_global`) |
 | `POST`| `/chat` | Recebe a pergunta e o Ticket JWT. Só libera para o `mbft_api.gerador` se o ticket for válido e a hora de embarque tiver chegado. | `mbft_api.recuperador`, `mbft_api.gerador` e KV (`KV_TICKETS`) |
+| `GET` | `/admin/tables` | Lista todas as tabelas e views do catálogo `sqlite_master`. Requer privilégios de `ADMIN_EMAIL`. | Cloudflare D1 / SQLite (`sqlite_master`) |
+| `GET` | `/admin/tables/{table_name}` | Visualização paginada (100 linhas) dos registros com ordenação decrescente. Requer `ADMIN_EMAIL`. | Cloudflare D1 / SQLite |
 
 ### 3.5. Estrutura do Banco (Migração D1 Necessária)
 
@@ -109,6 +111,14 @@ CREATE TABLE IF NOT EXISTS historico_consultas (
 
 CREATE INDEX IF NOT EXISTS idx_consultas_query_hash ON historico_consultas (query_hash);
 ```
+
+### 3.6. Painel de Administração e Inspeção de Tabelas (`/admin`)
+
+* **Controle de Acesso (*Secure by Default*):** O acesso aos endpoints `/admin/tables` e `/admin/tables/{table_name}` é restrito exclusivamente ao e-mail declarado na variável `ADMIN_EMAIL` do Worker (injetada de forma efêmera no deploy pelo `mbft-deploy`, PMS-010).
+* **Autenticação RS256 via Cloudflare Access:** Em produção, a requisição deve conter o token JWT emitido pelo Cloudflare Access (no header `cf-access-jwt-assertion` ou cookie `CF_Authorization`), validado com as chaves públicas JWKS do `ACCESS_TEAM_DOMAIN` (reutilizando a infraestrutura de validação criptográfica do PMS-011). Requisições anônimas ou de e-mails divergentes são rejeitadas com `401 Unauthorized` ou `403 Forbidden`.
+* **Ambiente de Desenvolvimento Local:** Fora do Cloudflare Workers (`sys.platform != "emscripten"`, sem binding D1) e com a variável `ENVIRONMENT` explicitamente configurada como `"dev"`, `"development"`, `"local"` ou `"test"`, o acesso é liberado para testes e homologação local.
+* **Paginação e Sanitização:** O nome da tabela é rigorosamente validado contra a lista autorizada no catálogo `sqlite_master` antes de qualquer execução SQL. A paginação fixa o teto em 100 linhas por página (`LIMIT 100 OFFSET ...`), com ordenação decrescente por chave primária/rowid para priorizar registros recentes.
+
 
 ---
 

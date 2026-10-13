@@ -182,6 +182,14 @@ def run_build(
     out_404 = output_dir / "404.html"
     out_404.write_text(html_404, encoding="utf-8")
 
+    # Painel administrativo (/admin e /admin/index.html)
+    admin_out_dir = output_dir / "admin"
+    admin_out_dir.mkdir(parents=True, exist_ok=True)
+    template_admin = env.get_template("admin.html")
+    html_admin = template_admin.render()
+    (admin_out_dir / "index.html").write_text(html_admin, encoding="utf-8")
+    (output_dir / "admin.html").write_text(html_admin, encoding="utf-8")
+
     logger.info(
         f"Build concluído com sucesso! {len(fichas)} fichas geradas em: {output_dir}"
     )

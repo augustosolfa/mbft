@@ -27,6 +27,7 @@ apps/api/
 ├── tests/
 │   ├── conftest.py              # Fixtures e isolamento do limitador real nos testes legados
 │   ├── test_access_jwt.py       # Testes unitários de validação do JWT RS256 do Cloudflare Access
+│   ├── test_admin_api.py        # Testes da API administrativa de inspeção do banco e autenticação
 │   ├── test_buscador.py         # Testes unitários RRF, diversificação, FTS5, adaptadores CF e DI
 │   ├── test_cache_auditoria.py  # Testes de cache exato SHA-256 e auditoria/telemetria D1/SQLite
 │   ├── test_integracao.py       # Testes de integração da Busca Híbrida sobre embeddings_mbft.jsonl
@@ -45,7 +46,8 @@ apps/api/
         ├── routers/
         │   ├── health.py        # GET  /health
         │   ├── busca.py         # GET  /busca
-        │   └── chat.py          # POST /chat
+        │   ├── chat.py          # POST /chat
+        │   └── admin.py         # GET  /admin/tables, GET /admin/tables/{table_name} (restrito ao ADMIN_EMAIL)
         ├── recuperador/         # Submódulo de Busca Híbrida (PMS-005)
         │   ├── interfaces.py    # Protocols (IVectorDB, IRelationalDB, IEmbedderClient) e formatador FTS5
         │   ├── buscador.py      # BuscadorHibrido (Reciprocal Rank Fusion + diversificação)
@@ -81,9 +83,11 @@ manifesto efêmero por deploy e o desativa automaticamente quando um hostname de
 | `GET` | `/health/` | Verifica a disponibilidade do serviço. |
 | `GET` | `/busca/?q=...&limit=5` | Executa Busca Híbrida (Denso + FTS5 via RRF) e retorna trechos normativos e links `/fichas/{codigo}.html`. |
 | `POST` | `/chat/` | Recebe `{"pergunta": "..."}`, executa o RAG completo e retorna a resposta fundamentada no MBFT. |
+| `GET` | `/admin/tables` | Lista todas as tabelas e views do catálogo D1/SQLite. Exige privilégios de `ADMIN_EMAIL`. |
+| `GET` | `/admin/tables/{table_name}` | Visualização paginada (100 linhas/pág) com ordenação temporal decrescente. Exige `ADMIN_EMAIL`. |
 
 No Worker único `mbft`, os routers acima são expostos externamente sob o prefixo `/api` (`/api/health/`,
-`/api/busca/` e `/api/chat/`); os caminhos sem prefixo continuam aceitos programaticamente.
+`/api/busca/`, `/api/chat/` e `/api/admin/...`); os caminhos sem prefixo continuam aceitos programaticamente.
 
 ---
 
@@ -98,6 +102,7 @@ No Worker único `mbft`, os routers acima são expostos externamente sob o prefi
 | `DB`, `VECTORIZE`, `AI` | Em produção (Workers) | Bindings declarados em `wrangler.jsonc` para Cloudflare D1, Vectorize e Workers AI. |
 | `ACCESS_TEAM_DOMAIN` | Não (vazio = ninguém reconhecido como logado) | Team domain do Access, ex.: `meutime.cloudflareaccess.com`. |
 | `ACCESS_AUD` | Não | Tag AUD do app no Access (várias, separadas por vírgula). |
+| `ADMIN_EMAIL` | Sim para acesso admin em produção | E-mail do administrador verificado pelo Cloudflare Access autorizado a inspecionar as tabelas via `/admin`. Injetado via manifesto efêmero pelo deploy. |
 | `RATE_LIMIT_SALT` | **Sim em produção** (secret) | Sal do HMAC das identidades. Gerar: `uv run python -c "import secrets; print(secrets.token_hex(32))"` e gravar com `npx wrangler secret put RATE_LIMIT_SALT`. |
 
 ---
